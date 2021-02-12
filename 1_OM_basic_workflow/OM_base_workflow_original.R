@@ -36,6 +36,8 @@ seasons =read.table(paste0("./Experiments/",exp,"/seasonality.txt"), sep="\t", h
 
 biting_pattern <- data.frame(Biting_pattern=c("Mali"),indoor=c(0.6),outdoor=c(0.4))
 
+EIR= data.frame(EIR=c(10))
+
 # max age intervention
 
 IntAge = data.frame(IntAge=c(4.9167),maxGroup=c(3))
@@ -48,6 +50,7 @@ Access_df = data.frame(Access=c(0.1))
 
 param_cat = list(seasons,
                  biting_pattern,
+                 EIR,
                  IntAge,
                  LAIdecay,
                  Access_df)
@@ -57,8 +60,7 @@ param_cat = list(seasons,
 #############################
 
 # Name of the experiment and parameters
-param_ranges_cont = rbind( EIR = c(1, 25),
-                      Coverage = c(0.4, 1),
+param_ranges_cont = rbind( Coverage = c(0.4, 1),
                       Halflife =c(30,150),
                       Efficacy= c(0.7,1) )
 
