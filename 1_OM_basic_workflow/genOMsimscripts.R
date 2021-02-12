@@ -1,3 +1,16 @@
+########################################
+# script genOMsimscripts.R
+#
+# creates scripts for running OM and submits the jobs to cluster 
+# INPUTS:
+#   exp: experiment name
+#   chunk_size: batch size for simulation submission
+
+# OUTPUTS:
+#	- OM scenario xml files and simulations in GROUP folder
+
+########################################
+
 genOMsimscripts <- function(exp, chunk_size){
   
 
@@ -11,10 +24,10 @@ genOMsimscripts <- function(exp, chunk_size){
   SIM_FOLDER=paste0(GROUP,exp,"/")
   
   dir.create(SIM_FOLDER)
-  file.copy(paste0("./Experiments/",exp,"/OM_jobs/scaffold.xml"), paste0("../../GROUP/M3TPP/",exp,"/scaffold.xml"),overwrite=TRUE)
-  file.copy(paste0("./Experiments/",exp,"/OM_jobs/param_tab_0.txt"), paste0("../../GROUP/M3TPP/",exp,"/param_tab_0.txt"),overwrite=TRUE)
+  file.copy(paste0("./Experiments/",exp,"/OM_JOBS/scaffold.xml"), paste0("../../GROUP/M3TPP/",exp,"/scaffold.xml"),overwrite=TRUE)
+  file.copy(paste0("./Experiments/",exp,"/OM_JOBS/param_tab_0.txt"), paste0("../../GROUP/M3TPP/",exp,"/param_tab_0.txt"),overwrite=TRUE)
   
-  sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_jobs/run_OM.sh"))
+  sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/run_OM.sh"))
   
 cat("#!/bin/bash","\n", sep ="")
 cat("#SBATCH --job-name=CT","\n", sep ="")
@@ -73,7 +86,7 @@ sink()
 
   #generate script for generating scenarios
   
-  sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_jobs/job_create_scenarios.sh"))
+  sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/job_create_scenarios.sh"))
   
   cat("#!/bin/bash","\n", sep ="")
   cat("#SBATCH --job-name=create_scenarios","\n", sep ="")
@@ -133,7 +146,7 @@ sink()
   no.bats = no.commands %/% chunk_size
   if(no.commands %% chunk_size >0){no.bats = no.bats+1}
   for(j in 0:(no.bats-1)){ #"split" counting automatically starts at 0, so myst start counting from 0 here
-    sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_jobs/submission","_",exp,"_",sprintf("%02i",j),".sh"))
+    sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/submission","_",exp,"_",sprintf("%02i",j),".sh"))
     cat("#!/bin/bash\n")
     cat("#SBATCH -o /scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT/submission",sprintf("%02i",j),".out","\n",sep ="")
     
@@ -159,12 +172,12 @@ sink()
   }
   
   # either submit run to cluster here or from terminal 
-  setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_jobs/"))
+  setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
   
-  # paste system command
-  sys_command = paste0("sbatch", " submission_",exp,"_00.sh")
+ for (j in 0:(no.bats-1)){ 
+  sys_command = paste0("sbatch", " submission_",exp,"_",sprintf("%02i",j),".sh")
   
   # Run  command
   system(sys_command)
-  
+  }
 } 

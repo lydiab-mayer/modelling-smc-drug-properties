@@ -1,14 +1,18 @@
 ########################################
-# script generate_experiment_param_table.R
+# script generate_param_table.R
 #
 # construct a table with parameter values for each scenario of an OM experiment
 #
 # INPUTS:
-#   table_file - name of the file where the table should be saved
-#   experiment - name of the experiment
-#
+#   exp: experiment name
+#   param_ranges_cont: continous paramter ranges for parameters to be sampled
+#   param_cat: categorical scenario parameters
+#   noSamples: number of parameters sampled via lhs
+#   noSeeds: no. seeds per OM simulation
+#   chunk_size: batch size for simulation submission
+
 # OUTPUTS:
-#	- a csv table with all the parameters for OM experiment
+#	- "big" paramter table and chunk_size parameter tables for OM submission and scenario creation in the GROUP and experiment folder
 
 # created 21.01.2018
 # monica.golumbeanu@unibas.ch

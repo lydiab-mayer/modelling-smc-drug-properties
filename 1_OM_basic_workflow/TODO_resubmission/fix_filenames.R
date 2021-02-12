@@ -26,11 +26,3 @@ param_tab_new <- a[-simulated,]
 
 write.table(param_tab_new,paste0("/scicore/home/penny/GROUP/smc_lai/",experiment, "/param_tab_new.txt"), sep = "\t", quote = FALSE, col.names = TRUE,
             row.names = FALSE)
-
-
-
-
-
-
-
-

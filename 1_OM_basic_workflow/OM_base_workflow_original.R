@@ -1,21 +1,9 @@
 ##############################
-# Main script for running OpenMalaria simulations on the cluster. 
-# 
-#	SIM_FOLDER = simulation  folder with all necessary input files:
-#			param_tab.txt = file where each line is a parameter configuration to simulate
-#			scaffold.xml = xml file containing @parameter@ wildcards for varied values across simulations
-# OUTPUT:
-#	The script creates the following folders in the specified SIM_FOLDER:
-#		base/ = folder containing replacement patterns and base xml files
-#		scenarios/ = folder with scenario files
-#		om/ = folder with OpenMalaria simulations
-#
-# SYNTHAX: 
-#	bash OM_base_workflow.sh SIM_FOLDER
+# Main script for specifying parameter values and running OpenMalaria simulations on the cluster. 
 # 
 #
-# created 03.05.2020
-#lydia.burgert@unibas.ch adapted from theresa.reiker@unibas.ch
+# created 12.02.2021
+#lydia.burgert@unibas.ch 
 #############################
 rm(list = ls())
 setwd("~/M3TPP")
@@ -25,10 +13,16 @@ library(tgp)
 
 source("./analysisworkflow/1_OM_basic_workflow/genOMsimscripts.R")
 source("./analysisworkflow/1_OM_basic_workflow/generate_param_table.R")
+source("./analysisworkflow/1_OM_basic_workflow/create_folders.R")
 
-exp ="E0_test"
+# insert experiment name here
+exp ="..."
+
+create_folders(exp)
 
 chunk_size = 90000
+
+# !!! copy the scaffold.xml file for your experiment into the ./M3TPP/Experiments/"exp"/OM_jobs folder!!!
 
 #############################
 # Specify the desired parameter values 
@@ -44,11 +38,11 @@ biting_pattern <- data.frame(Biting_pattern=c("Mali"),indoor=c(0.6),outdoor=c(0.
 
 # max age intervention
 
-IntAge = data.frame(IntAge=c(4.9167),maxGroup=c(3))#,9.9167 and ,4
+IntAge = data.frame(IntAge=c(4.9167),maxGroup=c(3))
 
 # intervention decay
 
-LAIdecay <- data.frame(fundecay=c("weibull"),kdecay=c(1 ),Decay_Scen=c("exp" ) )#"weibull", 2
+LAIdecay <- data.frame(fundecay=c("weibull"),kdecay=c(1 ),Decay_Scen=c("exp" ) )
 
 Access_df = data.frame(Access=c(0.1))
 
@@ -69,15 +63,21 @@ param_ranges_cont = rbind( EIR = c(1, 25),
                       Efficacy= c(0.7,1) )
 
 
+
+
+# generate the parameter tables  
+#############################
+
+# no. of continuous parameters sampled via lhs
 noSamples = 5
 
+# no. of OM seeds per sample
 noSeeds=  2
-
 
 gen_paramtable(exp, param_ranges_cont,param_cat, noSamples, noSeeds,chunk_size)
   
-
-
+# generate submission scripts and run the OM simulations
+#############################
 genOMsimscripts(exp, chunk_size)
 
 

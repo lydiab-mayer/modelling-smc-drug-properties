@@ -1,0 +1,15 @@
+OM schema 38
+
+parameters:
+
+mAB
+- @Halflife@ in days
+- @kdecay@ decay shape parameter
+- @fundecay@ decay function 
+- @Efficacy@ initial efficacy (1 = 100%)
+- @Coverage@ coverage in intervention cohort
+- @IntAge@ max intervention age in intervention cohort group in years 
+- @Access@ to healthcare 
+- @indoor@ @outdoor@ percentage indoor and outdoor biting (1 = 100%)
+- @Jan@ - @Dec@ seasonality profile, will be imported from seasonlity-txt file
+- @SEED@ seed for stochastic OM simulation
