@@ -35,8 +35,8 @@ To run the workflow, you need to
 0) create an "Experiments" folder within the M3TPP project in your home directory
 1) make a folder in M3TPP with your experiment name. Then copy the file OM_base_workflow_original.R into that folder and rename it to your experiment.
 2)Inside this script specify the experiment name and chunk size (batch size for simulation runs, can not be over 100 000) and run create_folders.R.
-3)Then copy a scaffold.xml file into the OM_JOBS folder. scaffold.xml: xml file containing marked parameters (surrounded by @) which will be varied across simulations. 
-4) copy a seasonality.txt file specifying the seasonality profiles into the ./M3TPP/Experiments/"exp"/ folder
+3)Then copy a scaffold.xml file into the OM_JOBS folder which contains marked parameters (surrounded by @) which will be varied across simulations. Check 0_scenarios/ for resources. File needs to be re-named scaffold.xml
+4) copy a seasonality.txt file specifying the seasonality profiles into the ./M3TPP/Experiments/"exp"/ folder. Check 0_scenarios/ for resources. File needs to be renamed seasonlity.txt
 5)specify the parameters you want to sample (continious) and categorical parameters for scenario definition. Parameter names need to correspond to the parameters marked with @ in the xml file.
 6) specify number of samples and number of seeds and run the functions gen_paramtable.R and genOMsimscripts.R.
 
