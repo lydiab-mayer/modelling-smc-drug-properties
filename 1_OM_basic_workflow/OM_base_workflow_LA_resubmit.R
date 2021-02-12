@@ -17,12 +17,12 @@
 # created 03.05.2020
 #lydia.burgert@unibas.ch adapted from theresa.reiker@unibas.ch
 #############################
-setwd("~/smc_lai/analysis_workflow/1_OM_basic_workflow")
-exp = "E5_2_CT_LAI"
+setwd("~/M3TPP/analysis_workflow/1_OM_basic_workflow")
+exp = "xxx"
 
 
 
-GROUP = "/scicore/home/smith/GROUP/smc_lai/"
+GROUP = "/scicore/home/penny/GROUP/M3TPP/"
 
 SIM_FOLDER=paste0(GROUP,exp,"/")
 
