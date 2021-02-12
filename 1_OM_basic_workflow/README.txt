@@ -1,8 +1,8 @@
 Basic workflow for creating scenario files and running OpenMalaria simulations
 
-created by Monica Golumbeanu
-monica.golumbeanu@unibas.ch
-28.01.2019
+created by Monica Golumbeanu and modified by lydia burgert
+monica.golumbeanu@unibas.ch, lydia.burgert@unibas.ch
+12.02.2021
 __________________________________
 
 
