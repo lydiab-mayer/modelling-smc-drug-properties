@@ -19,15 +19,10 @@
 library(dplyr)    
 library(rapportools)
 
-source("~/smc_lai/analysis_workflow/2_postprocessing/postprocessing_resources.R")
+source("../../../analysisworkflow/2_postprocessing/postprocessing_resources.R")
 
 ##### Main part of script: #####
 
-# Only for testing and developing:
-#om_results_folder = "/scicore/home/smith/GROUP/smc_lai/E2_LAI/om/"
-#split_file = "/scicore/home/smith/GROUP/smc_lai/E2_LAI/postprocessing_5/split/E2_LAI_Sen_4.9167_hill_0.5.txt"
-#dest_dir = "/scicore/home/smith/GROUP/smc_lai/E2_LAI/postprocessing_5/"
-#follow_up = 5
 
 # Read in command arguments
 args = commandArgs(TRUE)

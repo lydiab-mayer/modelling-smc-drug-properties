@@ -36,7 +36,7 @@ mkdir -p $OUTPUT_FOLDER
 mkdir -p $split_folder
 
 # split the parameter table by setting
-Rscript split_param_table_trial.R $PARAM_TAB $split_folder
+Rscript ../../../analysisworkflow/2_postprocessing/split_param_table_trial.R $PARAM_TAB $split_folder
 
 # Submit postprocessing array job
 split_files=(${split_folder}*.txt)

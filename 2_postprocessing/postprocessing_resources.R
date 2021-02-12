@@ -653,22 +653,7 @@ postprocess_OM_trial = function(results_folder, param_table_file, final_table_de
       # }
       OM_result = read.table(OM_result_file, sep="\t")
       # om_result, scenario_params, total_pop, survey_start, survey_end, int_start, int_end, pulsed_int_start
-      if(param_table[i,"Seasonality"]=="Mali"){
-      timing_df = data.frame(EIR=c(5,9,20,47,150),
-                             timingInt=c(5,5,5,4,3),
-                             start= c(47,47,47,46,45),
-                             end=c(71,71,71,70,69))
-      } else {
-        timing_df = data.frame(EIR=c(5,9,20,47,150),
-                               timingInt=c(5,5,5,4,3),
-                               start= c(53,53,53,52,51),
-                               end=c(71,71,71,70,69))
-        
-     }
-      
-      start <- timing_df[which(param_table[i,"EIR"]==timing_df[,"EIR"]),"start"]
-      end <- timing_df[which(param_table[i,"EIR"]==timing_df[,"EIR"]),"end"]
-      
+
       
         scenario_row = calculate_trial_outputs(OM_result, param_table[i,], start,end)
       processed_OM_sim = data.frame(rbind(processed_OM_sim, scenario_row),stringsAsFactors = FALSE)

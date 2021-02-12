@@ -28,7 +28,7 @@ FOLLOW_UP=$2
 
 PARAM_TAB=$SIM_FOLDER"param_tab.txt"
 OM_FOLDER=$SIM_FOLDER"om/"
-OUTPUT_FOLDER=$SIM_FOLDER"postprocessing_"$FOLLOW_UP"/"
+OUTPUT_FOLDER=$SIM_FOLDER"postprocessing/"
 split_folder=$OUTPUT_FOLDER"split/"
 
 # create the necessary folders
@@ -36,7 +36,7 @@ mkdir -p $OUTPUT_FOLDER
 mkdir -p $split_folder
 
 # split the parameter table by setting
-Rscript split_param_table.R $PARAM_TAB $split_folder
+Rscript ../../../analysisworkflow/2_postprocessing/split_param_table.R $PARAM_TAB $split_folder
 
 echo  $split_folder
 # Submit postprocessing array job

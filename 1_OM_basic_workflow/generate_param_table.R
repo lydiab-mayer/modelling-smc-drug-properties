@@ -24,6 +24,8 @@ user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1
 GROUP = "/scicore/home/penny/GROUP/M3TPP/"
 
 ranges_file = paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/param_ranges.RData")
+cat_file = paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/params_cat.RData")
+
 table_file = paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/param_tab.txt")
 scaffold_file= paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_jobs/scaffold.xml")
 
@@ -40,6 +42,9 @@ save(param_ranges_cont, file = ranges_file)
 
 file.copy(ranges_file, paste0("../../GROUP/M3TPP/",exp,"/param_ranges.RData"),overwrite=TRUE)
 
+save(param_cat, file = cat_file)
+
+file.copy(cat_file, paste0("../../GROUP/M3TPP/",exp,"/params_cat.RData"),overwrite=TRUE)
 
 
 # Table with the parameter values
