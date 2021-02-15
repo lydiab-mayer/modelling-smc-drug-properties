@@ -19,7 +19,8 @@
 library(dplyr)    
 library(rapportools)
 
-source("/scicore/home/penny/burlyd00/smc_lai/analysis_workflow/2_postprocessing/postprocessing_resources.R")
+user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
+source(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/postprocessing_resources.R"))
 
 ##### Main part of script: #####
 
