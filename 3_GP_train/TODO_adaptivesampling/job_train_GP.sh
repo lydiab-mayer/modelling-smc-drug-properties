@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=train_GP_prev_red
-#SBATCH --account=smith
-#SBATCH -o /scicore/home/smith/burlyd00/smc_lai/JOB_OUT/train_GP.out
+#SBATCH --account=penny
+#SBATCH -o /scicore/home/penny/burlyd00/smc_lai/JOB_OUT/train_GP.out
 #SBATCH --mem=2G
 #SBATCH --qos=6hours
 #SBATCH --cpus-per-task=1

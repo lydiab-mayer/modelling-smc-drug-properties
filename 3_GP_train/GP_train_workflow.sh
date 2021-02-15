@@ -12,7 +12,7 @@
 #       which trains a GP emulator.
 #
 # SYNTHAX: 
-#       bash GP_train_workflow.sh INPUT_DIR DEST_DIR PREDICTED
+#       bash GP_train_workflow.sh 
 # 
 #
 # created 14.09.2019
@@ -20,11 +20,10 @@
 #############################
 
 SIM_DIR=$1
-FOLLOW_UP=$2
-PREDICTED=$3
+PREDICTED=$2
 
-INPUT_DIR=$SIM_DIR"postprocessing_"$FOLLOW_UP"/"
-DEST_DIR=$SIM_DIR"gp_"$FOLLOW_UP"/"
+INPUT_DIR=$SIM_DIR"postprocessing/"
+DEST_DIR=$SIM_DIR"gp/"
 TRAINING_DIR=$DEST_DIR"trained/"$PREDICTED"/"
 RANGES_FILE=$SIM_DIR"param_ranges.RData"
 

@@ -25,9 +25,9 @@ user_dir <- paste0(getwd(),"/Experiments/",exp)
 GROUP = "/scicore/home/penny/GROUP/M3TPP/"
 
 ranges_file = paste0(user_dir,"/param_ranges.RData")
+cat_file = paste0(user_dir,"/params_cat.RData")
 table_file = paste0(user_dir,"/param_tab.txt")
 scaffold_file= paste0(user_dir,"/OM_jobs/scaffold.xml")
-
 
 # sample continuous parameter values 
 
@@ -40,7 +40,7 @@ SEED = c(1:noSeeds)
 save(param_ranges_cont, file = ranges_file)
 
 file.copy(ranges_file, paste0(GROUP,exp,"/param_ranges.RData"),overwrite=TRUE)
-
+save(param_cat, file = cat_file)
 
 # Table with the parameter values
 param_all <- param_cat
