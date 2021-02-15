@@ -6,7 +6,7 @@
 #lydia.burgert@unibas.ch 
 #############################
 rm(list = ls())
-setwd("~/M3TPP")
+setwd("./M3TPP")
 set.seed(42)
 
 library(tgp)
