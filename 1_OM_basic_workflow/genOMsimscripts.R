@@ -13,19 +13,18 @@
 
 genOMsimscripts <- function(exp, chunk_size){
   
-
   user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
+  user_dir = paste0("/scicore/home/penny/",user,"/M3TPP")
   
   dir.create(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT"))
 
-  
   GROUP = "/scicore/home/penny/GROUP/M3TPP/"
   
   SIM_FOLDER=paste0(GROUP,exp,"/")
   
   dir.create(SIM_FOLDER)
-  file.copy(paste0("./Experiments/",exp,"/OM_JOBS/scaffold.xml"), paste0("../../GROUP/M3TPP/",exp,"/scaffold.xml"),overwrite=TRUE)
-  file.copy(paste0("./Experiments/",exp,"/OM_JOBS/param_tab_0.txt"), paste0("../../GROUP/M3TPP/",exp,"/param_tab_0.txt"),overwrite=TRUE)
+  file.copy(paste0(user_dir,"/Experiments/",exp,"/OM_JOBS/scaffold.xml"), paste0(GROUP,exp,"/scaffold.xml"),overwrite=TRUE)
+  file.copy(paste0(user_dir,"/Experiments/",exp,"/OM_JOBS/param_tab.txt"), paste0(GROUP,exp,"/param_tab.txt"),overwrite=TRUE)
   
   sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/run_OM.sh"))
   

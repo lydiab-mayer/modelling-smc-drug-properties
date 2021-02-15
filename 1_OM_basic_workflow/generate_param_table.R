@@ -20,12 +20,13 @@
 gen_paramtable <- function(exp, param_ranges_cont,param_cat, noSamples, noSeeds,chunk_size) {
 
 user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
+user_dir <- paste0(getwd(),"/Experiments/",exp)
 
 GROUP = "/scicore/home/penny/GROUP/M3TPP/"
 
-ranges_file = paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/param_ranges.RData")
-table_file = paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/param_tab.txt")
-scaffold_file= paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_jobs/scaffold.xml")
+ranges_file = paste0(user_dir,"/param_ranges.RData")
+table_file = paste0(user_dir,"/param_tab.txt")
+scaffold_file= paste0(user_dir,"/OM_jobs/scaffold.xml")
 
 
 # sample continuous parameter values 
@@ -38,8 +39,7 @@ SEED = c(1:noSeeds)
 # save continous parameter ranges for the experiment and copy to GROUP folder
 save(param_ranges_cont, file = ranges_file)
 
-file.copy(ranges_file, paste0("../../GROUP/M3TPP/",exp,"/param_ranges.RData"),overwrite=TRUE)
-
+file.copy(ranges_file, paste0(GROUP,exp,"/param_ranges.RData"),overwrite=TRUE)
 
 
 # Table with the parameter values
@@ -62,13 +62,12 @@ file.remove(table_file)
  write.table(param_tab, table_file, sep = "\t", quote = FALSE, col.names = TRUE,
              row.names = FALSE)
  
- file.copy(table_file, paste0("../../GROUP/M3TPP/",exp,"/param_tab.txt"),overwrite=TRUE)
+ file.copy(table_file, paste0(GROUP,exp,"/param_tab.txt"),overwrite=TRUE)
  
  # copy over scaffold file 
- file.remove(paste0(GROUP,"/",exp,"/scaffold.xml"))
+ file.remove(paste0(GROUP,exp,"/scaffold.xml"))
 
- file.copy(scaffold_file, paste0("../../GROUP/M3TPP/",exp,"/scaffold.xml"),overwrite=TRUE)
-
+ file.copy(scaffold_file, paste0(GROUP,exp,"/scaffold.xml"),overwrite=TRUE)
 
 
 
@@ -80,7 +79,7 @@ split_param_tab <- split(param_tab,r)
 num_tab <- max(r)
 for(j in 0:(num_tab-1)){ 
   
-table_file = paste0(GROUP,"/",exp,"/param_tab_",j,".txt")
+table_file = paste0(GROUP,exp,"/param_tab_",j,".txt")
 
 # Write table to specified destination file
 file.remove(table_file)
