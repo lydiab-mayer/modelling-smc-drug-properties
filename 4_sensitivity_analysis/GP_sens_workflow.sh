@@ -28,8 +28,5 @@ NUM=${#gp_files[@]}
 
 echo $NUM
 
-for EIR in `seq 10 2 25`
-do
-    sbatch -W --array=1-$NUM job_sens_GP.sh $GP_DIR $PARAM_RANGES_FILE $EIR $SENS_DEST_DIR
-done
+sbatch -W --array=1-$NUM job_sens_GP.sh $GP_DIR $PARAM_RANGES_FILE $SENS_DEST_DIR
 
