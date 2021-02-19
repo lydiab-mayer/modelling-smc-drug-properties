@@ -9,6 +9,8 @@ rm(list = ls())
 setwd("~/M3TPP")
 set.seed(42)
 
+source("./analysisworkflow/3_GP_train/genGPtrainscripts.R")
+
 library(tgp)
 library(tgp)
 library(hetGP)
