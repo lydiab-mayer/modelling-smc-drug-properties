@@ -12,6 +12,22 @@ library(ggpubr)
 args = commandArgs(TRUE)
 k = as.numeric(args[1])
 
+gp_file = args[1]
+ranges_file = args[2]
+results_folder = args[3]
+
+# For testing
+gp_file = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/gp/trained/prevred_int_y10/seeds_E0MAB_Mali_4.9167_exp_0.1_10_prevred_int_y10_cv.RData"
+ranges_file = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/param_ranges.RData"
+results_folder = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/optimisation/"
+
+
+# Load GP model and parameter ranges
+gp_result_name = load(gp_file)
+gp_result = get(gp_result_name)
+rm(gp_result_name)
+load(ranges_file)
+param_ranges_cont <- param_ranges_cont[-which(param_ranges_cont[,1]== param_ranges_cont[,2]),]
 
 seasonalities <- c("Mali","Sen")
 decays <- c("exp","hill","wei")

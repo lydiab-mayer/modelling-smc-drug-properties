@@ -1,7 +1,7 @@
 ###########################
 # Solve the following optimization problem: given fixed (default = average) efficacy, 
 # halflife and access to treatment, at what minimum coverage should the intervention
-# be implemented to achieve a given prevalence reduction level at a gven transmission level
+# be implemented to achieve a given prevalence reduction level at a given transmission level
 # 
 # created 08.01.2019
 # monica.golumbeanu@unibas.ch
