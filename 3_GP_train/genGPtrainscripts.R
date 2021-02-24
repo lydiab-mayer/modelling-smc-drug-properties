@@ -17,6 +17,7 @@ genGPtrainscripts <- function(exp, predicted){
   user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
   
   dir.create(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT"))
+  dir.create(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS"))
   
   
   GROUP = "/scicore/home/penny/GROUP/M3TPP/"

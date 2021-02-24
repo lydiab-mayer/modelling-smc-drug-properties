@@ -24,10 +24,10 @@ library(reshape2)
 library(gridExtra)
 
 # insert experiment name here
-exp ="..."
+exp ="E0_MAB"
 
 # specify predicted parameter
-predicted = "..."
+predicted = "prevred_int_y10"
 
 # specify followup
 
