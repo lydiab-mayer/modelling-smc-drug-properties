@@ -10,7 +10,7 @@ library(tgp)
 library(hetGP)
 library(ggplot2)
 library(viridis)
-#library(sensitivity)
+library(sensitivity)
 #library(multisensi)
 #library(lhs)
 library(dplyr)
@@ -176,7 +176,7 @@ calc_sobol_idx = function(GP_model, param_spec, num_points){
     X2 = lhs(num_points, as.matrix(param_spec))
     
     # compute the Sobol indices
-    SA = soboljansen(model = GP_f, as.data.frame(X1), as.data.frame(X2), nboot = 1000)
+    SA = sensitivity::soboljansen(model = GP_f, as.data.frame(X1), as.data.frame(X2), nboot = 1000)
     S_eff = SA$S$original
     S_eff[S_eff < 0] = 0
     T_eff = SA$T$original
