@@ -17,20 +17,18 @@ library(dplyr)
 library(reshape2)
 library(gridExtra)
 
-test_GP_plot = function(GP_model, test, save) {
-    D = ncol(test) - 1
-    param_col = c(1:D)
-    response_col = D + 1
-    # apply the model on the test data and calculate the error
-    prediction = predict(x = as.matrix(test[, param_col]), object = GP_model)
-    MSE.gp = sum((test[, response_col] - prediction$mean)^2)/nrow(test)
+test_GP_plot = function(cv_result,save) {
+      # apply the model on the test data and calculate the error
+test <- cv_result[["test_data"]]
+      MSE.gp = sum((test[, ncol(test)-1] - test[, ncol(test)])^2)/nrow(test)
     print(MSE.gp)
-    true_result = as.matrix(test[, response_col])
+    true_result = as.matrix(test[, ncol(test)-1])
+    predicted=as.matrix(test[, ncol(test)])
     jpeg(save, width = 350, height = 350)
-     plot(as.data.frame(cbind(prediction$mean, true_result)),
-         col = densCols(as.data.frame(cbind(prediction$mean, true_result))),
+     plot(as.data.frame(cbind(predicted, true_result)),
+         col = densCols(as.data.frame(cbind(predicted, true_result))),
          xlab = "prediction", ylab = "true",
-         main = paste("r2 = ",round(cor(prediction$mean, true_result),2)), pch = 20)
+         main = paste("r2 = ",round(cor(predicted, true_result),2)), pch = 20)
      
      dev.off()
 
@@ -43,14 +41,14 @@ test_GP = function(GP_model, train_data, test_data) {
     response_col = D + 1
     # apply the model on the train data and calculate the error
     prediction_train = predict(x = as.matrix(train_data[, param_col]), object = GP_model)
-    predicted_prev_red = prediction_train$mean
-    train_data = cbind.data.frame(train_data, predicted_prev_red)
+    predicted = prediction_train$mean
+    train_data = cbind.data.frame(train_data, predicted)
     
     # apply the model on the train data and calculate the error
     if(!is.null(test_data)) {
         prediction_test = predict(x = as.matrix(test_data[, param_col]), object = GP_model)
-        predicted_prev_red = prediction_test$mean
-        test_data = cbind.data.frame(test_data, predicted_prev_red)
+        predicted = prediction_test$mean
+        test_data = cbind.data.frame(test_data, predicted)
     } else {
         test_data = NULL
     }
@@ -113,41 +111,32 @@ plot_gradient = function(data_tab, plot_file = NULL, labels_names) {
               panel.grid.major = element_blank(), panel.background = element_blank()) 
 }
 
-cv_train = function(input_data, K) {
-    # retrieve all data points indices
-    indices = c(1:nrow(input_data))
-    
-    # split the data in K groups
-    cv_indices = sample(rep(1:K, length.out = nrow(input_data)))
-    train_data = test_data = NULL
-    for (i in 1:K) {
-        print(paste("Performing CV run",i,"..."))
-        test_points = which(cv_indices == i)
-        train_points = setdiff(indices, test_points)
-        trained_model = train_GP(input_data[train_points,]) 
-        print(paste("Computing errors run",i,"..."))
-      
-            }
-    # Train the final GP model on the entire training set
-    trained_model = train_GP(input_data) 
-    return(list(train_data = train_data, test_data = test_data, GP_model = trained_model))
+
+rep.row = function(x,n){
+  return(matrix(rep(x,each=n),nrow=n))
 }
+rep.col<-function(x,n){
+  matrix(rep(x,each=n), ncol=n, byrow=TRUE)
+}
+
 
 cv_train_matern = function(input_data, K) {
   # retrieve all data points indices
   indices = c(1:nrow(input_data))
   
   # split the data in K groups
-  id <- rep(seq(1,length(indices)/K),each=K)
-  cv_indices <- split(id, ceiling(seq_along(id)/(length(unique(indices))/5)) )
+  cv_indices = sample(rep(1:K, length.out = nrow(input_data)))
   train_data = test_data = NULL
   for (i in 1:K) {
     print(paste("Performing CV run",i,"..."))
-    test_points = cv_indices[[i]]
-    train_points = setdiff(id, test_points)
+    test_points = which(cv_indices == i)
+    train_points = setdiff(indices, test_points)
     trained_model = train_GP_matern(input_data[train_points,]) 
     print(paste("Computing errors run",i,"..."))
-    
+    data_tabs = test_GP(trained_model, input_data[train_points,], 
+                        input_data[test_points,])
+    train_data = rbind.data.frame(train_data, cbind.data.frame(i, data_tabs$train_data))
+    test_data = rbind.data.frame(test_data, cbind.data.frame(i, data_tabs$test_data))
   }
   # Train the final GP model on the entire training set
   trained_model = train_GP_matern(input_data) 

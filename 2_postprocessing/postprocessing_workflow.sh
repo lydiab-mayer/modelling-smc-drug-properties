@@ -27,6 +27,7 @@ SIM_FOLDER=$1
 FOLLOW_UP=$2
 
 PARAM_TAB=$SIM_FOLDER"param_tab.txt"
+PARAM_CAT=$SIM_FOLDER"param_ranges_cat.RData"
 OM_FOLDER=$SIM_FOLDER"om/"
 OUTPUT_FOLDER=$SIM_FOLDER"postprocessing/"
 split_folder=$OUTPUT_FOLDER"split/"
@@ -36,7 +37,7 @@ mkdir -p $OUTPUT_FOLDER
 mkdir -p $split_folder
 
 # split the parameter table by setting
-Rscript ../../../analysisworkflow/2_postprocessing/split_param_table.R $PARAM_TAB $split_folder
+Rscript ../../../analysisworkflow/2_postprocessing/split_param_table.R $PARAM_TAB $split_folder $PARAM_CAT
 
 echo  $split_folder
 # Submit postprocessing array job

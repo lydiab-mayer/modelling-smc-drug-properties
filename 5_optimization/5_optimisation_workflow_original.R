@@ -9,7 +9,7 @@ rm(list = ls())
 setwd("~/M3TPP")
 set.seed(42)
 
-source("./analysisworkflow/3_GP_train/genGPtrainscripts.R")
+source("./analysisworkflow/5_optimization/genoptimizationscripts.R")
 
 library(tgp)
 library(tgp)
@@ -24,14 +24,17 @@ library(reshape2)
 library(gridExtra)
 
 # insert experiment name here
-exp ="..."
+exp ="E0_MAB"
 
-# specify predicted parameter
+# specify the predicted outcome and the desired reduction 
+
 predicted = "prevred_int_y10"
+reductions <- c(10,30)
 
-# specify followup
 
-genGPtrainscripts(exp, predicted)
+
+
+genoptimizationscripts(exp, predicted, reductions)
 
 
 

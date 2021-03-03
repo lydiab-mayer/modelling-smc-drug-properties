@@ -28,6 +28,6 @@ trialweeks=NA
 #followup= 5
 #trialweeks= c(42, 66)
 
-genOMpostprocscripts(setting, followup,trialweeks)
+genOMpostprocscripts(exp, setting, followup,trialweeks)
 
 

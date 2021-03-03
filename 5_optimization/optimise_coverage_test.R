@@ -18,9 +18,9 @@ results_folder = args[3]
 
 ###
 # For testing
-# gp_file = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/gp/trained/prevred_int_y10/seeds_E0MAB_Mali_4.9167_exp_0.1_10_prevred_int_y10_cv.RData"
-# ranges_file = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/param_ranges.RData"
-# results_folder = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/optimisation/"
+ gp_file = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/gp/trained/prevred_int_y10/seeds_E0MAB_Mali_4.9167_exp_0.1_10_prevred_int_y10_cv.RData"
+ ranges_file = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/param_ranges.RData"
+ results_folder = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/optimisation/"
 ####
 
 
@@ -29,7 +29,6 @@ gp_result_name = load(gp_file)
 gp_result = get(gp_result_name)
 rm(gp_result_name)
 load(ranges_file)
-param_ranges_cont <- param_ranges_cont[-which(param_ranges_cont[,1]== param_ranges_cont[,2]),]
 
 outfile_scenarios <- paste(results_folder,"scenarios_coverage.txt",sep = "")
 
@@ -37,7 +36,7 @@ outfile_scenarios <- paste(results_folder,"scenarios_coverage.txt",sep = "")
 # Here: What is the minimal coverage under which a prevalence reduction of at least 0.1 can be achieved?
 variable <- "Coverage"
 target <- gp_result$predicted
-cutoff <- 0.1
+cutoff <- 10
 n_gridpoints <- 10
 param_ranges <- param_ranges_cont[rownames(param_ranges_cont) != variable,]
 
@@ -59,7 +58,7 @@ for (i in 1:nrow(scenarios)) {
       
       colnames(param_vec) <-  c("Coverage",  "Halflife", "Efficacy")
       
-      prev_red = predict(x = as.matrix(param_vec), gp_result)$mean
+      prev_red = predict(x = as.matrix(param_vec), gp_result$GP_model$GP_model)$mean
 
       return(prev_red - cutoff)
       
@@ -70,9 +69,10 @@ for (i in 1:nrow(scenarios)) {
     }
     
     ans_mean = gosolnp(pars  = NULL, fixed = NULL, fun = return_coverage, ineqfun = get_prevred, 
-                         ineqLB = 0 , ineqUB = 1, 
                          LB = 0.4, UB = 1, distr = rep(1, 1), distr.opt = list(), 
-                         n.restarts = 3, control = list(maxit = 100), n.sim = 200)
+                         n.restarts = 3, control = list(maxit = 100), n.sim = 200, 
+                       x = scenario
+    )
       
     scenarios[i,]$optim_name <- ans_mean$pars
 }

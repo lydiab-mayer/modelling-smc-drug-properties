@@ -32,9 +32,9 @@ chunk_size = 90000
 #############################
 
 # Seasonality and biting patterns values
-seasons =read.table(paste0("./Experiments/",exp,"/seasonality.txt"), sep="\t", header = TRUE)
+Seasonality =read.table(paste0("./Experiments/",exp,"/seasonality.txt"), sep="\t", header = TRUE)
 
-biting_pattern <- data.frame(Biting_pattern=c("Mali"),indoor=c(0.6),outdoor=c(0.4))
+Biting_pattern <- data.frame(Biting_pattern=c("Mali"),indoor=c(0.6),outdoor=c(0.4))
 
 EIR= data.frame(EIR=c(10))
 
@@ -44,16 +44,16 @@ IntAge = data.frame(IntAge=c(4.9167),maxGroup=c(3))
 
 # intervention decay
 
-LAIdecay <- data.frame(fundecay=c("weibull"),kdecay=c(1 ),Decay_Scen=c("exp" ) )
+LAIdecay <- data.frame(fundecay=c("weibull"),kdecay=c(1 ),LAIdecay=c("exp" ) )
 
 Access_df = data.frame(Access=c(0.1))
 
-param_cat = list(seasons,
-                 biting_pattern,
-                 EIR,
-                 IntAge,
-                 LAIdecay,
-                 Access_df)
+param_cat = list(Seasonality=Seasonality,
+                 Biting_pattern=Biting_pattern,
+                 EIR=EIR,
+                 IntAge=IntAge,
+                 LAIdecay=LAIdecay,
+                 Access=Access)
 
 
 # continuous variables and their ranges

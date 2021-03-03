@@ -40,7 +40,10 @@ SEED = c(1:noSeeds)
 save(param_ranges_cont, file = ranges_file)
 
 file.copy(ranges_file, paste0(GROUP,exp,"/param_ranges.RData"),overwrite=TRUE)
+
 save(param_cat, file = cat_file)
+file.copy(cat_file, paste0(GROUP,exp,"/param_ranges_cat.RData"),overwrite=TRUE)
+
 
 # Table with the parameter values
 param_all <- param_cat
