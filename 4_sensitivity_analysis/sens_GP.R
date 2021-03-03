@@ -26,7 +26,7 @@ load(ranges_file)
 param_ranges <- param_ranges_cont
 
 # Calculate the Sobol indices
-sobol_idx_list = calc_sobol_idx(gp_result$GP_model, param_ranges, num_points = 50000)
+sobol_idx_list = calc_sobol_idx(gp_result, param_ranges, num_points = 50000)
 
 
 save(sobol_idx_list, file = sidx_file)
