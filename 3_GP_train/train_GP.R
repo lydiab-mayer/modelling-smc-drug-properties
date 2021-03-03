@@ -26,11 +26,6 @@ results_folder = args[2]
 predicted = args[3]
 ranges_file = args[4]
 
-#split_file = "/scicore/home/penny/GROUP/M3TPP/exp_2/postprocessing/seeds_exp2_seasonal_Mali_10_4.9167_exp_0.1_0.80.txt"
-#results_folder =  "/scicore/home/penny/GROUP/M3TPP/exp_2/gp/"
-#predicted = "prevred_int_y10"
-#ranges_file = "/scicore/home/penny/GROUP/M3TPP/exp_2/param_ranges.RData"
-
 
 OM_result = read.table(split_file, sep="\t", header = TRUE, as.is = TRUE)
 exp_name = tools::file_path_sans_ext(basename(split_file))
