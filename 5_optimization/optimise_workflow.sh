@@ -11,9 +11,5 @@ OPT_SETUP_FILE=$SIM_FOLDER"gp/optimisation/"$PREDICTED"/opt_setup.txt"
 gp_files=(${GP_FOLDER}*.RData)
 NUM=${#gp_files[@]}
 
-OPT_SETUP=$(wc -l < $OPT_SETUP_FILE)
+sbatch --array=1-$NUM job_optimise_parameter.sh $GP_FOLDER $PARAM_RANGES_FILE $OPT_DEST_DIR $OPT_SETUP_FILE
 
-for row_n in `seq 1 1 $OPT_SETUP`
-do
-    sbatch --array=1-$NUM job_optimise_parameter.sh $GP_FOLDER $PARAM_RANGES_FILE $OPT_DEST_DIR $OPT_SETUP_FILE $row_n
-done

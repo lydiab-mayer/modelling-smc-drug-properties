@@ -11,7 +11,7 @@
 
 ########################################
 
-genoptimizationscripts <- function(exp, predicted,reductions){
+genoptimizationscripts <- function(exp, predicted,reductions,optimized){
   
 
   user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
@@ -31,7 +31,7 @@ genoptimizationscripts <- function(exp, predicted,reductions){
   table_file = paste0(SIM_FOLDER, "opt_setup.txt")
   load(param_ranges_file)
   
-  Param_opt = c("Coverage", "Halflife", "Efficacy")
+  Param_opt = c(optimized)
   Param_vec = t(param_ranges_cont[,1])
   opt_setup = Reduce(merge, list(as.data.frame(reductions), as.data.frame( Param_vec ), as.data.frame(Param_opt)))
   
@@ -42,8 +42,8 @@ genoptimizationscripts <- function(exp, predicted,reductions){
   
   
   
- file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/5_optimization/optimise_coverage_workflow.sh"), 
-            paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/optimise_coverage_workflow.sh"),overwrite=TRUE)
+ file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/5_optimization/optimise_workflow.sh"), 
+            paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/optimise_workflow.sh"),overwrite=TRUE)
   
   
   
@@ -64,10 +64,17 @@ cat("GP_DIR=$1","\n", sep ="")
 cat("PARAM_RANGES_FILE=$2","\n", sep ="")
 cat("SENS_DEST_DIR=$3","\n", sep ="")
 cat("opt_setup_file=$4","\n", sep ="")
-cat("opt_row=$5","\n", sep ="")
+
+cat("gp_files=(${GP_DIR}*.RData)","\n", sep ="")
+
+cat("# Select scenario file in array","\n", sep ="")
+cat("ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)","\n", sep ="")
+cat("gp_file=${gp_files[$ID]}","\n", sep ="")
+cat("echo $gp_file","\n", sep ="")
+
 
 cat("ml R/3.6.0-foss-2018b","\n", sep ="")
-cat("Rscript ../../../analysisworkflow/5_optimization/optimise_parameter.R $GP_DIR $PARAM_RANGES_FILE $SENS_DEST_DIR $opt_setup_file $opt_row","\n", sep ="")
+cat("Rscript ../../../analysisworkflow/5_optimization/optimise_parameter.R $gp_file $PARAM_RANGES_FILE $SENS_DEST_DIR $opt_setup_file ","\n", sep ="")
 
 sink()
 
@@ -76,7 +83,7 @@ setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
 
   
 
-sys_command = paste("bash optimise_coverage_workflow.sh", SIM_FOLDER ,predicted)
+sys_command = paste("bash optimise_workflow.sh", SIM_FOLDER ,predicted)
 
 # Run  command
 system(sys_command)

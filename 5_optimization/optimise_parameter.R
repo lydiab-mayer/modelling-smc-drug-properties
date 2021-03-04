@@ -8,6 +8,7 @@ library(stringr)
 library(ggplot2)
 library(ggpubr)
 
+source("../../../analysisworkflow/5_optimization/optimisation_resources.R")
 
 
 args = commandArgs(TRUE)
@@ -15,20 +16,15 @@ gp_file = args[1]
 ranges_file = args[2]
 results_folder = args[3]
 opt_setup_file = args[4]
-opt_row = args[5]
+opt_row = 1
 
 print(gp_file)
-print(ranges_file)
+#print(ranges_file)
 
-print(opt_setup_file)
+#print(opt_setup_file)
 
-print(opt_row)
+#print(opt_row)
 
-gp_file = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/gp/trained/prevred_int_y10/seeds_E0MAB_Mali_4.9167_exp_0.1_10_prevred_int_y10_cv.RData"
-ranges_file = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/param_ranges.RData"
-opt_setup_file = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/gp/optimisation/opt_setup.txt"
-results_folder = "/scicore/home/penny/GROUP/M3TPP/E0_MAB/optimisation/"
-opt_row=1
 
 # Retrieve the optimization specifications
 print(opt_setup_file)
@@ -58,8 +54,8 @@ UB = param_ranges[opt_var_name, 2]
 # Here: What is the minimal coverage under which a prevalence reduction of at least 0.1 can be achieved?
 variable <- opt_var_name
 #target <- gp_result$predicted
-cutoff <- opt_setup$reductions*100
-prev_ranges
+cutoff <- opt_setup$reductions
+
 n_gridpoints <- 10
 param_ranges <- param_ranges_cont[rownames(param_ranges_cont) != variable,]
 
@@ -71,58 +67,61 @@ optim_name <- paste("optimal_",variable, sep = "")
 colnames(scenarios) <- c(rownames(param_ranges), optim_name)
 
 set_out <- strsplit(settings, ".RData", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][1]
-outfile_scenarios <- paste(results_folder,set_out,"_",opt_var_name, "_opt.RData", sep="")
-  
+outfile_scenarios <- paste(results_folder,set_out,"_",opt_var_name,"_cutoff",cutoff,"_opt.txt", sep="")
 
 for (i in 1:nrow(scenarios)) {
         
     scenario <- scenarios[i, ]
     
     # Function returning the parameter to be optimized, 
-    opt_df = point_df = NULL
-    
-        print(paste(EIRValuesRange[EIR_lvl], prev_ranges[prev_red_lvl]))
-        # Find minimum parameter value for given EIR and prevalence reduction range
-        
+     
+order <- rownames(param_ranges_cont)
         # Calculate maximum attainable prevalence reduction
-        max_param_vals = t(param_ranges[,2])
-          max_param_vals[head(names(scenario),-1),] = head(as.numeric(scenario),-1)
-        max_prev_red = predict(x = max_param_vals, gp_result$GP_model)$mean
+        max_param_vals = scenario[,1:ncol(scenario)-1]
+        max_param_vals[,opt_var_name] = param_ranges_cont[opt_var_name,2]
+        
+        max_param_vals <- max_param_vals[, order]
+        max_red = predict(x = as.matrix(max_param_vals), gp_result)$mean
         
         # Run optimization algorithm only of prev_red_lvl is below max_prev_red
         ans_mean = ans_sd_plus = ans_sd_minus = ans_sd2_plus = ans_sd2_minus = NULL
         ans_mean$pars = ans_sd_plus$pars = ans_sd_minus$pars = ans_sd2_plus$pars = ans_sd2_minus$pars = NA
         
-        if(max_prev_red >= prev_ranges[prev_red_lvl] | EIR_lvl < 10) {
+        if(max_red >= cutoff)  {
           result = tryCatch({
             ans_mean = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red, 
-                               ineqLB = c(prev_ranges[prev_red_lvl]), ineqUB = c(100), 
+                               ineqLB = cutoff, ineqUB = c(100), 
                                LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
-                               n.restarts = 10, control = list(maxit = 100), n.sim = 1000,  
-                               GP_model = gp_result$GP_model, param_vec = t(param_vec), param_name = opt_var_name)
+                               n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
+                               GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
             
+            
+        
+            
+            # Function returning the predicted mean prevalence reduction for a given input
+
             ans_sd_plus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd_plus, 
-                                  ineqLB = c(prev_ranges[prev_red_lvl]), ineqUB = c(100), #c(prev_ranges[prev_red_lvl+1]), 
+                                  ineqLB = cutoff, ineqUB = c(100), 
                                   LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
-                                  n.restarts = 2, control = list(maxit = 100), n.sim = 500,  
-                                  GP_model = gp_result$GP_model, param_vec = t(param_vec), param_name = opt_var_name)
+                                  n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
+                                  GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
             
             ans_sd_minus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd_minus, 
-                                   ineqLB = c(prev_ranges[prev_red_lvl]), ineqUB = c(100),
+                                   ineqLB = cutoff, ineqUB = c(100), 
                                    LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
-                                   n.restarts = 2, control = list(maxit = 100), n.sim = 500,  
-                                   GP_model = gp_result$GP_model, param_vec = t(param_vec), param_name = opt_var_name)
+                                   n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
+                                   GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
             ans_sd2_plus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd2_plus, 
-                                   ineqLB = c(prev_ranges[prev_red_lvl]), ineqUB = c(100), #c(prev_ranges[prev_red_lvl+1]), 
+                                   ineqLB = cutoff, ineqUB = c(100), 
                                    LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
-                                   n.restarts = 2, control = list(maxit = 100), n.sim = 500,  
-                                   GP_model = gp_result$GP_model, param_vec = t(param_vec), param_name = opt_var_name)
+                                   n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
+                                   GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
             
             ans_sd2_minus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd2_minus, 
-                                    ineqLB = c(prev_ranges[prev_red_lvl]), ineqUB = c(100),
+                                    ineqLB = cutoff, ineqUB = c(100), 
                                     LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
-                                    n.restarts = 2, control = list(maxit = 100), n.sim = 500,  
-                                    GP_model = gp_result$GP_model, param_vec = t(param_vec), param_name = opt_var_name)
+                                    n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
+                                    GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
           }, warning = function(w) {
             
           }, error = function(e) {
@@ -134,7 +133,12 @@ for (i in 1:nrow(scenarios)) {
           print("Maximum attainable prevalence reduction is lower than desired level.")
         }
         
-    scenarios[i,]$optim_name <- ans_mean$pars
+    scenarios[i,which(colnames(scenarios)==optim_name)] <- ans_mean$pars
+    scenarios[i,"sd_plus"] <- ans_sd_plus$pars
+    scenarios[i,"sd_minus"] <- ans_sd_minus$pars
+    scenarios[i,"sd2_plus"] <- ans_sd2_plus$pars
+    scenarios[i,"sd2_minus"] <- ans_sd2_minus$pars
+    
 }
   
 write.table(scenarios, file = outfile_scenarios)

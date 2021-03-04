@@ -24,17 +24,20 @@ library(reshape2)
 library(gridExtra)
 
 # insert experiment name here
-exp ="E0_MAB"
+exp ="..."
 
-# specify the predicted outcome and the desired reduction 
+# specify the predicted outcome, the desired reduction and parameter to be optimized  
 
+# same name as in the gp trained folder 
 predicted = "prevred_int_y10"
-reductions <- c(10,30)
+reductions <- c(50)
+
+# needs to be a predictor in the gp -> continuous parameter sampled when simulating
+optimized="Efficacy"
 
 
 
-
-genoptimizationscripts(exp, predicted, reductions)
+genoptimizationscripts(exp, predicted, reductions,optimized)
 
 
 
