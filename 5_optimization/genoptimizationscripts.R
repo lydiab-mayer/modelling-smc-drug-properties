@@ -35,7 +35,7 @@ genoptimizationscripts <- function(exp, predicted,reductions,optimized){
   Param_vec = t(param_ranges_cont[,1])
   opt_setup = Reduce(merge, list(as.data.frame(reductions), as.data.frame( Param_vec ), as.data.frame(Param_opt)))
   
-  table_file <- paste0(opt_folder,predicted, "/opt_setup.txt")
+  table_file <- paste0(opt_folder,predicted, "/",Param_opt,"_",reductions,"_opt_setup.txt")
  
    write.table(opt_setup, table_file, sep = "\t", quote = FALSE, col.names = TRUE,
               row.names = FALSE)
@@ -83,7 +83,7 @@ setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
 
   
 
-sys_command = paste("bash optimise_workflow.sh", SIM_FOLDER ,predicted)
+sys_command = paste("bash optimise_workflow.sh", SIM_FOLDER ,predicted, table_file)
 
 # Run  command
 system(sys_command)

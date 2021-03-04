@@ -33,7 +33,7 @@ predicted = "prevred_int_y10"
 reductions <- c(50)
 
 # needs to be a predictor in the gp -> continuous parameter sampled when simulating
-optimized="Efficacy"
+optimized="Halflife"
 
 
 

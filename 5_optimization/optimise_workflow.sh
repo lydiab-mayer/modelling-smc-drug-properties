@@ -1,10 +1,10 @@
 SIM_FOLDER=$1
 PREDICTED=$2
+OPT_SETUP_FILE=$3
 
 PARAM_RANGES_FILE=$SIM_FOLDER"param_ranges.RData"
 GP_FOLDER=$SIM_FOLDER"gp/trained/"$PREDICTED"/"
 OPT_DEST_DIR=$SIM_FOLDER"gp/optimisation/"$PREDICTED"/"
-OPT_SETUP_FILE=$SIM_FOLDER"gp/optimisation/"$PREDICTED"/opt_setup.txt"
 
 
 # Submit GP optimization analysis array job
