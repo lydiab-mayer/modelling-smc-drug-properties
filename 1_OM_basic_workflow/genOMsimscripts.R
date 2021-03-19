@@ -53,8 +53,11 @@ cat("DEST_DIR=$2","\n", sep ="")
   
 cat("# Load OpenMalaria module and change to folder with resource files","\n", sep ="")
 cat("module purge","\n", sep ="")
-cat("ml OpenMalaria/38.0-goolf-1.7.20-Python-2.7.11","\n", sep ="")
-cat("cd /scicore/home/penny/GROUP/M3TPP/OM_schema38","\n", sep ="")
+cat("ml OpenMalaria/43.0-iomkl-2019.01","\n", sep ="")
+cat("cd /scicore/home/penny/GROUP/M3TPP/OM_schema43","\n", sep ="")
+
+cat("# ml OpenMalaria/38.0-goolf-1.7.20-Python-2.7.11","\n", sep ="")
+cat("# cd /scicore/home/penny/GROUP/M3TPP/OM_schema38","\n", sep ="")
 cat("# module load OpenMalaria/32-RC3-goolf-1.7.20-Python-2.7.11","\n", sep ="")
 cat("# cd /scicore/home/smith/golmon00/OM_schema32","\n", sep ="")
   
