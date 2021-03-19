@@ -5,12 +5,9 @@
 # created 12.02.2021
 #lydia.burgert@unibas.ch 
 #############################
+
+# Setup
 rm(list = ls())
-setwd("~/M3TPP")
-set.seed(42)
-
-source("./analysisworkflow/5_optimization/genoptimizationscripts.R")
-
 library(tgp)
 library(tgp)
 library(hetGP)
@@ -22,6 +19,16 @@ library(lhs)
 library(dplyr)
 library(reshape2)
 library(gridExtra)
+set.seed(42)
+
+# User 
+user = strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
+
+# Working directory
+setwd(paste0("/scicore/home/penny/",user,"/M3TPP"))
+
+# Source function scripts
+source(paste0("./analysisworkflow/5_optimization/genoptimizationscripts.R"))
 
 # insert experiment name here
 exp ="..."
@@ -35,8 +42,7 @@ reductions <- c(50)
 # needs to be a predictor in the gp -> continuous parameter sampled when simulating
 optimized="Halflife"
 
-
-
+# Run
 genoptimizationscripts(exp, predicted, reductions,optimized)
 
 
