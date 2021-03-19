@@ -22,7 +22,9 @@ param_cat_file = args[3]
 param_tab = read.table(param_table, sep= "\t", header = TRUE, as.is = TRUE, stringsAsFactors = FALSE)
 
 # Label to be added in front of the names of splits
-experiment_name = paste0(strsplit(param_tab$Scenario_Name[1],"_")[[1]][-3],collapse="")
+experiment_name = strsplit(param_tab$Scenario_Name[1],"_")[[1]]
+experiment_name = paste0(experiment_name[-length(experiment_name)],collapse="")
+
 
 # Create destination folder if it doesn't exist
 if(!dir.exists(destination_folder)) {
@@ -32,12 +34,12 @@ if(!dir.exists(destination_folder)) {
 # Split the parameter table by seasonality, biting pattern and LAI decay shape
 
 load(param_cat_file)
- split_categories <- names(param_cat)
-
- list_tab_splits = split(param_tab, apply( param_tab[ , split_categories ] , 1 , paste , collapse = "_" ))
+split_categories <- names(param_cat)
 
 
-#list_tab_splits = split(param_tab, paste(param_tab$Seasonality,param_tab$Biting_pattern,param_tab$EIR, param_tab$IntAge, param_tab$LAIdecay,param_tab$Access,param_tab$init_BS_eff , sep="_"))
+list_tab_splits = split(param_tab,  unique(param_tab[,split_categories]), sep="_" )
+
+
 
 # Write each split to a file named according to the corresponding EIR and seasonality
 for (i in 1:length(list_tab_splits)) {
