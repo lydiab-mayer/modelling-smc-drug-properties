@@ -44,7 +44,7 @@ settings <- unique(param_table[,names(param_cat)])
 ### setting 1 #####
 
 # set the setting from the settings table 
-set_setting <- 1
+set_setting <- ...
 # filter for settings param table 
 params_setting <- merge( param_table,settings[set_setting,], by.x = names(settings))[1, ]
 
@@ -56,29 +56,29 @@ print(paste0("simulated EIR=",sum(AGO_EIR5$simulated.EIR)))
 
 ### setting 2 #####
 # set the setting from the settings table 
-set_setting <- 2
+set_setting <- ...
 # filter for settings param table 
 params_setting <- merge( param_table,settings[set_setting,], by.x = names(settings))[1, ]
 
 # rename the object here to your prefered setting identifier
-AGO_EIR10 = import_EIRs_cat(exp,params_setting, seeds=max(params_setting$SEED))
+... = import_EIRs_cat(exp,params_setting, seeds=max(params_setting$SEED))
 
-print(paste0("input EIR=",sum(AGO_EIR10$input.EIR)))
-print(paste0("simulated EIR=",sum(AGO_EIR10$simulated.EIR)))
+print(paste0("input EIR=",sum(...$input.EIR)))
+print(paste0("simulated EIR=",sum(...$simulated.EIR)))
 
 #### plot settings ####
 
-colors <- c("AGO_EIR10" = "#517594", "AGO_EIR5"="#42733C")
+colors <- c("..." = "#517594", "..."="#42733C")
 types <- c("simulated" = "solid", "input"="dashed")
 
 plot_name <- "input vs simulated EIR"
 
 
 p = ggplot()+
- geom_line(data=AGO_EIR10, aes(x=timestep*5/30, y=input.EIR,color="AGO_EIR10",linetype="input")) + 
-  geom_line(data=AGO_EIR10, aes(x=timestep*5/30, y=simulated.EIR,color="AGO_EIR10",linetype="simulated")) + 
-  geom_line(data=AGO_EIR5, aes(x=timestep*5/30, y=input.EIR,color="AGO_EIR5",linetype="input")) + 
-  geom_line(data=AGO_EIR5, aes(x=timestep*5/30, y=simulated.EIR,color="AGO_EIR5",linetype="simulated")) + 
+ geom_line(data=..., aes(x=timestep*5/30, y=input.EIR,color="...",linetype="input")) + 
+  geom_line(data=..., aes(x=timestep*5/30, y=simulated.EIR,color="...",linetype="simulated")) + 
+  geom_line(data=..., aes(x=timestep*5/30, y=input.EIR,color="...",linetype="input")) + 
+  geom_line(data=..., aes(x=timestep*5/30, y=simulated.EIR,color="...",linetype="simulated")) + 
    scale_color_manual(values = colors,
                      labels=names(colors),)+
   labs( x ="Month", y = "EIR",
