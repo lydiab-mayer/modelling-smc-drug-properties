@@ -68,9 +68,9 @@ scenario<- scenario_name
 } 
 
 
-import_EIRs <- function(exp,Scenario_Names,param_table_file,seeds,follow_up,years_before_interv){
+import_EIRs_cat <- function(exp,params_setting,seeds){
   
-  
+  params_setting
   
   om_results_folder <- paste0("/scicore/home/penny/GROUP/M3TPP/",exp,"/om/")
   param_table <- read.table(param_table_file, sep= "\t", header = TRUE, as.is = TRUE, stringsAsFactors = FALSE)
@@ -78,23 +78,21 @@ import_EIRs <- function(exp,Scenario_Names,param_table_file,seeds,follow_up,year
   
   param_table = read.table(param_table_file, sep= "\t", as.is = TRUE, header = TRUE, stringsAsFactors = FALSE)
   res_df <- list()
-  for (i in 1:nrow(param_table)) {
+  for (i in 1:seeds) {
     
     #  param_table <- param_table[order(param_table$Scenario_Name), ]
-    OM_result_file = paste(om_results_folder, param_table[i,]$Scenario_Name, "_",
-                           +                                param_table[i,]$SEED, "_cts.txt", sep="")
+    OM_result_file = paste(om_results_folder, params_setting$Scenario_Name, "_",
+                           +                                i, "_cts.txt", sep="")
     OM_result = read.table(OM_result_file, sep="\t",header=TRUE)
     
     res <- subset(OM_result, timestep %in% seq(1,73))
-    inpmax <- which(res$input.EIR==max(res$input.EIR))
-    simmax <- which(res$simulated.EIR==max(res$simulated.EIR))
-    diff <- simmax-inpmax
     
     
-    res_df[[i]]<- data.frame(cbind(param_table[i,],simmax,inpmax,diff))
+    res_df[[i]]<- res 
     
   }
-  df <- do.call(rbind, res_df)
-  return(df)
+ 
+   df_EIR <- rbindlist(res_df)[,lapply(.SD,mean), list(timestep)]  
+  return(df_EIR)
   
 }
