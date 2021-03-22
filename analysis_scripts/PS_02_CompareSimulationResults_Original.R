@@ -1,8 +1,8 @@
 ##############################
-# Main script for specifying parameter values and running OpenMalaria simulations on the cluster. 
+# script for plotting single OM simulations and comparing prevalence and incidence in multiple age groups
 # 
 #
-# created 12.02.2021
+# created 22.02.2021
 #lydia.burgert@unibas.ch 
 #############################
 
