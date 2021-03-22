@@ -22,6 +22,8 @@ library(rapportools)
 
 user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
 source(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/postprocessing_resources.R"))
+source(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/openmalaria_metrics.R"))
+source(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/openmalaria_extract.R"))
 
 ##### Main part of script: #####
 
@@ -32,6 +34,7 @@ om_results_folder = args[1]
 split_file = args[2]
 dest_dir = args[3]
 follow_up = as.integer(args[4])
+years_before_interv = as.integer(args[5])
 
 # Create output file names
 split_name = basename(split_file)
@@ -41,4 +44,4 @@ dest_table_seeds = paste(dest_dir, "seeds_", split_name, sep="")
 # Postprocess the OpenMalaria simulations
 postprocess_OM(results_folder = om_results_folder, param_table_file = split_file,
                final_table_dest = dest_table_agg, final_seed_table_dest = dest_table_seeds,
-               follow_up)
+               follow_up,years_before_interv)

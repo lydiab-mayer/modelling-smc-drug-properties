@@ -25,6 +25,7 @@ ml R/3.6.0-foss-2018b
 
 SIM_FOLDER=$1
 FOLLOW_UP=$2
+YEARSBEFINT=$3
 
 PARAM_TAB=$SIM_FOLDER"param_tab.txt"
 PARAM_CAT=$SIM_FOLDER"param_ranges_cat.RData"
@@ -43,4 +44,4 @@ echo  $split_folder
 # Submit postprocessing array job
 split_files=(${split_folder}*.txt)
 NUM=${#split_files[@]}
-sbatch -W --array=1-$NUM job_postprocessing.sh $split_folder $OM_FOLDER $OUTPUT_FOLDER $FOLLOW_UP
+sbatch -W --array=1-$NUM job_postprocessing.sh $split_folder $OM_FOLDER $OUTPUT_FOLDER $FOLLOW_UP $YEARSBEFINT

@@ -26,6 +26,7 @@ exp ="..."
 # are you post-processing an implementation or trial setting?
 
 setting= "implementation"
+yearsbeforeInt= 5
 followup = 5
 trialweeks=NA
 
@@ -34,6 +35,6 @@ trialweeks=NA
 #followup= 5
 #trialweeks= c(42, 66)
 
-genOMpostprocscripts(exp, setting, followup,trialweeks)
+genOMpostprocscripts(exp, setting, followup,trialweeks,yearsbeforeInt)
 
 

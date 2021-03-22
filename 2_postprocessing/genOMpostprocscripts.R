@@ -11,7 +11,7 @@
 
 ########################################
 
-genOMpostprocscripts <- function(exp, setting,followup, trialweeks){
+genOMpostprocscripts <- function(exp, setting,followup, trialweeks,yearsbeforeInt){
   
   user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
   
@@ -47,6 +47,8 @@ cat("INPUT_DIR=$1","\n", sep ="")
 cat("OM_RESULTS_DIR=$2","\n", sep ="")
 cat("DEST_DIR=$3","\n", sep ="")
 cat("FOLLOW_UP=$4","\n", sep ="")
+cat("YEARSBEFINT=$5","\n", sep ="")
+
 
 # IMPORTANT: the number of files must equal to the task array length (index starts at 0)","\n", sep ="")
 cat("split_files=(${INPUT_DIR}*.txt)","\n", sep ="")
@@ -56,7 +58,7 @@ cat("ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)","\n", sep ="")
 cat("split_file=${split_files[$ID]}","\n", sep ="")
 cat("echo \"Postprocessing for $split_file\"","\n", sep ="")
 
-cat("Rscript ../../../analysisworkflow/2_postprocessing/calc_sim_outputs.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP","\n", sep ="")
+cat("Rscript ../../../analysisworkflow/2_postprocessing/calc_sim_outputs.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP","$YEARSBEFINT","\n", sep ="")
 
 sink()
 
@@ -66,7 +68,7 @@ sink()
 
 setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
 
-sys_command = paste("sbatch postprocessing_workflow.sh", SIM_FOLDER ,followup)
+sys_command = paste("sbatch postprocessing_workflow.sh", SIM_FOLDER ,followup, yearsbeforeInt)
 
 # Run  command
 system(sys_command)
@@ -96,6 +98,7 @@ system(sys_command)
   cat("OM_RESULTS_DIR=$2","\n", sep ="")
   cat("DEST_DIR=$3","\n", sep ="")
   cat("FOLLOW_UP=$4","\n", sep ="")
+  cat("YEARSBEFINT=$5","\n", sep ="")
   
   # IMPORTANT: the number of files must equal to the task array length (index starts at 0)","\n", sep ="")
   cat("split_files=(${INPUT_DIR}*.txt)","\n", sep ="")
@@ -105,7 +108,7 @@ system(sys_command)
   cat("split_file=${split_files[$ID]}","\n", sep ="")
   cat("echo \"Postprocessing for $split_file\"","\n", sep ="")
   
-  cat("Rscript ../../../analysisworkflow/2_postprocessing/calc_sim_outputs_trial.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP","\n", sep ="")
+  cat("Rscript ../../../analysisworkflow/2_postprocessing/calc_sim_outputs_trial.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP","$YEARSBEFINT","\n", sep ="")
   
   sink()
   

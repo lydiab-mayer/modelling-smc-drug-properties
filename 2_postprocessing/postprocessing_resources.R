@@ -11,12 +11,20 @@ library(cmprsk)
 
 # Function which calculates prevalence reduction given an OpenMalaria
 # simulation result.
-calculate_outputs = function(om_result, scenario_params, follow_up) {
+calculate_outputs = function(om_result, scenario_params, follow_up,years_before_interv,cont) {
   colnames(om_result) = c("time", "age_group", "measure", "value")
   year_to_5day = 73
   month_to_5day = 6
   years_before_interv = 5
   
+  # define age groups 
+  
+  age_groups <- c(0,0.25,2,5,10,15,20,100)
+  minIntAge=0.25
+
+  age210 = seq(which(age_groups==2),which(age_groups==10)-1)
+  ageint = seq(which(age_groups==minIntAge),as.numeric(scenario_params["maxGroup"]))
+  age05 = seq(which(age_groups==0),which(age_groups==5)-1)
   # Remove first measurement as it includes all cases until then
   to_remove = which(om_result$time == 1)
   om_result = om_result[-to_remove,]
@@ -34,20 +42,22 @@ calculate_outputs = function(om_result, scenario_params, follow_up) {
   total_pop_all = total_pop %>% group_by( time,year) %>% summarise(sum = sum(value) )%>% group_by( year)  %>% summarise(n = mean(sum) )
   
   # sum up population intervention age-groups over the years 
-  pop_int <- total_pop_age[total_pop_age$age_group %in% seq(2,as.numeric(scenario_params["maxGroup"])),]%>% group_by( year) %>% summarise(n = sum(n) )
+  pop_int <- total_pop_age[total_pop_age$age_group %in% ageint,]%>% group_by( year) %>% summarise(n = sum(n) )
  
-  pop_210 <- total_pop_age[total_pop_age$age_group %in% c(3,4),]%>% group_by( year) %>% summarise(n = sum(n) )
+  pop_210 <- total_pop_age[total_pop_age$age_group %in% age210,]%>% group_by( year) %>% summarise(n = sum(n) )
+  
+  pop_05 <- total_pop_age[total_pop_age$age_group %in% age05,]%>% group_by( year) %>% summarise(n = sum(n) )
   
    # mean intervention population size 
   meanpopint <- mean(pop_int$n)
   
   
   # Summarize all measures results by summing up over age groups
-  agg_om_result_total = om_result[,-which(names(om_result)=="age_group")]%>% group_by(time, measure) %>% summarise(val = sum(value))
+  agg_om_result_total = om_result[,-which(names(om_result)=="age_group")]%>% group_by(time, measure) %>% summarise(value = sum(value))
   
   
   # Extract the clinical case numbers 
-  trialpop <- sum( total_pop_age[total_pop_age$age_group %in% seq(2,as.numeric(scenario_params["maxGroup"])) & total_pop_age$year == years_before_interv +follow_up,"n"])
+  trialpop <- sum( total_pop_age[total_pop_age$age_group %in% ageint & total_pop_age$year == years_before_interv +follow_up,"n"])
   
   ######################################
   #calculate output prevalence reduction
@@ -70,54 +80,68 @@ calculate_outputs = function(om_result, scenario_params, follow_up) {
   n_infected <- inner_join(total_pop_age,n_infected, by=c("age_group","year"))
   n_infected_total <- inner_join(total_pop_all,n_infected_total ,by=c("year"))
   
-  # divide number of cases by respective age-group
+
+    # divide number of infected  by respective age-group
+  prev_agegroups = n_infected %>% mutate(prev = value/n )
+  prev_allages = n_infected_total %>% mutate(prev = value/n )
   
-  prev = n_infected %>% mutate(prev = value/n )
-  prev_total = n_infected_total %>% mutate(prev = val/n )
+  prev_int = n_infected[ n_infected$age_group %in% ageint, ] %>% group_by(time) %>%
+    summarise(intinf = sum(value), intn=sum(n),year=mean(year))%>% mutate(prev = intinf/intn )
   
-  cases_int_y10 <- data.frame(n_infected[n_infected$year==10 & n_infected$age_group %in% seq(2,as.numeric(scenario_params["maxGroup"])),]%>% 
-    group_by(time)%>% mutate(totcas = sum(value) ))
-  prev_int_y10 <- mean(cases_int_y10[cases_int_y10$age_group==2 , "totcas"] /  pop_int[pop_int$year ==10,"n"]$n )
-  
-  cases_int_y5 <- data.frame(n_infected[n_infected$year==5 & n_infected$age_group %in% seq(2,as.numeric(scenario_params["maxGroup"])),]%>% 
-                                group_by(time)%>% mutate(totcas = sum(value) ))
-  
-  prev_int_y5 <- mean(cases_int_y5[cases_int_y5$age_group==2 , "totcas"] /  pop_int[pop_int$year ==10,"n"]$n )
-  
- 
-  
-  cases_210 <- data.frame(n_infected[n_infected$year==5 & n_infected$age_group %in% c(3,4),]%>% 
-                                group_by(time)%>% mutate(totcas = sum(value) ))
-  
-  prev_210_y5 <- mean(cases_210[cases_210$age_group==4 , "totcas"] /  pop_210[pop_210$year ==5,"n"]$n )
+  prev_210 = n_infected[ n_infected$age_group %in% age210,] %>% group_by(time) %>%
+    summarise(intinf = sum(value), intn=sum(n),year=mean(year))%>% mutate(prev = intinf/intn ) 
   
   
   # yearly average prevalence
-  yearly_avg_prev <- prev %>% group_by(age_group, year) %>% summarise(avg = mean(prev) )
-  yearly_avg_prev_total = prev_total %>% group_by( year) %>% summarise(avg = mean(prev) )
+  prev_agegroups_yearly <- prev_agegroups %>% group_by(age_group, year) %>% summarise(avg = mean(prev) )
+  prev_allages_yearly = prev_allages %>% group_by( year) %>% summarise(avg = mean(prev) )
   
-  # initial prevalence for prevalence reduction
-  initial_prev = yearly_avg_prev[yearly_avg_prev$year==years_before_interv,"avg"]
-    #prevalence reduction for follow up point
+  prev_red_all = (prev_allages_yearly[which(prev_allages_yearly$year==years_before_interv),"avg"] - prev_allages_yearly[which(prev_allages_yearly$year==years_before_interv+follow_up),"avg"])/prev_allages_yearly[which(prev_allages_yearly$year==years_before_interv),"avg"] * 100
+  prev_red_all = prev_red_all*(prev_red_all >= 0) 
   
-  #Select the last time point according to the type of follow-up
-  final_prev = yearly_avg_prev[yearly_avg_prev$year==years_before_interv + follow_up,"avg"]
   
-
+  # calculate the number of infected at follow up  in intervention age groups 
+  inf_int_followup <- data.frame(n_infected[n_infected$year==years_before_interv+follow_up & n_infected$age_group %in% ageint,] %>% 
+                                     group_by(time) %>%
+                                     summarise(totcas = sum(value)) )
+                                  
+  # calculate yearly average prevalence at follow up for intervention age groups 
+  prev_int_followup <- mean(inf_int_followup[ , "totcas"] /  pop_int[pop_int$year ==years_before_interv+follow_up,"n"]$n )
+  
+ 
+  # calculate the number of infected  before and yearly average prevalence interventions 
+  
+  inf_int_beg <- data.frame(n_infected[n_infected$year==years_before_interv & n_infected$age_group %in% ageint,] %>% 
+                              group_by(time) %>%
+                              summarise(totcas = sum(value)) )
+  
+  prev_int_beg <- mean(inf_int_beg[  , "totcas"] /  pop_int[pop_int$year ==years_before_interv+follow_up,"n"]$n )
+  
   # prevalence reduction per age group
-  prev_red = (initial_prev - final_prev)/initial_prev * 100
-  prev_red = prev_red*(prev_red >= 0) 
-  
-  #Select the last time point according to the type of follow-up
-  final_prevall = yearly_avg_prev[yearly_avg_prev$year==years_before_interv + follow_up,"avg"]
-  
-  # prevalence reduction per age group
-  prev_red_all = (initial_prev - final_prev)/initial_prev * 100
-  prev_red_all = prev_red*(prev_red >= 0) 
-  
-  # prevalence reduction in intervention age-group
-  prev_red_int = (prev_int_y5 - prev_int_y10)/prev_int_y5 * 100
+  prev_red_int = (prev_int_beg - prev_int_followup)/prev_int_beg * 100
   prev_red_int = prev_red_int*(prev_red_int >= 0) 
+  
+  
+  # calculate the number of infected in age_group 2-10 and yearly average prevalence before interventions 
+  
+  inf_210_beg <- data.frame(n_infected[n_infected$year==years_before_interv & n_infected$age_group %in% age210,]%>% 
+                                group_by(time)%>%
+                            summarise(totcas = sum(value)) )
+  
+  prev_210_beg <- mean(inf_210_beg[  , "totcas"] /  pop_210[pop_210$year ==years_before_interv,"n"]$n )
+  
+  # calculate the number of infected  and yearly average prevalence in age_group 2-10 at followup  
+  
+  inf_210_followup <- data.frame(n_infected[n_infected$year==years_before_interv+follow_up & n_infected$age_group %in% age210,]%>% 
+                              group_by(time)%>%
+                              summarise(totcas = sum(value)) )
+  
+  prev_210_followup <- mean(inf_210_followup[  , "totcas"] /  pop_210[pop_210$year ==years_before_interv+follow_up,"n"]$n )
+  
+  # prevalence reduction per age group
+  prev_red_210 = (prev_210_beg - prev_210_followup)/prev_210_beg * 100
+  prev_red_210 = prev_red_210*(prev_red_210 >= 0) 
+  
   
   
   ######################################
@@ -132,111 +156,74 @@ calculate_outputs = function(om_result, scenario_params, follow_up) {
   
   
   # yearly average clinical cases per age-group
-  nclin_yearly <- nclin %>% group_by(age_group ,year) %>% summarise(sum = sum(value) )
+  inc_agegroups_yearly <- nclin %>% group_by(age_group ,year) %>% summarise(sum = sum(value) )
+  
+  # summed yearly clinical cases in intervention age-groups
+  inc_all_yearly <- inc_agegroups_yearly%>% group_by( year) %>% summarise(inc = sum(sum) )
+  inc_all_yearly$cpp <- inc_all_yearly$inc / tail(total_pop_all$n,1)
+  
+  # incidence reduction in intervention age group
+  inc_red_all = (inc_all_yearly[inc_all_yearly$year==years_before_interv,"cpp"] - inc_all_yearly[inc_all_yearly$year==follow_up+years_before_interv,"cpp"])/inc_all_yearly[inc_all_yearly$year==years_before_interv,"cpp"] * 100
+  inc_red_all = inc_red_all*(inc_red_all >= 0) 
   
   
   # summed yearly clinical cases in intervention age-groups
-  final_nclin_intGroup <- nclin_yearly[nclin_yearly$age_group  %in% c(2,as.numeric(scenario_params["maxGroup"])),]
+  inc_int_yearly <- inc_agegroups_yearly[inc_agegroups_yearly$age_group  %in% ageint,]%>% group_by( year) %>% summarise(inc = sum(sum) )
+  inc_int_yearly$cpp <- inc_int_yearly$inc / pop_int$n
   
-  # sum of intervntion age-groups
-  final_nclin_yearly <- final_nclin_intGroup[final_nclin_intGroup$year %in% seq(1,years_before_interv+follow_up),] %>% 
-    group_by( year) %>% 
-    summarise(sumclin = sum(sum) )
-  
-  
-  
-  final_nclin_pppy <- final_nclin_yearly[final_nclin_yearly$year ==10,"sumclin"] /pop_int[pop_int$year ==10,"n"]$n 
-  beg_nclin_pppy <- final_nclin_yearly[final_nclin_yearly$year ==4,"sumclin"] /pop_int[pop_int$year ==5,"n"]$n 
+  # incidence reduction in intervention age group
+  inc_red_int = (inc_int_yearly[inc_int_yearly$year==years_before_interv,"cpp"] - inc_int_yearly[inc_int_yearly$year==follow_up+years_before_interv,"cpp"])/inc_int_yearly[inc_int_yearly$year==years_before_interv,"cpp"] * 100
+  inc_red_int = inc_red_int*(inc_red_int >= 0) 
   
   
-  # calculate cpppy in 2-10 years old for reference 
+  # summed yearly clinical cases in  age-group 0-5 
+  inc_05_yearly <- inc_agegroups_yearly[inc_agegroups_yearly$age_group  %in% age05,]%>% group_by( year) %>% summarise(inc = sum(sum) )
+  inc_05_yearly$cpp <- inc_05_yearly$inc / pop_05$n
+  
+  # incidence reduction in intervention age group
+  inc_red_05 = (inc_05_yearly[inc_05_yearly$year==years_before_interv,"cpp"] - inc_05_yearly[inc_05_yearly$year==follow_up+years_before_interv,"cpp"])/inc_05_yearly[inc_05_yearly$year==years_before_interv,"cpp"] * 100
+  inc_red_05 = inc_red_05*(inc_red_05 >= 0) 
   
   
-  final_nclin_210 <- nclin_yearly[nclin_yearly$age_group %in% c(3,4),]
+  # incidence over time 
+  nclin <- inner_join(total_pop_age,nclin, by=c("age_group","year"))
+  inc_agegroups = nclin %>% mutate(cpp = value/n )
   
-  # sum of intervntion age-groups
-  final_nclin_yearly210 <- final_nclin_210[final_nclin_210$year %in% seq(1,years_before_interv+follow_up),] %>% 
-    group_by( year) %>% 
-    summarise(sumclin = sum(sum) )
+  inc_allages = nclin %>% group_by(time) %>%
+    summarise(intinc = sum(value), intn=sum(n),year=mean(year))%>% mutate(cpp = intinc/intn )%>% group_by(year)  %>% mutate(cppcum = cumsum(cpp))
   
-  beg_nclin_pppy210 <- final_nclin_yearly210[final_nclin_yearly210$year ==4,"sumclin"] /pop_210[pop_210$year ==5,"n"]$n 
+  inc_int = nclin[ nclin$age_group %in% ageint, ] %>% group_by(time) %>%
+    summarise(intinc = sum(value), intn=sum(n),year=mean(year))%>% mutate(cpp = intinc/intn )%>% group_by(year)  %>% mutate(cppcum = cumsum(cpp))
   
-  # cases pppy at last survey in the interventaion age-groups
-  final_nclin_age_group <- final_nclin_intGroup[final_nclin_intGroup$year == years_before_interv +follow_up,"sum"]/
-    total_pop_age[total_pop_age$age_group %in% seq(2,as.numeric(scenario_params["maxGroup"])) & total_pop_age$year == years_before_interv +follow_up,"n"]
-  
-  # cumulative clinical cases over all age-groups over all years
-  final_nclin = c(sum(final_nclin_yearly$sumclin))
+  inc_05 = nclin[ nclin$age_group %in% age05, ] %>% group_by(time) %>%
+    summarise(intinc = sum(value), intn=sum(n),year=mean(year))%>% mutate(cpp = intinc/intn )%>% group_by(year)  %>% mutate(cppcum = cumsum(cpp))
   
   
-  # extract cases in intervention year 
-  nclintrial <-  nclin[nclin$age_group %in% c(2,as.numeric(scenario_params["maxGroup"]))  & nclin$year== years_before_interv+follow_up, ]
-  nclintrial <- nclintrial %>% group_by(time) %>% summarise(sum = sum(value) )
   
-  nclintrial$timeyeartrial <- nclintrial$time-min(nclintrial$time)
-  nclintrial$cpp <- nclintrial$sum/trialpop
-  
-  
-  nclinint <-  nclintrial
-  nclinint$trialtime <-  nclinint$timeyeartrial-min(nclinint$timeyeartrial)
-  
-  nclinint <-  nclinint  %>% mutate(cppcum = cumsum(cpp))
-  
-  
-
-  dfsurv <- nclinint[, c("trialtime", "sum")]
-  
-  # dfcases <- as.data.frame(lapply(dfsurv, rep, dfsurv$sum))
-  # dfcases$surv <- 1
-  # dfcases$id <- seq(1:nrow(dfcases))
-  # 
-  # dfcens <- data.frame(cbind(trialtime=year_to_5day, sum=0,surv=0, id= seq(max(dfcases$id)+1:trialpop) ))
-  # 
-  # dfsurv2 <- data.frame(rbind(dfcases, dfcens))
-  # 
-  # 
-  # km_fit <- survfit(Surv(trialtime, surv) ~ 1, data=dfsurv2)
-  # surv <- summary(km_fit, times = max(dfsurv$trialtime))
-  # survival <-  surv$surv
-  # survival_var <- (surv$std.err)^2
-  
-  calc_KM <- function(df,trialpop) {
-    
-    df$natrisk <- trialpop-df$sum
-    
-    processed <- df %>%
-      arrange(trialtime) %>%
-      mutate(KM = cumprod((natrisk - sum) / natrisk),
-             KM_se = KM*sqrt(cumsum(sum/(natrisk * (natrisk-sum)) ) ) )
-     
-
-    return(processed)
-  }
-  km_fit <- calc_KM(dfsurv, trialpop)
-  
-   survival <- tail(km_fit,1)$KM
-   
-   survival_var <- (tail(km_fit,1)$KM_se)^2
-  # Final row with outputs to return
+   if(cont==FALSE) { 
+    # Final row with outputs to return
   return_row = cbind.data.frame(scenario_params$Scenario_Name, 
-                                scenario_params$SEED,
-                                final_nclin,meanpopint,final_nclin_pppy,beg_nclin_pppy,beg_nclin_pppy210,
-                                t(final_nclin_yearly$sumclin),
-                                t(final_nclin_age_group),
-                                t(initial_prev[ 2:as.numeric(scenario_params["maxGroup"]),]) ,prev_210_y5,
-                                t(prev_red[ 2:as.numeric(scenario_params["maxGroup"]),]), prev_int_y5,prev_red_int,survival,survival_var
+                                scenario_params$SEED,prev_red_all,prev_red_210,prev_red_int,
+                                inc_red_05,inc_red_int, inc_red_all
+                                
   ) 
   colnames(return_row) = c("Scenario_Name",
-                           "seed", 
-                           "sum_clin","mean_popint","pppy_y10_all","pppy_y4_all","pppy_y4_210",
-                           paste0("clin_y",final_nclin_yearly$year),
-                           paste0("pppy_y", follow_up+years_before_interv,"_", seq(2,as.numeric(scenario_params["maxGroup"]))),
-                           paste0("iprev_y",years_before_interv,"_", seq(2,as.numeric(scenario_params["maxGroup"]))),"prev_210_y5",
-                           paste0("prevred_y", follow_up+years_before_interv,"_", seq(2,as.numeric(scenario_params["maxGroup"]))),
-                           "iprev_int_y5","prevred_int_y10","KM","KM_var"
+                           "seed","prev_red_all","prev_red_210","prev_red_int", "inc_red_05","inc_red_int", "inc_red_all"
+                           
   )
   
-  return(return_row)
+  return(return_row)}else{
+    out_df= list("prevalence_210"=prev_210,
+                 "prevalence_int"=prev_int,
+                 "prevalence_allages"=prev_allages,
+                 "prevalence_agegroups"=prev_agegroups,
+                 "incidence_05"=inc_05,
+                 "incidence_int"=inc_int,
+                 "incidence_allages"=inc_allages,
+                 "incidence_agegroups"=inc_agegroups
+                 )
+    return(out_df)
+  }
 }
 
 
@@ -298,7 +285,7 @@ calculate_trial_outputs = function(om_result, scenario_params,start,end) {
   # divide number of cases by respective age-group
   
   prev = n_infected %>% mutate(prev = value/n )
-  prev_total = n_infected[n_infected$age_group %in% c(2,as.numeric(scenario_params["maxGroup"])), ]  %>% mutate(prev = value/n )
+  prev_total = n_infected[n_infected$age_group %in% pop, ]  %>% mutate(prev = value/n )
   
   
   # yearly average prevalence
@@ -591,7 +578,7 @@ calculate_trial_outputs_plots = function(om_result, scenario_params,start,end) {
 
 # Wrapper for looping across all simulation results and gathering postprocessing results in a table
 postprocess_OM = function(results_folder, param_table_file, final_table_dest, 
-                          final_seed_table_dest, follow_up) {
+                          final_seed_table_dest, follow_up,years_before_interv) {
   
   param_table = read.table(param_table_file, sep= "\t", as.is = TRUE, header = TRUE, stringsAsFactors = FALSE)
   processed_OM_sim = NULL
@@ -607,8 +594,8 @@ postprocess_OM = function(results_folder, param_table_file, final_table_dest,
       #     write("detected")
       # }
       OM_result = read.table(OM_result_file, sep="\t")
-      # om_result, scenario_params, total_pop, survey_start, survey_end, int_start, int_end, pulsed_int_start
-      scenario_row = calculate_outputs(OM_result, param_table[i,], follow_up)
+      # om_result, scenario_params, total_pop, survey_start, survey_end, int_start, int_enda, pulsed_int_start
+      scenario_row = calculate_outputs(OM_result, param_table[i,], follow_up,years_before_interv,cont=FALSE)
       processed_OM_sim = data.frame(rbind(processed_OM_sim, scenario_row),stringsAsFactors = FALSE)
     }
   }
@@ -618,7 +605,7 @@ postprocess_OM = function(results_folder, param_table_file, final_table_dest,
   
   
   
-  aggregated_OM =   processed_OM_sim %>% group_by(Scenario_Name) %>% summarise_at(c(names(processed_OM_sim)[which(names(processed_OM_sim)=="sum_clin"):length(names(processed_OM_sim) ) ]),median,na.rm=TRUE)
+  aggregated_OM =   processed_OM_sim %>% group_by(Scenario_Name) %>% summarise_at(c(names(processed_OM_sim)[which(names(processed_OM_sim)=="prev_red_all"):length(names(processed_OM_sim) ) ]),median,na.rm=TRUE)
   
   
   
