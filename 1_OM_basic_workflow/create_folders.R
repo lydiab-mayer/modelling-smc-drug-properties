@@ -29,4 +29,16 @@ create_folders <- function(exp){
   file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/5_optimization/5_optimisation_workflow_original.R"), 
             paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/5_optimisation_workflow_",exp,".R"),overwrite=FALSE)
   
+  
+  # copying plotting files 
+  
+  dir.create(paste0("./Experiments/",exp,"/analysis_scripts/"))
+  dir.create(paste0("./Experiments/",exp,"/Outputs/"))
+  
+  file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/analysis_scripts/PS_00_plotseasonality_Original.R"), 
+            paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/PS_00_plotseasonality_",exp,".R"),overwrite=TRUE)
+  
+  file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/analysis_scripts/PS_02_CompareSimulationResults_Original.R"), 
+            paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/PS_02_CompareSimulationResults_",exp,".R"),overwrite=TRUE)
+  
 }
