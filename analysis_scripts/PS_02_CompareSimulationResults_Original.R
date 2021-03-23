@@ -19,9 +19,6 @@ user = strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]
 
 # Working directory and group directory
 setwd(paste0("/scicore/home/penny/",user,"/M3TPP"))
-
-dir.create(paste0("./Experiments/",exp,"/Outputs"))
-
 GROUP_dr = "/scicore/home/penny/GROUP/M3TPP/"
 
 # Source function scripts

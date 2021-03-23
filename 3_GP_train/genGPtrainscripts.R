@@ -24,7 +24,6 @@ genGPtrainscripts <- function(exp, predicted){
   
   
   sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/job_train_GP.sh"))
-  
   cat("#!/bin/bash","\n", sep ="")
   cat("#SBATCH --job-name=GPtrain","\n", sep ="")
   cat("#SBATCH --account=penny","\n", sep ="")
