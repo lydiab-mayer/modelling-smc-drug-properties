@@ -1,5 +1,6 @@
 
-source("/scicore/home/penny/burlyd00/M3TPP/analysisworkflow/2_postprocessing/postprocessing_resources.R")
+
+source(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/postprocessing_resources.R"))
 
 
 
