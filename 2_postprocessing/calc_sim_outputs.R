@@ -22,8 +22,6 @@ library(rapportools)
 
 user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
 source(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/postprocessing_resources.R"))
-source(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/openmalaria_metrics.R"))
-source(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/openmalaria_extract.R"))
 
 ##### Main part of script: #####
 
