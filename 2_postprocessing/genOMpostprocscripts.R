@@ -68,7 +68,7 @@ sink()
 
 setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
 
-sys_command = paste("sbatch postprocessing_workflow.sh", SIM_FOLDER ,followup, yearsbeforeInt)
+sys_command = paste("sbatch postprocessing_workflow.sh", SIM_FOLDER ,follow_up, yearsbeforeInt)
 
 # Run  command
 system(sys_command)

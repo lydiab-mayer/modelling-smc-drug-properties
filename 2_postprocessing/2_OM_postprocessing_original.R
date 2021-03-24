@@ -27,7 +27,7 @@ exp ="..."
 
 setting= "implementation"
 yearsbeforeInt= 5
-followup = 5
+follow_up = 5
 trialweeks=NA
 
 

@@ -94,9 +94,11 @@ calculate_outputs = function(om_result, scenario_params, follow_up,years_before_
   
   # yearly average prevalence
   prev_agegroups_yearly <- prev_agegroups %>% group_by(age_group, year) %>% summarise(avg = mean(prev) )
-  prev_allages_yearly = prev_allages %>% group_by( year) %>% summarise(avg = mean(prev) )
+  prev_allages_yearly = prev_allages %>% group_by( year) %>% summarise(avg = mean(prev) ) %>% ungroup()
   
-  prev_red_all = (prev_allages_yearly[which(prev_allages_yearly$year==years_before_interv),"avg"] - prev_allages_yearly[which(prev_allages_yearly$year==years_before_interv+follow_up),"avg"])/prev_allages_yearly[which(prev_allages_yearly$year==years_before_interv),"avg"] * 100
+  prev_all_before=as.numeric(prev_allages_yearly[which(prev_allages_yearly$year==years_before_interv),"avg"])
+  prev_all_followup=as.numeric(prev_allages_yearly[which(prev_allages_yearly$year==(years_before_interv+follow_up)),"avg"])
+  prev_red_all = ( prev_all_before - prev_all_followup )/ prev_all_before* 100
   prev_red_all = prev_red_all*(prev_red_all >= 0) 
   
   
@@ -163,7 +165,7 @@ calculate_outputs = function(om_result, scenario_params, follow_up,years_before_
   inc_all_yearly$cpp <- inc_all_yearly$inc / tail(total_pop_all$n,1)
   
   # incidence reduction in intervention age group
-  inc_red_all = (inc_all_yearly[inc_all_yearly$year==years_before_interv,"cpp"] - inc_all_yearly[inc_all_yearly$year==follow_up+years_before_interv,"cpp"])/inc_all_yearly[inc_all_yearly$year==years_before_interv,"cpp"] * 100
+  inc_red_all = (as.numeric(inc_all_yearly[inc_all_yearly$year==years_before_interv,"cpp"]) - as.numeric(inc_all_yearly[inc_all_yearly$year==(follow_up+years_before_interv),"cpp"]))/as.numeric(inc_all_yearly[inc_all_yearly$year==years_before_interv,"cpp"]) * 100
   inc_red_all = inc_red_all*(inc_red_all >= 0) 
   
   
@@ -172,7 +174,7 @@ calculate_outputs = function(om_result, scenario_params, follow_up,years_before_
   inc_int_yearly$cpp <- inc_int_yearly$inc / pop_int$n
   
   # incidence reduction in intervention age group
-  inc_red_int = (inc_int_yearly[inc_int_yearly$year==years_before_interv,"cpp"] - inc_int_yearly[inc_int_yearly$year==follow_up+years_before_interv,"cpp"])/inc_int_yearly[inc_int_yearly$year==years_before_interv,"cpp"] * 100
+  inc_red_int = (as.numeric(inc_int_yearly[inc_int_yearly$year==years_before_interv,"cpp"]) - as.numeric(inc_int_yearly[inc_int_yearly$year==(follow_up+years_before_interv),"cpp"]))/as.numeric(inc_int_yearly[inc_int_yearly$year==years_before_interv,"cpp"]) * 100
   inc_red_int = inc_red_int*(inc_red_int >= 0) 
   
   
@@ -181,7 +183,7 @@ calculate_outputs = function(om_result, scenario_params, follow_up,years_before_
   inc_05_yearly$cpp <- inc_05_yearly$inc / pop_05$n
   
   # incidence reduction in intervention age group
-  inc_red_05 = (inc_05_yearly[inc_05_yearly$year==years_before_interv,"cpp"] - inc_05_yearly[inc_05_yearly$year==follow_up+years_before_interv,"cpp"])/inc_05_yearly[inc_05_yearly$year==years_before_interv,"cpp"] * 100
+  inc_red_05 = (as.numeric(inc_05_yearly[inc_05_yearly$year==years_before_interv,"cpp"]) - as.numeric(inc_05_yearly[inc_05_yearly$year==(follow_up+years_before_interv),"cpp"]))/as.numeric(inc_05_yearly[inc_05_yearly$year==years_before_interv,"cpp"]) * 100
   inc_red_05 = inc_red_05*(inc_red_05 >= 0) 
   
   
