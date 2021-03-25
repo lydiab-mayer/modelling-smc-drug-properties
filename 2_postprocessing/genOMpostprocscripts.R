@@ -58,7 +58,7 @@ cat("ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)","\n", sep ="")
 cat("split_file=${split_files[$ID]}","\n", sep ="")
 cat("echo \"Postprocessing for $split_file\"","\n", sep ="")
 
-cat("Rscript ../../../analysisworkflow/2_postprocessing/calc_sim_outputs.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP","$YEARSBEFINT","\n", sep ="")
+cat("Rscript ../../../analysisworkflow/2_postprocessing/calc_sim_outputs.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP $YEARSBEFINT","\n", sep ="")
 
 sink()
 
