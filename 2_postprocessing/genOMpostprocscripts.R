@@ -49,6 +49,12 @@ cat("DEST_DIR=$3","\n", sep ="")
 cat("FOLLOW_UP=$4","\n", sep ="")
 cat("YEARSBEFINT=$5","\n", sep ="")
 
+cat("echo \"Input: $INPUT_DIR\"","\n", sep ="")
+cat("echo \"OM dir: $OM_RESULTS_DIR\"","\n", sep ="")
+cat("echo \"Dest dir: $DEST_DIR\"","\n", sep ="")
+cat("echo \"Followup: $FOLLOW_UP\"","\n", sep ="")
+cat("echo \"Years before: $YEARSBEFINT\"","\n", sep ="")
+
 
 # IMPORTANT: the number of files must equal to the task array length (index starts at 0)","\n", sep ="")
 cat("split_files=(${INPUT_DIR}*.txt)","\n", sep ="")

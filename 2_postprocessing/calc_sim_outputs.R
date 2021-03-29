@@ -39,7 +39,18 @@ split_name = basename(split_file)
 dest_table_agg = paste(dest_dir, "agg_", split_name, sep="")
 dest_table_seeds = paste(dest_dir, "seeds_", split_name, sep="")
 
+cat("Command arguments:")
+print(paste("OM folder:", om_results_folder))
+print(paste("Split file:", split_file))
+print(paste("Split name:", split_name))
+print(paste("Dest dir:", dest_dir))
+print(paste("Dest dir agg:", dest_table_agg))
+print(paste("Dest dir seeds:", dest_table_seeds))
+print(paste("Followup:", follow_up))
+print(paste("Years before:", years_before_interv))
+
 # Postprocess the OpenMalaria simulations
+cat("Run OM postprocessing function:")
 postprocess_OM(results_folder = om_results_folder, param_table_file = split_file,
                final_table_dest = dest_table_agg, final_seed_table_dest = dest_table_seeds,
                follow_up,years_before_interv)
