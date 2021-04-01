@@ -69,7 +69,7 @@ MaxAge = data.frame(MaxAge=c(4.9167),maxGroup=c(3))
 LAIdecay <- data.frame(fundecay=c("weibull"),kdecay=c(1 ),LAIdecay=c("exp" ) )
 
 # Coverage of healthcare system
-Access = data.frame(Access=c(0.1))
+Access = data.frame(Access=c(0.1))  
 
 # Combine
 param_cat = list(Seasonality=Seasonality,

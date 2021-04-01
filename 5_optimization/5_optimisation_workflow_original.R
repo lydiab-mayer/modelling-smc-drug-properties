@@ -9,7 +9,6 @@
 # Setup
 rm(list = ls())
 library(tgp)
-library(tgp)
 library(hetGP)
 library(ggplot2)
 library(viridis)

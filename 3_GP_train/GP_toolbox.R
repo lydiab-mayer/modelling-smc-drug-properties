@@ -86,9 +86,10 @@ train_GP_matern = function(train_data) {
   prdata = find_reps(X = as.matrix(train_data[, param_col]), 
                      Z = as.matrix(train_data[, response_col]), 
                      rescale = FALSE, normalize = FALSE)
-  GP_model = mleHetGP(X = list(X0 = as.matrix(prdata$X0), 
+  GP_model = mleHetGP(X = list(X0 = as.matrix(prdata$X0),   
                                Z0 = as.matrix(prdata$Z0), mult = prdata$mult), 
-                      Z = prdata$Z, lower = rep(0.0001, D), upper = rep(10, D), 
+                      Z = prdata$Z, lower = rep(0.0001, D), upper = rep(10, D),
+                 
                       covtype = "Matern5_2")
   return(GP_model)
 }
@@ -142,6 +143,30 @@ cv_train_matern = function(input_data, K) {
   trained_model = train_GP_matern(input_data) 
   return(list(train_data = train_data, test_data = test_data, GP_model = trained_model))
 }
+
+cv_train = function(input_data, K) {
+  # retrieve all data points indices
+  indices = c(1:nrow(input_data))
+  
+  # split the data in K groups
+  cv_indices = sample(rep(1:K, length.out = nrow(input_data)))
+  train_data = test_data = NULL
+  for (i in 1:K) {
+    print(paste("Performing CV run",i,"..."))
+    test_points = which(cv_indices == i)
+    train_points = setdiff(indices, test_points)
+    trained_model = train_GP(input_data[train_points,]) 
+    print(paste("Computing errors run",i,"..."))
+    data_tabs = test_GP(trained_model, input_data[train_points,], 
+                        input_data[test_points,])
+    train_data = rbind.data.frame(train_data, cbind.data.frame(i, data_tabs$train_data))
+    test_data = rbind.data.frame(test_data, cbind.data.frame(i, data_tabs$test_data))
+  }
+  # Train the final GP model on the entire training set
+  trained_model = train_GP_matern(input_data) 
+  return(list(train_data = train_data, test_data = test_data, GP_model = trained_model))
+}
+
 
 rep.row = function(x,n){
     return(matrix(rep(x,each=n),nrow=n))

@@ -20,6 +20,8 @@ user = strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]
 # Working directory and group directory
 setwd(paste0("/scicore/home/penny/",user,"/M3TPP"))
 
+# insert experiment name here
+exp ="..."
 dir.create(paste0("./Experiments/",exp,"/Outputs"))
 
 GROUP_dr = "/scicore/home/penny/GROUP/M3TPP/"
@@ -27,8 +29,6 @@ GROUP_dr = "/scicore/home/penny/GROUP/M3TPP/"
 # Source function scripts
 source(paste0("./analysisworkflow/analysis_scripts/supp/import_functions.R"))
 
-# insert experiment name here
-exp ="..."
 
 # import parameter table for experiment 
 param_table_file <- paste0(GROUP_dr,exp,"/param_tab.txt")

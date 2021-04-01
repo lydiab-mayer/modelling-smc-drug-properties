@@ -33,8 +33,8 @@ source(paste0("./analysisworkflow/3_GP_train/genGPtrainscripts.R"))
 # insert experiment name here
 exp ="..."
 
-# specify predicted parameter
-predicted = "prevred_int_y10"
+# specify predicted parameter as named in the postprocessing files
+predicted = "prev_red_int"
 
 # specify followup
 

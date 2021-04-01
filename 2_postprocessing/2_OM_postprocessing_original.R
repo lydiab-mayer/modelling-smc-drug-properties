@@ -26,8 +26,10 @@ exp ="..."
 # are you post-processing an implementation or trial setting?
 
 setting= "implementation"
-yearsbeforeInt= 5
-follow_up = 5
+# specify the number of years before your intervention is implemented, used to calculate the pre-intervention incidence and prevalence 
+yearsbeforeInt= ... 
+# specify the number of follow-up years, used to calcuate the post-intervention prevalene and incidence 
+follow_up = ...
 trialweeks=NA
 
 
