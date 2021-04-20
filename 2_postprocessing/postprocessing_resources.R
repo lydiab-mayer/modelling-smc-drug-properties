@@ -592,13 +592,21 @@ postprocess_OM = function(results_folder, param_table_file, final_table_dest,
                            param_table[i,]$SEED, "_out.txt", sep="")
     # Calculate the necessary outputs
     if(file.exists(OM_result_file) & file.info(OM_result_file)$size > 0) {
-      # if (str_detect(OM_result_file, "_1220_")) {
-      #     write("detected")
-      # }
+      
+      # Read in file
       OM_result = read.table(OM_result_file, sep="\t")
-      # om_result, scenario_params, total_pop, survey_start, survey_end, int_start, int_enda, pulsed_int_start
-      scenario_row = calculate_outputs(OM_result, param_table[i,], follow_up,years_before_interv,cont=FALSE)
-      processed_OM_sim = data.frame(rbind(processed_OM_sim, scenario_row),stringsAsFactors = FALSE)
+      
+      # Identify error to skip
+      mtry <- try(calculate_outputs(OM_result, param_table[i,], follow_up,years_before_interv,cont=FALSE),
+                  silent = TRUE)
+      
+      # Skip error or calculate outputs
+      if (class(mtry) != "try-error") {
+        scenario_row = calculate_outputs(OM_result, param_table[i,], follow_up,years_before_interv,cont=FALSE)
+        processed_OM_sim = data.frame(rbind(processed_OM_sim, scenario_row),stringsAsFactors = FALSE)
+      } else {
+        message("Error")
+      }
     }
   }
   
