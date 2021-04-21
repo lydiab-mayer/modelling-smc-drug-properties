@@ -23,7 +23,7 @@ source(paste0("./analysisworkflow/1_OM_basic_workflow/generate_param_table.R"))
 source(paste0("./analysisworkflow/1_OM_basic_workflow/create_folders.R"))
 
 # Insert experiment name here
-exp ="..."
+exp ="Test_0"
 
 # Create folder in working directory
 create_folders(exp) # <----- run 1st time then comment

@@ -14,6 +14,9 @@ create_folders <- function(exp){
   dir.create(paste0("./Experiments/",exp,"/JOB_OUT"))
   dir.create(paste0("./Experiments/",exp,"/OM_JOBS"))
   
+  file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/1_OM_basic_workflow/1_OM_base_workflow_original.R"), 
+            paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/1_OM_base_workflow_",exp,".R"),overwrite=FALSE)
+  
   file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/2_OM_postprocessing_original.R"), 
             paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/2_OM_postprocessing_",exp,".R"),overwrite=FALSE)
   
