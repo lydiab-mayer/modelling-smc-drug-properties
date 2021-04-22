@@ -21,8 +21,11 @@ genOMsimscripts <- function(exp, chunk_size){
   GROUP = "/scicore/home/penny/GROUP/M3TPP/"
   
   SIM_FOLDER=paste0(GROUP,exp,"/")
+  ERROR_FOLDER=paste0(GROUP,exp,"/err/")
   
   dir.create(SIM_FOLDER)
+  dir.create(ERROR_FOLDER)
+  
   file.copy(paste0(user_dir,"/Experiments/",exp,"/OM_JOBS/scaffold.xml"), paste0(GROUP,exp,"/scaffold.xml"),overwrite=TRUE)
   file.copy(paste0(user_dir,"/Experiments/",exp,"/OM_JOBS/param_tab.txt"), paste0(GROUP,exp,"/param_tab.txt"),overwrite=TRUE)
   
@@ -31,7 +34,8 @@ genOMsimscripts <- function(exp, chunk_size){
 cat("#!/bin/bash","\n", sep ="")
 cat("#SBATCH --job-name=CT","\n", sep ="")
 cat("#SBATCH --account=penny","\n", sep ="")
-cat("#SBATCH -o /scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT/OM_output.out","\n", sep ="")
+cat("#SBATCH -o ",ERROR_FOLDER,"%A_%a.out","\n", sep ="")
+# cat("#SBATCH -e /scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT/OM_error.err","\n", sep ="")
 cat("#SBATCH --mem=2G","\n", sep ="")
 cat("#SBATCH --qos=30min","\n", sep ="")
 cat("#SBATCH --cpus-per-task=1","\n", sep ="")
@@ -52,7 +56,7 @@ cat("INPUT_DIR=$1","\n", sep ="")
 cat("DEST_DIR=$2","\n", sep ="")
   
 cat("# Load OpenMalaria module and change to folder with resource files","\n", sep ="")
-cat("module purge","\n", sep ="")
+cat("# module purge","\n", sep ="")
 cat("ml OpenMalaria/43.0-iomkl-2019.01","\n", sep ="")
 cat("cd /scicore/home/penny/GROUP/M3TPP/OM_schema43","\n", sep ="")
 
@@ -82,6 +86,7 @@ cat("echo \"Outputs will be written to $output1 and $output2\"","\n", sep ="")
 cat("openMalaria --scenario $scenario_file --output $output1 --ctsout $output2","\n", sep ="")
 cat("echo \"OpenMalaria simulation ended.\"","\n", sep ="")
 cat("parentdir=\"$(dirname \"$INPUT_DIR\")\"","\n", sep ="")
+cat("# Remove error files","\n", sep ="")
 
 sink()
 
@@ -181,5 +186,6 @@ sink()
   
   # Run  command
   system(sys_command)
-  }
+ }
+  
 } 
