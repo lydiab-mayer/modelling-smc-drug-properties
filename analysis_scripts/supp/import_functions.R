@@ -19,7 +19,7 @@ import_cont <- function(exp,scenario_name,param_table_file,seeds,follow_up,years
   df_list_incidence_int<- list()
   df_list_incidence_allages<- list()
   df_list_incidence_agegroups<- list()
-  
+  df_list_incidence_int_5mo<- list()
 
 scenario<- scenario_name  
   for (k in 1:seeds) { 
@@ -39,7 +39,7 @@ scenario<- scenario_name
   df_list_incidence_int[[k]] <-  test$incidence_int 
   df_list_incidence_allages[[k]] <-  test$incidence_allages 
   df_list_incidence_agegroups[[k]] <-  test$incidence_agegroups 
-  
+  df_list_incidence_int_5mo[[k]] <-  test$incidence_int_5mo 
   
   }
   
@@ -53,6 +53,7 @@ scenario<- scenario_name
   df_incidence_int<- rbindlist(df_list_incidence_int)[,lapply(.SD,mean), list(time)]  
   df_incidence_allages<- rbindlist(df_list_incidence_allages)[,lapply(.SD,mean), list(time)]  
   df_incidence_agegroups<- rbindlist(df_list_incidence_agegroups)[,lapply(.SD,mean), list(time)]  
+  df_incidence_int_5mo<- rbindlist(df_list_incidence_int_5mo)[,lapply(.SD,mean), list(time)]  
   
   
    
@@ -64,10 +65,56 @@ scenario<- scenario_name
     "incidence_05"=df_incidence_05,
     "incidence_int"=df_incidence_int,
     "incidence_allages"=df_incidence_allages,
-    "incidence_agegroups"=df_incidence_agegroups
+    "incidence_agegroups"=df_incidence_agegroups,
+    "incidence_int_5mo"=df_incidence_int_5mo
   ))
 } 
 
+import_cont_4var <- function(exp,scenario_name,param_table_file,seeds,follow_up,years_before_interv){
+  
+  om_results_folder <- paste0("/scicore/home/penny/GROUP/M3TPP/",exp,"/om/")
+  param_table <- read.table(param_table_file, sep= "\t", header = TRUE, as.is = TRUE, stringsAsFactors = FALSE)
+  
+  
+  
+  df_list_prev_210<- list()
+  df_list_prev_int<- list()
+  df_list_incidence_int<- list()
+  df_list_incidence_int_5mo<- list()
+  
+  scenario<- scenario_name  
+  for (k in 1:seeds) { 
+    OM_result_file = paste(om_results_folder, scenario, "_",
+                           +                                k, "_out.txt", sep="")
+    OM_result = read.table(OM_result_file, sep="\t",header=TRUE)
+    
+    scenario_params <- param_table[which(param_table$Scenario_Name==scenario),][1,]
+    
+    test <-  calculate_outputs(OM_result, scenario_params, follow_up,years_before_interv,cont=TRUE)
+    
+    df_list_prev_210[[k]] <-  test$prevalence_210 
+    df_list_prev_int[[k]] <-  test$prevalence_int 
+    df_list_incidence_int[[k]] <-  test$incidence_int 
+    df_list_incidence_int_5mo[[k]] <-  test$incidence_int_5mo 
+    
+  }
+  
+  
+  df_prevalence_210 <- rbindlist(df_list_prev_210)[,lapply(.SD,mean), list(time)]  
+  df_prevalence_int <- rbindlist(df_list_prev_int)[,lapply(.SD,mean), list(time)]  
+
+  df_incidence_int<- rbindlist(df_list_incidence_int)[,lapply(.SD,mean), list(time)]  
+  df_incidence_int_5mo<- rbindlist(df_list_incidence_int_5mo)[,lapply(.SD,mean), list(time)]  
+  
+  
+  
+  return(list(
+    "prevalence_210"=df_prevalence_210,
+    "prevalence_int"=df_prevalence_int,
+    "incidence_int"=df_incidence_int,
+    "incidence_int_5mo"=df_incidence_int_5mo
+  ))
+} 
 
 import_EIRs_cat <- function(exp,params_setting,seeds){
   
