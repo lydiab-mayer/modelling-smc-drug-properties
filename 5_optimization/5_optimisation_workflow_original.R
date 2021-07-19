@@ -35,14 +35,21 @@ exp ="..."
 # specify the predicted outcome, the desired reduction and parameter to be optimized  
 
 # same name as in the gp trained folder 
-predicted = "prevred_int_y10"
-reductions <- c(50)
+predicted = "..."
+reductions_list <- seq(10,80,10)
 
 # needs to be a predictor in the gp -> continuous parameter sampled when simulating
 optimized="Halflife"
 
-# Run
-genoptimizationscripts(exp, predicted, reductions,optimized)
+# Grid points (number of breaks of continuous variables)
+n_gridpoints = 10
 
+# loop run for each
+for(i in reductions_list){
+  reductions = i
+  print(i)
+  # Run
+  genoptimizationscripts(exp, predicted, reductions, optimized, n_gridpoints)
+}
 
 
