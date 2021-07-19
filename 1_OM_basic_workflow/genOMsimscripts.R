@@ -86,7 +86,8 @@ cat("echo \"Outputs will be written to $output1 and $output2\"","\n", sep ="")
 cat("openMalaria --scenario $scenario_file --output $output1 --ctsout $output2","\n", sep ="")
 cat("echo \"OpenMalaria simulation ended.\"","\n", sep ="")
 cat("parentdir=\"$(dirname \"$INPUT_DIR\")\"","\n", sep ="")
-cat("# Remove error files","\n", sep ="")
+# cat("# Remove error files","\n", sep ="")
+# cat(paste0("del \"",ERROR_FOLDER,"%A_%a.out\"","\n"))
 
 sink()
 
