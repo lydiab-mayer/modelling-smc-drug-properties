@@ -34,11 +34,17 @@ source(paste0("./analysisworkflow/4_sensitivity_analysis/gensensanalysisscripts.
 exp ="..."
 
 # specify predicted parameter
-predicted = "..."
+pred_list = c("prev_red_all","prev_red_210","prev_red_int","inc_red_05","inc_red_int","inc_red_all","inc_red_int_5mo")
 
-# specify followup
+# loop run for each
+for(i in pred_list){
+  predicted = i
+  print(i)
+  gensensanalysisscripts(exp, predicted)
+}
 
-gensensanalysisscripts(exp, predicted)
+
+
 
 
 
