@@ -23,14 +23,14 @@ source(paste0("./analysisworkflow/1_OM_basic_workflow/generate_param_table.R"))
 source(paste0("./analysisworkflow/1_OM_basic_workflow/create_folders.R"))
 
 # Insert experiment name here
-exp ="Test_0"
+exp ="..."
 
 # Create folder in working directory
 create_folders(exp) # <----- run 1st time then comment
 
 # Seasonality type: monthly EIR vs. Fourier transformation (choose 1)
-# seasonality_type = "monthly"
-seasonality_type = "Fourier"
+seasonality_type = "monthly"
+# seasonality_type = "Fourier"
 
 # !!! Depending on which seasonality is used, choose the correct scaffold.xml to upload
 # !!! If using Fourier, make sure number of coefficients correspond (example here I use a 6 coeff model with requires 5 a and 5 b values)
@@ -63,7 +63,15 @@ Biting_pattern <- data.frame(Biting_pattern=c("Mali"),indoor=c(0.6),outdoor=c(0.
 EIR= data.frame(EIR=c(10))
 
 # Max age intervention
-MaxAge = data.frame(MaxAge=c(4.9167),maxGroup=c(3))
+# age_groups (surveys age group)
+# 0.25 = group 1
+# 2 = group 2
+# 5 = group 3
+# 10 = group 4
+# 15 = group 5
+# 20 = group 6
+# 100 = group 7
+MaxAge = data.frame(MaxAge=c(10),maxGroup=c(4))
 
 # Intervention decay
 LAIdecay <- data.frame(fundecay=c("weibull"),kdecay=c(1 ),LAIdecay=c("exp" ) )
@@ -87,8 +95,6 @@ param_ranges_cont = rbind( Coverage = c(0.4, 1),
                            Halflife =c(30,150),
                            Efficacy= c(0.7,1) )
 
-
-
 ###############################
 # Generate the parameter tables  
 ###############################
@@ -105,6 +111,9 @@ gen_paramtable(exp, param_ranges_cont,param_cat, noSamples, noSeeds,chunk_size)
 ########################################################
 # Generate submission scripts and run the OM simulations
 ########################################################\
+
+# Number of outputs to get in OM folder
+2*nrow(Seasonality)*nrow(Biting_pattern)*nrow(EIR)*nrow(LAIdecay)*nrow(MaxAge)*nrow(Access)*noSamples*noSeeds
 
 # Run
 genOMsimscripts(exp, chunk_size)

@@ -33,12 +33,15 @@ source(paste0("./analysisworkflow/3_GP_train/genGPtrainscripts.R"))
 # insert experiment name here
 exp ="..."
 
-# specify predicted parameter as named in the postprocessing files
-predicted = "prev_red_int"
+# specify predicted parameter
+pred_list = c("prev_red_all","prev_red_210","prev_red_int","inc_red_05","inc_red_int","inc_red_all","inc_red_int_5mo")
 
-# specify followup
-
-genGPtrainscripts(exp, predicted)
+# loop run for each
+for(i in pred_list){
+  predicted = i
+  print(i)
+  genGPtrainscripts(exp, predicted)
+}
 
 
 

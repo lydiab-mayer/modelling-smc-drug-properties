@@ -17,6 +17,7 @@ ranges_file = args[2]
 results_folder = args[3]
 opt_setup_file = args[4]
 opt_row = 1
+n_gridpoints = as.numeric(args[5])
 
 print(gp_file)
 #print(ranges_file)
@@ -56,7 +57,7 @@ variable <- opt_var_name
 #target <- gp_result$predicted
 cutoff <- opt_setup$reductions
 
-n_gridpoints <- 10
+n_gridpoints <- n_gridpoints
 param_ranges <- param_ranges_cont[rownames(param_ranges_cont) != variable,]
 
 grid <- mapply(seq, param_ranges[,1], param_ranges[,2], length.out = n_gridpoints)
@@ -89,39 +90,45 @@ order <- rownames(param_ranges_cont)
         
         if(max_red >= cutoff)  {
           result = tryCatch({
-            ans_mean = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red, 
-                               ineqLB = cutoff, ineqUB = c(100), 
-                               LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
-                               n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
+            ans_mean = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red,
+                               ineqLB = cutoff, ineqUB = c(100),
+                               LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(),
+                               n.restarts = 10, control = list(maxit = 200), n.sim = 500,
                                GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
+            
+            # ans_mean = solnp(pars  = NULL, fun = get_param, ineqfun = get_p_red, 
+            #                    ineqLB = cutoff, ineqUB = c(100), 
+            #                    LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
+            #                    control = list(maxit = 100), n.sim = 500,  
+            #                    GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
             
             
         
             
-            # Function returning the predicted mean prevalence reduction for a given input
-
-            ans_sd_plus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd_plus, 
-                                  ineqLB = cutoff, ineqUB = c(100), 
-                                  LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
-                                  n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
-                                  GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
-            
-            ans_sd_minus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd_minus, 
-                                   ineqLB = cutoff, ineqUB = c(100), 
-                                   LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
-                                   n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
-                                   GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
-            ans_sd2_plus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd2_plus, 
-                                   ineqLB = cutoff, ineqUB = c(100), 
-                                   LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
-                                   n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
-                                   GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
-            
-            ans_sd2_minus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd2_minus, 
-                                    ineqLB = cutoff, ineqUB = c(100), 
-                                    LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
-                                    n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
-                                    GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
+            # # Function returning the predicted mean prevalence reduction for a given input
+            # 
+            # ans_sd_plus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd_plus, 
+            #                       ineqLB = cutoff, ineqUB = c(100), 
+            #                       LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
+            #                       n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
+            #                       GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
+            # 
+            # ans_sd_minus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd_minus, 
+            #                        ineqLB = cutoff, ineqUB = c(100), 
+            #                        LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
+            #                        n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
+            #                        GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
+            # ans_sd2_plus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd2_plus, 
+            #                        ineqLB = cutoff, ineqUB = c(100), 
+            #                        LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
+            #                        n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
+            #                        GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
+            # 
+            # ans_sd2_minus = gosolnp(pars  = NULL, fixed = NULL, fun = get_param, ineqfun = get_p_red_sd2_minus, 
+            #                         ineqLB = cutoff, ineqUB = c(100), 
+            #                         LB = LB, UB = UB, distr = rep(1, length(LB)), distr.opt = list(), 
+            #                         n.restarts = 5, control = list(maxit = 100), n.sim = 500,  
+            #                         GP_model = gp_result, param_vec = as.vector(max_param_vals), param_name = opt_var_name)
           }, warning = function(w) {
             
           }, error = function(e) {
@@ -134,10 +141,10 @@ order <- rownames(param_ranges_cont)
         }
         
     scenarios[i,which(colnames(scenarios)==optim_name)] <- ans_mean$pars
-    scenarios[i,"sd_plus"] <- ans_sd_plus$pars
-    scenarios[i,"sd_minus"] <- ans_sd_minus$pars
-    scenarios[i,"sd2_plus"] <- ans_sd2_plus$pars
-    scenarios[i,"sd2_minus"] <- ans_sd2_minus$pars
+    # scenarios[i,"sd_plus"] <- ans_sd_plus$pars
+    # scenarios[i,"sd_minus"] <- ans_sd_minus$pars
+    # scenarios[i,"sd2_plus"] <- ans_sd2_plus$pars
+    # scenarios[i,"sd2_minus"] <- ans_sd2_minus$pars
     
 }
   

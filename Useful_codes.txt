@@ -1,0 +1,19 @@
+# Useful codes
+
+# Force remove files
+find . -name '*' | xargs rm
+
+# Checking number of files
+ls /scicore/home/penny/GROUP/M3TPP/EXP_2MAB/om/ | wc -l
+
+# Give permissions
+chmod -R 774 "path"
+
+# Remove files if rm * doesn't work
+find . -type f -exec rm -v {} \;
+
+# Get list of git files
+git ls-tree -r master --name-only
+
+# Git commit only 1 file example with comment
+git commit -m "Changed duration from 6h to 1 day" 5_optimization/genoptimizationscripts.R
