@@ -18,8 +18,14 @@ git ls-tree -r master --name-only
 # Git commit only 1 file example with comment
 git commit -m "Changed duration from 6h to 1 day" 5_optimization/genoptimizationscripts.R
 
+# Checkout to the branch that you intended to commit to
+git checkout [branchname]
+
+# Shows you what branch you're on, what files are in the working or staging directory, and any other important information.
+git status
+
 # Merge branch commit changes back to master
 git checkout master
 git pull origin master
-git merge branchname
+git merge [branchname]
 git push origin master
