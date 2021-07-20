@@ -17,3 +17,9 @@ git ls-tree -r master --name-only
 
 # Git commit only 1 file example with comment
 git commit -m "Changed duration from 6h to 1 day" 5_optimization/genoptimizationscripts.R
+
+# Merge branch commit changes back to master
+git checkout master
+git pull origin master
+git merge branchname
+git push origin master
