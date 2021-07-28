@@ -33,10 +33,12 @@
   
   <monitoring name="Survey once a year" startDate="1990-01-01"> <!-- start up period to reach equilibrium; can optimize? change to reduce burnin time -->
     <continuous period="1">
-      <option name="input EIR" value="true"/>   <!-- here list outputs with continuous results per time step, can add more -->
+      <option name="input EIR" value="true"/>   <!-- here list outputs with continuous results per time step, can add more;
+      note that the names are written differently than in surveyoptions; 
+      check wiki for refs (scroll down): https://github.com/SwissTPH/openmalaria/wiki/MonitoringOptions#continuous_measures-->
       <option name="simulated EIR" value="true"/>
     </continuous>
-    <SurveyOptions>   <!-- aggregated data...? -->
+    <SurveyOptions>   <!-- aggregated data per cohort...? -->
       <option name="nHost" value="true"/>
       <option name="nPatent" value="true"/>
       <option name="nInfect" value="true"/>
@@ -188,7 +190,8 @@
           <clearInfections stage="blood" timesteps="1"/>
         </QN>
       </treatmentActions>
-	  <pSeekOfficialCareUncomplicated1 value="@Access@"/> <!-- review definition; specific to setting or do analyze this in a senstivity analysis -->
+	  <pSeekOfficialCareUncomplicated1 value="@Access@"/> <!-- review definition; specific to setting or do analyze this in a senstivity analysis;
+	  if access=0.1 over 5-day time step, equivalent to ~20% access to effective treatment of clinical cases over 2 week period (low-moderate) -->
       <pSelfTreatUncomplicated value="0"/>
       <pSeekOfficialCareUncomplicated2 value="@Access@"/>
       <pSeekOfficialCareSevere value="0.48"/>       <!-- Value 0.48 used in Tediosi et al., 2006 for reference scenario; any new data for updates? -->
