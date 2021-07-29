@@ -29,3 +29,7 @@ git checkout master
 git pull origin master
 git merge [branchname]
 git push origin master
+
+# Cloning existing repository
+cd [path] # where you want the repo to be copied
+git clone [url] # copy url from gitlab
