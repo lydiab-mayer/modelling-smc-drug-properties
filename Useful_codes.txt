@@ -33,3 +33,9 @@ git push origin master
 # Cloning existing repository
 cd [path] # where you want the repo to be copied
 git clone [url] # copy url from gitlab
+
+# Adding new files
+git status # check branch & which files modified/added
+git add . # add all files listed in git status
+git commit -m "[comment]" # add comment for all files to be commited
+git push # files added to repo
