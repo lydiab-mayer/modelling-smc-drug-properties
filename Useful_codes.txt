@@ -39,3 +39,8 @@ git status # check branch & which files modified/added
 git add . # add all files listed in git status
 git commit -m "[comment]" # add comment for all files to be commited
 git push # files added to repo
+
+# Pushing changes to a new branch
+git checkout -b [branchname] # creates new branch and checkout to new branch at same time
+# next commit changes while in branch
+git push -u origin [branchname] # push to create new branch
