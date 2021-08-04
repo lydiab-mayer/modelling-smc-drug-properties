@@ -22,7 +22,7 @@ setwd(paste0("/scicore/home/penny/",user,"/M3TPP"))
 GROUP_dr = "/scicore/home/penny/GROUP/M3TPP/"
 
 # Source function scripts
-source(paste0("./analysisworkflow/analysis_scripts/supp/import_functions.R"))
+source(paste0("./analysisworkflow/analysis_scripts/import_functions.R"))
 
 # insert experiment name here
 exp ="..."

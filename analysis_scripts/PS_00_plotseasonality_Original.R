@@ -27,7 +27,7 @@ dir.create(paste0("./Experiments/",exp,"/Outputs"))
 GROUP_dr = "/scicore/home/penny/GROUP/M3TPP/"
 
 # Source function scripts
-source(paste0("./analysisworkflow/analysis_scripts/supp/import_functions.R"))
+source(paste0("./analysisworkflow/analysis_scripts/import_functions.R"))
 
 
 # import parameter table for experiment 
