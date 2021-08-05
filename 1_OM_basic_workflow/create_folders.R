@@ -44,4 +44,7 @@ create_folders <- function(exp){
   file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/analysis_scripts/PS_03_ContParamOutput_Original.R"), 
             paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/analysis_scripts/PS_03_ContParamOutput_",exp,".R"),overwrite=TRUE)
   
+  file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/analysis_scripts/PS_04_PlotOpenMalariaOutcome.R"), 
+            paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/analysis_scripts/PS_04_PlotOpenMalariaOutcome_",exp,".R"),overwrite=TRUE)
+  
 }
