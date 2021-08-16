@@ -67,7 +67,7 @@ df <- import_monitoring_outcome(exp = exp,
 # ----------------------------------------------------------
 
 # Define line types
-types <- c("Average" = "solid", "Seed" = "dashed")
+types <- c("Median" = "solid", "Seed" = "dashed")
 
 # !!! Define name of your plot !!!
 plot_name <- "..."
@@ -81,7 +81,7 @@ plot_name <- "..."
 p <- ggplot()
 
 # Add data for average survey outcome, faceted by age group
-p <- p + geom_line(data = df$Average, aes(x = timestep, y = outcome, colour = scenario_id, linetype = "Average")) +
+p <- p + geom_line(data = df$Median, aes(x = timestep, y = outcome, colour = scenario_id, linetype = "Median")) +
   facet_wrap(.~ agegroup, scales = "free_y")
 
 # Add data for survey outcome for each individual seed, faceted by age group

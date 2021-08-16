@@ -182,7 +182,7 @@ import_monitoring_outcome <- function(exp, scenario_id, measure, seeds, timestep
   #
   # Outputs
   # out: list containing 'All', data frame containing the selected OpenMalaria monitoring outcome for all simulations for a given setting, and
-  # 'Average', data frame containing averaged OpenMalaria monitoring outcome for the given setting
+  # 'Median', data frame containing median OpenMalaria monitoring outcome for the given setting
   #
   # ----------------------------------------------------------
   
@@ -207,9 +207,9 @@ import_monitoring_outcome <- function(exp, scenario_id, measure, seeds, timestep
   
   # Average continuous OpenMalaria outputs across seeds, by age group
   out_all <- rbindlist(out_all)
-  out_average <- out_all[, lapply(.SD, mean), list(scenario_id, timestep, agegroup)]
+  out_median <- out_all[, lapply(.SD, mean), list(scenario_id, timestep, agegroup)]
   
   # Return function outputs
-  return(list("All" = out_all, "Average" = out_average))
+  return(list("All" = out_all, "Median" = out_median))
   
 }
