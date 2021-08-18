@@ -79,7 +79,7 @@ cat("echo \"Debug parameter names: \" $column_names", "\n", sep ="")
 cat("echo \"Debug parameter values: \" $param_line", "\n", sep ="")
 
 cat("# Construct the replacement patterns", "\n", sep ="")
-cat("Rscript /scicore/home/penny/brauna0000/M3TPP/analysisworkflow/1_OM_basic_workflow/create_scenario.R --column_names $column_names --params $param_line --base_folder $BASE_FOLDER --scenario_folder $INPUT_DIR --scaffold_file $SCAFFOLD_FILE","\n", sep ="")
+cat("Rscript ../../../analysisworkflow/1_OM_basic_workflow/create_scenario.R --column_names $column_names --params $param_line --base_folder $BASE_FOLDER --scenario_folder $INPUT_DIR --scaffold_file $SCAFFOLD_FILE","\n", sep ="")
 cat("echo \"Replacement patterns, base and scenario xml created.\"", "\n", sep ="")
 
 # Load OpenMalaria
@@ -187,6 +187,8 @@ sink()
     cat("#!/bin/bash\n")
     cat("#SBATCH -o /scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT/submission",sprintf("%02i",j),".out","\n",sep ="")
     
+    # cat("#SBATCH --qos=30min","\n", sep ="") #uncomment to change the queue from 6h to 30min (suitable for small jo)
+    
     cat("PARAM_TABLE_FILE=",SIM_FOLDER,"param_tab_",j,".txt","\n\n", sep ="")
     cat("SCAFFOLD_FILE=",SIM_FOLDER,"scaffold.xml","\n", sep ="")
     cat("BASE_FOLDER=",SIM_FOLDER,"base_",j,"/","\n", sep ="")
@@ -194,12 +196,8 @@ sink()
     cat("OM_FOLDER=",SIM_FOLDER,"om/","\n", sep ="")
     
     cat("NUM=$(wc -l < $PARAM_TABLE_FILE)","\n", sep ="")
-    
-    #cat(" echo \"Creating $NUM-1 scenarios ...\" ","\n", sep ="")
-    
-    #cat("sbatch -W ./job_create_scenarios.sh $PARAM_TABLE_FILE $SCAFFOLD_FILE $BASE_FOLDER $SCENARIOS_FOLDER","\n\n", sep ="")
-    
-    cat(" echo \"Creating scenarioes and running OM simulations... \" ","\n", sep ="")
+
+    cat(" echo \"Creating $NUM-1 scenarios and running OM simulations... \" ","\n", sep ="")
     
     cat("sbatch -W --array=1-$NUM ./run_OM.sh $PARAM_TABLE_FILE $SCAFFOLD_FILE $BASE_FOLDER $SCENARIOS_FOLDER $OM_FOLDER","\n\n", sep ="")
     
