@@ -66,7 +66,7 @@ cat("# create destination directory","\n", sep ="")
 cat("mkdir -p $DEST_DIR","\n", sep ="")
 
 cat("ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)","\n", sep ="")
-cat("echo \"Debug array ID: \" $ID", "\n", sep ="")
+cat("# echo \"Debug array ID: \" $ID", "\n", sep ="")
 
 # Generate scenarios
 cat("echo \"Generate replacement patterns and scenario xml\"","\n", sep ="")
@@ -75,8 +75,8 @@ cat("# Select the parameter names and the scenario  line from the parameter file
 cat("column_names=$(sed -n \"1p\" < $PARAM_TABLE_FILE)", "\n", sep ="")
 cat("param_line=$(sed -n \"$(expr ${ID} + 2)p\" < $PARAM_TABLE_FILE)", "\n", sep ="")
 
-cat("echo \"Debug parameter names: \" $column_names", "\n", sep ="")
-cat("echo \"Debug parameter values: \" $param_line", "\n", sep ="")
+cat("echo \"Parameter names: \" $column_names", "\n", sep ="")
+cat("echo \"Parameter values: \" $param_line", "\n", sep ="")
 
 cat("# Construct the replacement patterns", "\n", sep ="")
 cat("Rscript ../../../analysisworkflow/1_OM_basic_workflow/create_scenario.R --column_names $column_names --params $param_line --base_folder $BASE_FOLDER --scenario_folder $INPUT_DIR --scaffold_file $SCAFFOLD_FILE","\n", sep ="")
@@ -98,13 +98,13 @@ cat("# IMPORTANT: the number of files must equal to the task array length (index
 # Run OpenMalaria simulations
 cat("scenario_file=$(echo $param_line | awk '{print $1}')", "\n", sep ="")
 cat("seed=$(echo $param_line | awk '{print $NF}')", "\n", sep ="")
-cat("echo \"Debug scenario file: \" $scenario_file", "\n", sep ="")
-cat("echo \"Debug seed: \" $seed", "\n", sep ="")
+cat("# echo \"Debug scenario file: \" $scenario_file", "\n", sep ="")
+cat("# echo \"Debug seed: \" $seed", "\n", sep ="")
 
 cat("scenario_file=${INPUT_DIR}${scenario_file}\"_\"${seed}\".xml\"", "\n", sep = "")
-cat("echo \"Debug scenario file: \" $scenario_file", "\n", sep ="")
+cat("# echo \"Debug scenario file: \" $scenario_file", "\n", sep ="")
 
-cat("echo \"Running simulation for $scenario_file\"","\n", sep ="")
+cat("# echo \"Running simulation for $scenario_file\"","\n", sep ="")
   
 cat("# Run OpenMalaria on scenario file","\n", sep ="")
 cat("scenario_name=$(basename \"$scenario_file\" \".xml\")","\n", sep ="")
