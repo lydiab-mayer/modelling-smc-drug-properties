@@ -8,6 +8,8 @@
 library(rapportools)
 library(survival)
 library(cmprsk)
+require(plyr)
+require(dplyr)
 
 # Function which calculates prevalence reduction given an OpenMalaria
 # simulation result.
