@@ -16,9 +16,7 @@
 # monica.golumbeanu@unibas.ch
 ##############################
 
-library(dplyr)    
-library(rapportools)
-
+sessionInfo()
 
 user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
 source(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/postprocessing_resources.R"))

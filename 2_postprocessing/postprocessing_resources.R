@@ -5,9 +5,8 @@
 # monica.golumbeanu@unibas.ch
 # modified by lydia.burgert@unibas.ch 
 ##########################
-library(rapportools)
-library(survival)
-library(cmprsk)
+
+library(dplyr)
 
 # Function which calculates prevalence reduction given an OpenMalaria
 # simulation result.
@@ -18,15 +17,15 @@ calculate_outputs = function(om_result, scenario_params, follow_up, years_before
   years_before_interv = years_before_interv
   
   # define age groups 
-  age_groups <- c(0,0.25,2,5,10,15,20,100)
+  age_groups <- c(0,0.25,2,5,10,20,50,100)
   minIntAge=0.25
   age210 = seq(which(age_groups==2),which(age_groups==10)-1)
   ageint = seq(which(age_groups==minIntAge),as.numeric(scenario_params["maxGroup"]))
   age05 = seq(which(age_groups==0),which(age_groups==5)-1)
   
   # Remove first measurement as it includes all cases until then
-  to_remove = which(om_result$time == 1)
-  om_result = om_result[-to_remove,]
+  # to_remove = which(om_result$time == 1)
+  # om_result = om_result[-to_remove,]
   
   # population per time step per age group
   total_pop = as.data.frame(om_result[om_result$measure == 0, ])

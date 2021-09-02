@@ -31,6 +31,7 @@ INPUT_DIR=$1
 OM_RESULTS_DIR=$2
 DEST_DIR=$3
 FOLLOW_UP=$4
+YEARSBEFINT=$5
 
 # IMPORTANT: the number of files must equal to the task array length (index starts at 0)
 split_files=(${INPUT_DIR}*.txt)
@@ -40,4 +41,4 @@ ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)
 split_file=${split_files[$ID]}
 echo "Postprocessing for $split_file"
 
-Rscript calc_sim_outputs.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP
+Rscript calc_sim_outputs.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP $YEARSBEFINT

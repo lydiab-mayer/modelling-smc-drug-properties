@@ -17,115 +17,109 @@ genOMpostprocscripts <- function(exp, setting,followup, trialweeks,yearsbeforeIn
   
   dir.create(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT"))
 
-  
   GROUP = "/scicore/home/penny/GROUP/M3TPP/"
   
   SIM_FOLDER=paste0(GROUP,exp,"/")
-  
+  ERROR_FOLDER=paste0(GROUP,exp,"/postprocessing/err/")
+  dir.create(ERROR_FOLDER)
   
   if (setting=="implementation"){
-  file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/postprocessing_workflow.sh"), 
+    
+    file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/postprocessing_workflow.sh"), 
                    paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/postprocessing_workflow.sh"),overwrite=TRUE)
-  
-  
-  
-sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/job_postprocessing.sh"))
-  
-cat("#!/bin/bash","\n", sep ="")
-cat("#SBATCH --job-name=OM_pp","\n", sep ="")
-cat("#SBATCH --account=penny","\n", sep ="")
-cat("#SBATCH -o /scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT/2_postprocessing_jobs.out","\n", sep ="")
-cat("#SBATCH --mem=2G","\n", sep ="")
-cat("#SBATCH --qos=6hours","\n", sep ="")
-cat("#SBATCH --cpus-per-task=1","\n", sep ="")
-cat("###########################################","\n", sep ="")
-cat("ml purge","\n", sep ="")
-cat("ml R/3.6.0-foss-2018b","\n", sep ="")
-
-
-cat("INPUT_DIR=$1","\n", sep ="")
-cat("OM_RESULTS_DIR=$2","\n", sep ="")
-cat("DEST_DIR=$3","\n", sep ="")
-cat("FOLLOW_UP=$4","\n", sep ="")
-cat("YEARSBEFINT=$5","\n", sep ="")
-
-cat("echo \"Input: $INPUT_DIR\"","\n", sep ="")
-cat("echo \"OM dir: $OM_RESULTS_DIR\"","\n", sep ="")
-cat("echo \"Dest dir: $DEST_DIR\"","\n", sep ="")
-cat("echo \"Followup: $FOLLOW_UP\"","\n", sep ="")
-cat("echo \"Years before: $YEARSBEFINT\"","\n", sep ="")
-
-
-# IMPORTANT: the number of files must equal to the task array length (index starts at 0)","\n", sep ="")
-cat("split_files=(${INPUT_DIR}*.txt)","\n", sep ="")
-
-cat("# Select scenario file in array","\n", sep ="")
-cat("ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)","\n", sep ="")
-cat("split_file=${split_files[$ID]}","\n", sep ="")
-cat("echo \"Postprocessing for $split_file\"","\n", sep ="")
-
-cat("Rscript ../../../analysisworkflow/2_postprocessing/calc_sim_outputs.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP $YEARSBEFINT","\n", sep ="")
-
-sink()
-
-
-
-
-
-setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
-
-sys_command = paste("sbatch postprocessing_workflow.sh", SIM_FOLDER ,follow_up, yearsbeforeInt)
-
-# Run  command
-system(sys_command)
-
-} else{
-  
-  file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/postprocessing_workflow_trial.sh"), 
-           paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/postprocessing_workflow_trial.sh"),overwrite=TRUE)
-  
-  
-  
-  sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/job_postprocessing_trial.sh"))
-  
-  cat("#!/bin/bash","\n", sep ="")
-  cat("#SBATCH --job-name=OM_pp","\n", sep ="")
-  cat("#SBATCH --account=penny","\n", sep ="")
-  cat("#SBATCH -o /scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT/2_postprocessing_trial.out","\n", sep ="")
-  cat("#SBATCH --mem=2G","\n", sep ="")
-  cat("#SBATCH --qos=6hours","\n", sep ="")
-  cat("#SBATCH --cpus-per-task=1","\n", sep ="")
-  cat("###########################################","\n", sep ="")
-  cat("ml purge","\n", sep ="")
-  cat("ml R/3.6.0-foss-2018b","\n", sep ="")
-  
-  
-  cat("INPUT_DIR=$1","\n", sep ="")
-  cat("OM_RESULTS_DIR=$2","\n", sep ="")
-  cat("DEST_DIR=$3","\n", sep ="")
-  cat("FOLLOW_UP=$4","\n", sep ="")
-  cat("YEARSBEFINT=$5","\n", sep ="")
-  
-  # IMPORTANT: the number of files must equal to the task array length (index starts at 0)","\n", sep ="")
-  cat("split_files=(${INPUT_DIR}*.txt)","\n", sep ="")
-  
-  cat("# Select scenario file in array","\n", sep ="")
-  cat("ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)","\n", sep ="")
-  cat("split_file=${split_files[$ID]}","\n", sep ="")
-  cat("echo \"Postprocessing for $split_file\"","\n", sep ="")
-  
-  cat("Rscript ../../../analysisworkflow/2_postprocessing/calc_sim_outputs_trial.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP","$YEARSBEFINT","\n", sep ="")
-  
-  sink()
-  
- setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
-  
-  sys_command = paste("sbatch postprocessing_workflow_trial.sh", SIM_FOLDER , trialweeks[1], trialweeks[2])
-  
-  # Run  command
-  system(sys_command)
-  
-}
-  
-}
+    
+    sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/job_postprocessing.sh"))
+    
+    cat("#!/bin/bash","\n", sep ="")
+    cat("#SBATCH --job-name=OM_pp","\n", sep ="")
+    cat("#SBATCH --account=penny","\n", sep ="")
+    cat("#SBATCH -o ",ERROR_FOLDER,"%A_%a.out","\n", sep ="")
+    # cat("#SBATCH -o /scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT/2_postprocessing_jobs.out","\n", sep ="")
+    cat("#SBATCH --mem=2G","\n", sep ="")
+    cat("#SBATCH --qos=6hours","\n", sep ="")
+    cat("#SBATCH --cpus-per-task=1","\n", sep ="")
+    cat("###########################################","\n", sep ="")
+    cat("ml purge","\n", sep ="")
+    cat("ml R/3.6.0-foss-2018b","\n", sep ="")
+    
+    cat("INPUT_DIR=$1","\n", sep ="")
+    cat("OM_RESULTS_DIR=$2","\n", sep ="")
+    cat("DEST_DIR=$3","\n", sep ="")
+    cat("FOLLOW_UP=$4","\n", sep ="")
+    cat("YEARSBEFINT=$5","\n", sep ="")
+    
+    cat("echo \"Input: $INPUT_DIR\"","\n", sep ="")
+    cat("echo \"OM dir: $OM_RESULTS_DIR\"","\n", sep ="")
+    cat("echo \"Dest dir: $DEST_DIR\"","\n", sep ="")
+    cat("echo \"Followup: $FOLLOW_UP\"","\n", sep ="")
+    cat("echo \"Years before: $YEARSBEFINT\"","\n", sep ="")
+    
+    # IMPORTANT: the number of files must equal to the task array length (index starts at 0)","\n", sep ="")
+    cat("split_files=(${INPUT_DIR}*.txt)","\n", sep ="")
+    
+    cat("# Select scenario file in array","\n", sep ="")
+    cat("ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)","\n", sep ="")
+    cat("split_file=${split_files[$ID]}","\n", sep ="")
+    cat("echo \"Postprocessing for $split_file\"","\n", sep ="")
+    
+    cat("Rscript ../../../analysisworkflow/2_postprocessing/calc_sim_outputs.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP $YEARSBEFINT","\n", sep ="")
+    
+    sink()
+    
+    setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
+    
+    sys_command = paste("sbatch postprocessing_workflow.sh", SIM_FOLDER ,follow_up, yearsbeforeInt)
+    
+    # Run  command
+    system(sys_command)
+    
+    } else{
+      
+      file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/postprocessing_workflow_trial.sh"), 
+                paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/postprocessing_workflow_trial.sh"),overwrite=TRUE)
+      
+      
+      
+      sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/job_postprocessing_trial.sh"))
+      
+      cat("#!/bin/bash","\n", sep ="")
+      cat("#SBATCH --job-name=OM_pp","\n", sep ="")
+      cat("#SBATCH --account=penny","\n", sep ="")
+      cat("#SBATCH -o ",ERROR_FOLDER,"%A_%a.out","\n", sep ="")
+      # cat("#SBATCH -o /scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT/2_postprocessing_trial.out","\n", sep ="")
+      cat("#SBATCH --mem=2G","\n", sep ="")
+      cat("#SBATCH --qos=6hours","\n", sep ="")
+      cat("#SBATCH --cpus-per-task=1","\n", sep ="")
+      cat("###########################################","\n", sep ="")
+      cat("ml purge","\n", sep ="")
+      cat("ml R/3.6.0-foss-2018b","\n", sep ="")
+      
+      
+      cat("INPUT_DIR=$1","\n", sep ="")
+      cat("OM_RESULTS_DIR=$2","\n", sep ="")
+      cat("DEST_DIR=$3","\n", sep ="")
+      cat("FOLLOW_UP=$4","\n", sep ="")
+      cat("YEARSBEFINT=$5","\n", sep ="")
+      
+      # IMPORTANT: the number of files must equal to the task array length (index starts at 0)","\n", sep ="")
+      cat("split_files=(${INPUT_DIR}*.txt)","\n", sep ="")
+      
+      cat("# Select scenario file in array","\n", sep ="")
+      cat("ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)","\n", sep ="")
+      cat("split_file=${split_files[$ID]}","\n", sep ="")
+      cat("echo \"Postprocessing for $split_file\"","\n", sep ="")
+      
+      cat("Rscript ../../../analysisworkflow/2_postprocessing/calc_sim_outputs_trial.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP","$YEARSBEFINT","\n", sep ="")
+      
+      sink()
+      
+      setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
+      
+      sys_command = paste("sbatch postprocessing_workflow_trial.sh", SIM_FOLDER , trialweeks[1], trialweeks[2])
+      
+      # Run  command
+      system(sys_command)
+      
+    }
+  }
  
