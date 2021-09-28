@@ -44,3 +44,6 @@ git push # files added to repo
 git checkout -b [branchname] # creates new branch and checkout to new branch at same time
 # next commit changes while in branch
 git push -u origin [branchname] # push to create new branch
+
+# Selective merge of specific files from branch
+https://stackoverflow.com/questions/449541/how-can-i-selectively-merge-or-pick-changes-from-another-branch-in-git
