@@ -1,14 +1,40 @@
-##############################
-# Main script for running GP training functions on post-processed OM simulations 
-# 
-#
-# created 12.02.2021
-#lydia.burgert@unibas.ch 
-#############################
+#####################################
+#####################################
+###                               ###
+### STEP 4: SENSITIVITY ANALYSIS  ###
+###                               ###
+#####################################
+#####################################
 
-# Setup
+
+### -------------------------------------------------------------------------
+###
+### M3TPP PROJECT:
+### Main script for running sensitivity analyses
+### 
+### Original script:
+### Created 12.02.2021
+### lydia.burgert@unibas.ch 
+###
+### Adapted script:
+### Saved 01.09.2021
+### narimane.nekkab@unibas.ch
+###
+### R version 3.6.0
+###
+### -------------------------------------------------------------------------
+
+##############
+### HEADER ###
+##############
+
+# Clear environment
 rm(list = ls())
-library(tgp)
+
+# Set seed for replication
+set.seed(42)
+
+# Library
 library(tgp)
 library(hetGP)
 library(ggplot2)
@@ -19,7 +45,6 @@ library(lhs)
 library(dplyr)
 library(reshape2)
 library(gridExtra)
-set.seed(42)
 
 # User 
 user = strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
@@ -30,11 +55,32 @@ setwd(paste0("/scicore/home/penny/",user,"/M3TPP"))
 # Source function scripts
 source(paste0("./analysisworkflow/4_sensitivity_analysis/gensensanalysisscripts.R"))
 
-# insert experiment name here
+
+##################
+### EXPERIMENT ###
+##################
+
+# Insert experiment name here
 exp ="..."
 
-# specify predicted parameter
-pred_list = c("prev_red_all","prev_red_210","prev_red_int","inc_red_05","inc_red_int","inc_red_all","inc_red_int_5mo")
+
+##################
+### PARAMETERS ###
+##################
+
+# Specify parameter to be predicted
+# Make sure GP exists or will get error
+
+# All current variables for loop --> may be updated in future
+pred_list = c("prev_red_all","prev_red_210","prev_red_int","inc_red_05",
+              "inc_red_int","inc_red_all","inc_red_int_5mo")
+
+# Or choose 1
+# pred_list = "prev_red_all"
+
+####################
+### RUN ANALYSIS ###
+####################
 
 # loop run for each
 for(i in pred_list){
