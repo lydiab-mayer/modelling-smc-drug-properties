@@ -1,4 +1,4 @@
-## Function returning the parameter to be optimized, 
+# Function returning the parameter to be optimized, 
 get_param = function(x, GP_model, param_vec, param_name) {
   return(x)
 }
@@ -10,7 +10,6 @@ get_p_red = function(x, GP_model, param_vec, param_name) {
   if(prev_red>100) {
     prev_red = 100
   }
-  # print(prev_red)
   return(prev_red)
 }
 

@@ -21,6 +21,9 @@
 
 SIM_DIR=$1
 PREDICTED=$2
+LOWER=$3
+UPPER=$4
+SCALE=$5
 
 INPUT_DIR=$SIM_DIR"postprocessing/"
 DEST_DIR=$SIM_DIR"gp/"
@@ -34,5 +37,5 @@ mkdir -p $TRAINING_DIR
 # Submit postprocessing array job
 setting_postprocessing_results=(${INPUT_DIR}seeds_*.txt)
 NUM=${#setting_postprocessing_results[@]}
-sbatch -W --array=1-$NUM job_train_GP.sh $INPUT_DIR $TRAINING_DIR $PREDICTED $RANGES_FILE
+sbatch -W --array=1-$NUM job_train_GP.sh $INPUT_DIR $TRAINING_DIR $PREDICTED $RANGES_FILE $LOWER $UPPER $SCALE
   

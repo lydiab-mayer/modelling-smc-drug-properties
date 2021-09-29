@@ -11,7 +11,7 @@
 
 ########################################
 
-genGPtrainscripts <- function(exp, predicted){
+genGPtrainscripts <- function(exp, predicted, lower, upper, scale){
   
   
   user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
@@ -39,6 +39,9 @@ genGPtrainscripts <- function(exp, predicted){
   cat("DEST_DIR=$2","\n", sep ="")
   cat("PREDICTED=$3","\n", sep ="")
   cat("RANGES_FILE=$4","\n", sep ="")
+  cat("LOWER=$5","\n", sep ="")
+  cat("UPPER=$6","\n", sep ="")
+  cat("SCALE=$7","\n", sep ="")
   
   cat("# IMPORTANT: the number of files must equal to the task array length (index starts at 0)","\n", sep ="")
   cat("setting_postprocessing_results=(${INPUT_DIR}seeds_*.txt)","\n", sep ="")
@@ -46,9 +49,9 @@ genGPtrainscripts <- function(exp, predicted){
   cat("# Select scenario file in array","\n", sep ="")
   cat("ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)","\n", sep ="")
   cat("setting_postprocessing_result=${setting_postprocessing_results[$ID]}","\n", sep ="")
-  cat("echo \"Postprocessing for $setting_postprocessing_result\"","\n", sep ="")
+  cat("echo \"Postprocessing $PREDICTED for $setting_postprocessing_result\"","\n", sep ="")
   
-  cat("Rscript ../../../analysisworkflow/3_GP_train/train_GP.R $setting_postprocessing_result $DEST_DIR $PREDICTED $RANGES_FILE","\n", sep ="")
+  cat("Rscript ../../../analysisworkflow/3_GP_train/train_GP.R $setting_postprocessing_result $DEST_DIR $PREDICTED $RANGES_FILE $LOWER $UPPER $SCALE","\n", sep ="")
   
   sink()
   
@@ -57,7 +60,7 @@ genGPtrainscripts <- function(exp, predicted){
   
   setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
   
-  sys_command = paste("sbatch GP_train_workflow.sh", SIM_FOLDER ,predicted)
+  sys_command = paste("sbatch GP_train_workflow.sh", SIM_FOLDER, predicted, lower, upper, scale)
   
   # Run  command
   system(sys_command)

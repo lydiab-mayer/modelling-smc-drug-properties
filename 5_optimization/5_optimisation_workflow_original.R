@@ -1,119 +1,61 @@
-######################################
-######################################
-###                                ###
-### STEP 5: OPTIMIZATION ANALYSIS  ###
-###                                ###
-######################################
-######################################
+##############################
+# Main script for running GP training functions on post-processed OM simulations 
+# 
+#
+# created 12.02.2021
+#lydia.burgert@unibas.ch 
+#
+# updated September 2021
+# lydia.braunack-mayer@swisstph.ch
+#############################
 
-
-### -------------------------------------------------------------------------
-###
-### M3TPP PROJECT:
-### Main script for running optimization analyses
-### 
-### Original script:
-### Created 12.02.2021
-### lydia.burgert@unibas.ch 
-###
-### Adapted script:
-### Saved 01.09.2021
-### narimane.nekkab@unibas.ch
-###
-### R version 3.6.0
-###
-### -------------------------------------------------------------------------
-
-##############
-### HEADER ###
-##############
-
-# Clear environment
+# Setup
 rm(list = ls())
-
-# Set seed for replication
+# library(tgp)
+# library(hetGP)
+# library(ggplot2)
+# library(viridis)
+# library(sensitivity)
+# library(multisensi)
+# library(lhs)
+# library(dplyr)
+# library(reshape2)
+# library(gridExtra)
 set.seed(42)
-
-# Library (double-check which are no longer required and remove)
-library(tgp)
-library(hetGP)
-library(ggplot2)
-library(viridis)
-library(sensitivity)
-library(multisensi)
-library(lhs)
-library(dplyr)
-library(reshape2)
-library(gridExtra)
 
 # User 
 user = strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
 
 # Working directory
-setwd(paste0("/scicore/home/penny/",user,"/M3TPP"))
+setwd(paste0("/scicore/home/penny/", user, "/M3TPP"))
 
 # Source function scripts
 source(paste0("./analysisworkflow/5_optimization/genoptimizationscripts.R"))
 
-
-##################
-### EXPERIMENT ###
-##################
-
-# Insert experiment name here
+# insert experiment name here
 exp ="..."
 
+# specify the predicted outcome, the desired reduction and parameter to be optimized  
 
-##################
-### PARAMETERS ###
-##################
+# same name as in the gp trained folder 
+predicted = "..."
+reductions_list = seq(10, 80, 10)
 
-# Specify the following 3 variables:
-# --> 1 predicted outcome
-# --> multiple desired health targets (% reduction) 
-# --> 1 parameter to be optimized (Coverage, Halflife, Efficacy) --> verify spelling
-
-###############
-### OUTCOME ###
-
-# Choose 1 outcome variable for optimization from full list (to be updated)
-pred_list = c("prev_red_all","prev_red_210","prev_red_int","inc_red_05",
-              "inc_red_int","inc_red_all","inc_red_int_5mo")
-predicted = pred_list[1]
-
-###############
-### TARGETS ###
-
-# Choose health targets (% reduction) for loop
-targets_list = seq(10,80,10)
-
-##########################
-### OPTIMIZED VARIABLE ###
-
-# Choose 1 variable to optimize
-# Needs to be a predictor in the gp -> continuous parameter sampled when simulating
-optimized="Halflife"
-# optimized="Coverage"
-# optimized="Efficacy"
-
-###################
-### GRID POINTS ###
+# needs to be a predictor in the gp -> continuous parameter sampled when simulating
+optimized = "Halflife"
 
 # Grid points (number of breaks of continuous variables)
-# Increasing number increases number of finite values & run time
 n_gridpoints = 10
 
+# specify whether, when training the GP, input parameters were scaled to c(0, 1) (TRUE) or used on their original scale (FALSE)
+scale = TRUE
 
-########################
-### RUN OPTIMIZATION ###
-########################
-
-# loop run for each target
-for(i in targets_list){
-  targets = i
+# loop run for each
+for(i in reductions_list){
+  reductions = i
   print(i)
   # Run
-  genoptimizationscripts(exp, predicted, targets, optimized, n_gridpoints)
+  genoptimizationscripts(exp, predicted, reductions, optimized, n_gridpoints, scale)
 }
 
 

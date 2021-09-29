@@ -25,6 +25,9 @@ split_file = args[1]
 results_folder = args[2]
 predicted = args[3]
 ranges_file = args[4]
+lower = args[5]
+upper = args[6]
+scale = args[7]
 
 
 OM_result = read.table(split_file, sep="\t", header = TRUE, as.is = TRUE)
@@ -32,6 +35,8 @@ exp_name = tools::file_path_sans_ext(basename(split_file))
 cv_file = paste(results_folder, exp_name,"_",predicted, "_cv.RData", sep="")
 ranges = load(ranges_file)
 param_ranges <- param_ranges_cont
+lower <- as.numeric(strsplit(lower, "/")[[1]])
+upper <- as.numeric(strsplit(upper, "/")[[1]])
   
 if((predicted %in%colnames(OM_result)) == FALSE) {
     stop(paste("Column ", predicted, "not found.", sep=""))
@@ -62,7 +67,14 @@ print(c("n_seeds: ", n_seeds))
 
 input_data <- input_data[,c(input_parameters,predicted)]
 #train GP
-cv_result = cv_train_matern(input_data, 5)
+
+if (scale == TRUE) {
+  scale <- param_ranges 
+} else {
+  scale <- NULL
+}
+
+cv_result = cv_train_matern(input_data = input_data, K = 5, lower = lower, upper = upper, scale = scale)
 
 save= paste(results_folder, exp_name,"_",predicted, "_cv.jpg", sep="")
 
