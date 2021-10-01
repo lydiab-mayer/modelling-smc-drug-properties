@@ -5,10 +5,11 @@
 # monica.golumbeanu@unibas.ch
 # modified by lydia.burgert@unibas.ch 
 ##########################
-library(rapportools)
-library(survival)
-library(cmprsk)
-require(plyr)
+
+# library(rapportools)
+# library(survival)
+# library(cmprsk)
+# require(plyr)
 require(dplyr)
 
 # Function which calculates prevalence reduction given an OpenMalaria

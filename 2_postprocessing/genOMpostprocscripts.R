@@ -5,23 +5,27 @@
 # INPUTS:
 #   exp: experiment name
 #   chunk_size: batch size for simulation submission
-
+#
 # OUTPUTS:
 #	- OM scenario xml files and simulations in GROUP folder
-
+#
+# Updates
+# narimane.nekkab@swisstph.ch
+# 01.10.2021
+#
 ########################################
 
 genOMpostprocscripts <- function(exp, setting,followup, trialweeks,yearsbeforeInt){
   
   user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
   
-  dir.create(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT"))
-
+  if(!dir.exists(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT"))){
+    dir.create(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT"))
+  }
+  
   GROUP = "/scicore/home/penny/GROUP/M3TPP/"
   
   SIM_FOLDER=paste0(GROUP,exp,"/")
-  ERROR_FOLDER=paste0(GROUP,exp,"/postprocessing/err/")
-  dir.create(ERROR_FOLDER)
   
   if (setting=="implementation"){
     
@@ -73,12 +77,10 @@ genOMpostprocscripts <- function(exp, setting,followup, trialweeks,yearsbeforeIn
     # Run  command
     system(sys_command)
     
-    } else{
+    }else{
       
       file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/2_postprocessing/postprocessing_workflow_trial.sh"), 
                 paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/postprocessing_workflow_trial.sh"),overwrite=TRUE)
-      
-      
       
       sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/job_postprocessing_trial.sh"))
       
@@ -121,5 +123,11 @@ genOMpostprocscripts <- function(exp, setting,followup, trialweeks,yearsbeforeIn
       system(sys_command)
       
     }
+  
+  ERROR_FOLDER=paste0(GROUP,exp,"/postprocessing/err/")
+  if(!dir.exists(ERROR_FOLDER)){
+    dir.create(ERROR_FOLDER)
   }
+  
+}
  
