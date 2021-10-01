@@ -24,6 +24,7 @@ genOMpostprocscripts <- function(exp, setting,followup, trialweeks,yearsbeforeIn
   }
   
   GROUP = "/scicore/home/penny/GROUP/M3TPP/"
+  ERROR_FOLDER = paste0(GROUP,exp,"/postprocessing/err/")
   
   SIM_FOLDER=paste0(GROUP,exp,"/")
   
@@ -123,11 +124,6 @@ genOMpostprocscripts <- function(exp, setting,followup, trialweeks,yearsbeforeIn
       system(sys_command)
       
     }
-  
-  ERROR_FOLDER=paste0(GROUP,exp,"/postprocessing/err/")
-  if(!dir.exists(ERROR_FOLDER)){
-    dir.create(ERROR_FOLDER)
-  }
   
 }
  

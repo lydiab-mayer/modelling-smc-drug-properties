@@ -31,17 +31,19 @@ PARAM_TAB=$SIM_FOLDER"param_tab.txt"
 PARAM_CAT=$SIM_FOLDER"param_ranges_cat.RData"
 OM_FOLDER=$SIM_FOLDER"om/"
 OUTPUT_FOLDER=$SIM_FOLDER"postprocessing/"
-split_folder=$OUTPUT_FOLDER"split/"
+ERROR_FOLDER=$OUTPUT_FOLDER"err/"
+SPLIT_FOLDER=$OUTPUT_FOLDER"split/"
 
 # create the necessary folders
 mkdir -p $OUTPUT_FOLDER
-mkdir -p $split_folder
+mkdir -p $SPLIT_FOLDER
+mkdir -p $ERROR_FOLDER
 
 # split the parameter table by setting
-Rscript ../../../analysisworkflow/2_postprocessing/split_param_table.R $PARAM_TAB $split_folder $PARAM_CAT
+Rscript ../../../analysisworkflow/2_postprocessing/split_param_table.R $PARAM_TAB $SPLIT_FOLDER $PARAM_CAT
 
-echo  $split_folder
+echo  $SPLIT_FOLDER
 # Submit postprocessing array job
-split_files=(${split_folder}*.txt)
+split_files=(${SPLIT_FOLDER}*.txt)
 NUM=${#split_files[@]}
-sbatch -W --array=1-$NUM job_postprocessing.sh $split_folder $OM_FOLDER $OUTPUT_FOLDER $FOLLOW_UP $YEARSBEFINT
+sbatch -W --array=1-$NUM job_postprocessing.sh $SPLIT_FOLDER $OM_FOLDER $OUTPUT_FOLDER $FOLLOW_UP $YEARSBEFINT
