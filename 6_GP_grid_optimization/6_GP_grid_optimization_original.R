@@ -51,8 +51,7 @@ setwd(paste0("/scicore/home/penny/",user,"/M3TPP"))
 ##################
 
 # Insert experiment name here
-# exp = "..."
-exp = "MOCK_EIR15_sig2_april_age10"
+exp = "..."
 
 # Group and simulation folder
 GROUP = "/scicore/home/penny/GROUP/M3TPP/"
@@ -68,7 +67,7 @@ load(ranges_file)
 param_ranges_cont
 
 # Predicted variables
-predicted = "inc_red_int_5mo"
+predicted = "..."
 
 # Get postprocessing seed file name for GP file name
 seed_name = list.files(path = paste0(GROUP,exp,"/postprocessing/"), pattern = "seeds", full.names = FALSE)
@@ -85,10 +84,10 @@ gp_file = paste0("/scicore/home/penny/GROUP/M3TPP/",
                  "_cv.RData")
 
 # Variable to optimize
-optim_param = "Halflife"
+optim_param = "..."
 
 # GP using scaled values
-scale = F
+scale = T
 
 # Grid size
 n_grid = 100
