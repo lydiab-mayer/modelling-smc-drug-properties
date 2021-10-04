@@ -45,7 +45,7 @@ seasonality_type = "monthly"
 
 chunk_size = 90000
 
-QOS = "30min"
+QOS = "..."
 
 #############################
 # Categorical variables
