@@ -79,10 +79,9 @@ optim_param = "..."
 # GP using scaled values
 scale = T
 
-# Grid size
-n_grid = 10
-# LBM: Can we have it so that you can specify a different resolution for the parameter being optimised vs. other parameters?
-# LBM: For example... n_grid = c("Coverage" = 20, "Halflife" = 20, "Efficacy" = 100)
+# Create grid of parameter values to search
+ngrid <- c(NA, NA, NA)
+# ngrid = c("Coverage" = ..., "Halflife" = ..., "Efficacy" = ...)
 
 # Set target range size (1 is per 1% jumps, 10 by 10% etc.)
 target_range_size = 10
@@ -111,7 +110,7 @@ if(!dir.exists(opt_folder)){
 #######################################################
 
 # Create grid search optimization function
-GP_grid_search_predictions <- function(predicted, gp_file, optim_param, scale, n_grid, target_range_size){
+GP_grid_search_predictions <- function(predicted, gp_file, optim_param, scale, n_grid, target_range_size, opt_folder, j){
   
   ###############
   ### SCALING ###
@@ -135,19 +134,8 @@ GP_grid_search_predictions <- function(predicted, gp_file, optim_param, scale, n
   # Load GP model
   gp_result_name <- load(gp_file)
   gp_result <- cv_result$GP_model
-  
-  # Create grid of parameter values to search
-  ngrid <- c(NA, NA, NA)
-  names(ngrid) <- rownames(param_ranges_cont)
-  
-  # Grid size
-  ngrid[!(names(ngrid) == optim_param)] <- n_grid
-  ngrid[optim_param] <- n_grid * 10
-  # ngrid[optim_param] <- param_ranges_cont[optim_param, 2] - param_ranges_cont[optim_param, 1] + 1 # number of integer values between min and max parameter ranges
-  # LBM: Since we decided to have these specified manually, lines 154:159 should be something like this:
-  # LBM: ngrid <- rep(n_grid, length(rownames(param_ranges_cont)))
-  
-  # Create scenarios
+
+  # Create scenarios (default for 3 variables; change for specific experiments when necessary)
   scenarios <- expand.grid(seq(scale_params[1, 1], scale_params[2, 1], length.out = ngrid[1]),
                            seq(scale_params[1, 2], scale_params[2, 2], length.out = ngrid[2]),
                            seq(scale_params[1, 3], scale_params[2, 3], length.out = ngrid[3]))
@@ -184,9 +172,8 @@ GP_grid_search_predictions <- function(predicted, gp_file, optim_param, scale, n
   head(optimization_results)
   
   # Save tables
-  write.table(scenarios, file=paste0(opt_folder,predicted,"/",j,"_",predicted,"_GP_grid_scenario_predictions.txt")) # LBM: This file name is craaaazy long, what about something like '<exp name>_<scenario details>_<outcome>'
+  write.table(scenarios, file=paste0(opt_folder,predicted,"/",j,"_",predicted,"_GP_grid_scenario_predictions.txt")) 
   write.table(optimization_results, file=paste0(opt_folder,predicted,"/",j,"_",predicted,"_GP_grid_optimization_",optim_param,".txt")) 
-  # LBM: Both opt_folder and seed_name are arguments required here, better if we include them in the function inputs? I also run into the same problem here as above, in that for me seed_name is a string vector rather than string 
   
   return(list(scenarios, optimization_results))
 }
@@ -218,8 +205,8 @@ for(i in pred_list){
       dir.create(paste0(opt_folder,i,"/"))
     }
     
-    # Run
-    results = GP_grid_search_predictions(i, gp_file, optim_param, scale, n_grid, target_range_size)
+    # Run (check it works)
+    results = GP_grid_search_predictions(i, gp_file, optim_param, scale, n_grid, target_range_size, opt_folder, j)
     scenario_predictions = results[[1]]
     optimization_results = results[[2]]
     rm(results)
