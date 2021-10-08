@@ -47,6 +47,17 @@ git push -u origin [branchname] # push to create new branch
 
 # Selective merge of specific files from branch
 https://stackoverflow.com/questions/449541/how-can-i-selectively-merge-or-pick-changes-from-another-branch-in-git
+1. Selectivly merge from one branch to current branch or master
+git checkout master
+git merge --no-ff --no-commit [branchname]
+git status
+2. Files you don't want to merge
+git checkout HEAD [file]
+3. If you want the version in branch and not master
+git checkout [branchname] [file2]
 
 # Discard uncommitted changes to a file
 git checkout --<file>  
+
+# Remove staged file
+git reset HEAD -- [file]
