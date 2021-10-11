@@ -133,36 +133,49 @@ import_cont_4var <- function(exp,scenario_name,param_table_file,seeds,follow_up,
 # import_EIRs_cat
 # ----------------------------------------------------------
 
-import_EIRs_cat <- function(exp,params_setting,seeds){
+import_EIRs_cat <- function(exp, scenario_id, seeds, timesteps){
   
-  params_setting
+  # ----------------------------------------------------------
+  # This function averages continuous OpenMalaria outputs from multiple random seeds, by setting
+  #
+  # Inputs
+  # exp: string containing the experiment name as it appears on SciCore, e.g. "MyExperiment"
+  # scenario_id: character vector containing id(s) for scenario(s) to plot, e.g c("MyExperiment_1", "MyExperiment_2")
+  # seeds: integer vector containing selection of seeds to plot, e.g. c(1)
+  # timesteps: integer vector containing selection of OpenMalaria timesteps to plot, e.g. 1:73 captures outputs for the first year of simulation
+  #
+  # Outputs
+  # out: list containing 'All', data frame containing all continuous OpenMalaria outputs for the given setting, and
+  # 'Average', data frame containing averaged continuous OpenMalaria outputs for the given setting
+  #
+  # ----------------------------------------------------------
   
-  om_results_folder <- paste0("/scicore/home/penny/GROUP/M3TPP/",exp,"/om/")
-  param_table <- read.table(param_table_file, sep= "\t", header = TRUE, as.is = TRUE, stringsAsFactors = FALSE)
+  # Load packages
+  require(data.table)
   
+  # Set up file pathways
+  om_results_folder <- paste0("/scicore/home/penny/GROUP/M3TPP/", exp, "/om/")
   
-  param_table = read.table(param_table_file, sep= "\t", as.is = TRUE, header = TRUE, stringsAsFactors = FALSE)
-  res_df <- list()
-  for (i in 1:seeds) {
-    
-    #  param_table <- param_table[order(param_table$Scenario_Name), ]
-    OM_result_file = paste(om_results_folder, params_setting$Scenario_Name, "_",
-                           +                                i, "_cts.txt", sep="")
-    OM_result = read.table(OM_result_file, sep="\t",header=TRUE)
-    
-    res <- subset(OM_result, timestep %in% seq(1,73))
-    
-    
-    res_df[[i]]<- res 
-    
+  # Set up list to store function outputs
+  out_all <- list()
+  
+  # Identify and concatenate continuous OpenMalaria outputs for the given setting, seed and selection of timesteps
+  for (j in scenario_id) {
+    for (i in seeds) {
+      om_result <- read.table(paste0(om_results_folder, j, "_", i, "_cts.txt"), sep = "\t", header = TRUE)
+      om_result$scenario_id <- j; om_result$seed <- i
+      out_all[[paste0("scenario_id", j, "_seed", i)]]<- subset(om_result, timestep %in% timesteps)
+    }
   }
- 
-   df_EIR <- rbindlist(res_df)[,lapply(.SD,mean), list(timestep)]  
-  return(df_EIR)
+  
+  # Average continuous OpenMalaria outputs across seeds
+  out_all <- rbindlist(out_all)
+  out_average <- out_all[, lapply(.SD, mean), list(scenario_id, timestep)]
+  
+  # Return function outputs
+  return(list("All" = out_all, "Average" = out_average))
   
 }
-
-
 
 # ----------------------------------------------------------
 # import_monitoring_outcome
@@ -182,7 +195,7 @@ import_monitoring_outcome <- function(exp, scenario_id, measure, seeds, timestep
   #
   # Outputs
   # out: list containing 'All', data frame containing the selected OpenMalaria monitoring outcome for all simulations for a given setting, and
-  # 'Median', data frame containing median OpenMalaria monitoring outcome for the given setting
+  # 'Average', data frame containing averaged OpenMalaria monitoring outcome for the given setting
   #
   # ----------------------------------------------------------
   
@@ -207,9 +220,10 @@ import_monitoring_outcome <- function(exp, scenario_id, measure, seeds, timestep
   
   # Average continuous OpenMalaria outputs across seeds, by age group
   out_all <- rbindlist(out_all)
-  out_median <- out_all[, lapply(.SD, mean), list(scenario_id, timestep, agegroup)]
+  out_average <- out_all[, lapply(.SD, mean), list(scenario_id, timestep, agegroup)]
   
   # Return function outputs
-  return(list("All" = out_all, "Median" = out_median))
+  return(list("All" = out_all, "Average" = out_average))
   
 }
+

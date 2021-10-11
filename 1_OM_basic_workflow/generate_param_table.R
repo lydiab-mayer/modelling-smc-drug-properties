@@ -27,7 +27,7 @@ GROUP = "/scicore/home/penny/GROUP/M3TPP/"
 ranges_file = paste0(user_dir,"/param_ranges.RData")
 cat_file = paste0(user_dir,"/params_cat.RData")
 table_file = paste0(user_dir,"/param_tab.txt")
-scaffold_file= paste0(user_dir,"/OM_jobs/scaffold.xml")
+scaffold_file= paste0(user_dir,"/OM_JOBS/scaffold.xml")
 
 # sample continuous parameter values 
 
@@ -68,7 +68,7 @@ file.remove(table_file)
  file.copy(table_file, paste0(GROUP,exp,"/param_tab.txt"),overwrite=TRUE)
  
  # copy over scaffold file 
- file.remove(paste0(GROUP,exp,"/scaffold.xml"))
+ if (file.exists(paste0(GROUP,exp,"/scaffold.xml"))) file.remove(paste0(GROUP,exp,"/scaffold.xml"))
 
  file.copy(scaffold_file, paste0(GROUP,exp,"/scaffold.xml"),overwrite=TRUE)
 
