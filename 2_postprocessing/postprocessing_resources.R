@@ -224,16 +224,17 @@ calculate_outputs = function(om_result, scenario_params, follow_up, years_before
    if(cont==FALSE) {
     # Final row with outputs to return
   return_row = cbind.data.frame(scenario_params$Scenario_Name,
-                                scenario_params$SEED,prev_red_all,prev_red_210,prev_red_int,
-                                inc_red_05,inc_red_int, inc_red_all,inc_red_int_5mo
+                                scenario_params$SEED,
+                                prev_red_all, prev_red_210, prev_red_int,
+                                inc_red_05, inc_red_int, inc_red_all, inc_red_int_5mo,
+                                prev_all_before, prev_210_beg, prev_int_beg) #LBM: Updated to include prev prior to intervention
+  
+  colnames(return_row) = c("Scenario_Name", "seed",
+                           "prev_red_all", "prev_red_210", "prev_red_int",
+                           "inc_red_05", "inc_red_int", "inc_red_all", "inc_red_int_5mo",
+                           "prev_all_before", "prev_210_beg", "prev_int_beg")
 
-  )
-  colnames(return_row) = c("Scenario_Name",
-                           "seed","prev_red_all","prev_red_210","prev_red_int", "inc_red_05","inc_red_int", "inc_red_all","inc_red_int_5mo"
-
-  )
-
-  return(return_row)}else{
+  return(return_row)} else{
     out_df= list("prevalence_210"=prev_210,
                  "prevalence_int"=prev_int,
                  "prevalence_allages"=prev_allages,
@@ -242,8 +243,7 @@ calculate_outputs = function(om_result, scenario_params, follow_up, years_before
                  "incidence_int"=inc_int,
                  "incidence_allages"=inc_allages,
                  "incidence_agegroups"=inc_agegroups,
-                 "incidence_int_5mo"=inc_int
-                 )
+                 "incidence_int_5mo"=inc_int)
     return(out_df)
   }
   if(cont==FALSE) { 
