@@ -21,15 +21,16 @@ calculate_outputs = function(om_result, scenario_params, follow_up, years_before
   years_before_interv = years_before_interv
   
   # define age groups 
-  age_groups <- c(0,0.25,2,5,10,15,20,100)
+  age_groups <- c(0, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 100)
   minIntAge=0.25
   age210 = seq(which(age_groups==2),which(age_groups==10)-1)
   ageint = seq(which(age_groups==minIntAge),as.numeric(scenario_params["maxGroup"]))
   age05 = seq(which(age_groups==0),which(age_groups==5)-1)
   
   # Remove first measurement as it includes all cases until then
-  to_remove = which(om_result$time == 1)
-  om_result = om_result[-to_remove,]
+  # to_remove = which(om_result$time == 1)
+  # om_result = om_result[-to_remove,]
+  # LBM: Updated to avoid this, it causes errors! But need to make sure this won't cause problems down the track
   
   # population per time step per age group
   total_pop = as.data.frame(om_result[om_result$measure == 0, ])
@@ -67,7 +68,7 @@ calculate_outputs = function(om_result, scenario_params, follow_up, years_before
   # Prevalence = total number of infected people (in age group)/ total population (in age group)
   
   # number of infected per age-group per time-step
-  # n_infected = as.data.frame(om_result[om_result$measure == 1,]) # The number of human hosts with an infection (patent or not) on the reporting timestep
+  #n_infected = as.data.frame(om_result[om_result$measure == 1,]) # The number of human hosts with an infection (patent or not) on the reporting timestep
   n_infected = as.data.frame(om_result[om_result$measure == 3,]) # The number of human hosts whose total (blood-stage) parasite density is above the detection threshold
   n_infected$year <- rep(seq(1,max(n_infected$time)/year_to_5day),each=year_to_5day*max(om_result$age_group) )
   
@@ -116,7 +117,7 @@ calculate_outputs = function(om_result, scenario_params, follow_up, years_before
                               group_by(time) %>%
                               summarise(totcas = sum(value)) )
   
-  prev_int_beg <- mean(inf_int_beg[  , "totcas"] /  pop_int[pop_int$year ==years_before_interv+follow_up,"n"]$n )
+  prev_int_beg <- mean(inf_int_beg[  , "totcas"] /  pop_int[pop_int$year ==years_before_interv,"n"]$n )
   
   # prevalence reduction per age group
   prev_red_int = (prev_int_beg - prev_int_followup)/prev_int_beg * 100

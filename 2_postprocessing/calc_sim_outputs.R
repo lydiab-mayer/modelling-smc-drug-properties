@@ -34,6 +34,13 @@ dest_dir = args[3]
 follow_up = as.integer(args[4])
 years_before_interv = as.integer(args[5])
 
+# Sample command arguments, retained here for testing
+# om_results_folder = "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/om/"
+# split_file = "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/postprocessing/split/iTPP3tradeoffs_sharpseasonal_Mali_10_5_exp_0.04_May.txt"
+# dest_dir = "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/postprocessing/"
+# follow_up = 5
+# years_before_interv = 5
+
 # Create output file names
 split_name = basename(split_file)
 dest_table_agg = paste(dest_dir, "agg_", split_name, sep="")
