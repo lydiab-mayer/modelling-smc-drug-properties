@@ -29,10 +29,12 @@ INPUT_DIR=$SIM_DIR"postprocessing/"
 DEST_DIR=$SIM_DIR"gp/"
 TRAINING_DIR=$DEST_DIR"trained/"$PREDICTED"/"
 RANGES_FILE=$SIM_DIR"param_ranges.RData"
+ERROR_DIR=$DEST_DIR"trained/err/"
 
 # create destination directories
 mkdir -p $DEST_DIR
 mkdir -p $TRAINING_DIR
+mkdir -p $ERROR_DIR
 
 # Submit postprocessing array job
 setting_postprocessing_results=(${INPUT_DIR}seeds_*.txt)

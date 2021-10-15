@@ -1,25 +1,41 @@
 #############################
-# Training GP on a database of simulations
+# script train_GP.R
+#
+# Trains a gaussian process emulator on a database of simulations prepared by postprocessing
+# 
 #
 # INPUT: 
-#       split_file: file with the data points for a setting
-#       results_folder: folder where the trained object will be saved
-#       predicted: name of the quantity to be predicted (e.g. prev_red for prevalence reduction)
+#       split_file: file pathway with the data points for a setting
+#       results_folder: folder file pathway where the trained object will be saved
+#       predicted: name of the quantity to be predicted (e.g. prev_red_int for prevalence reduction)
 #       ranges_file: file with parameter names and ranges of their values
+#       lower: lower input parameter bounds passed to mleHetGP() for mle optimisation
+#       upper: upper input parameter bounds passed to mleHetGP() for mle optimisation
+#       scale: TRUE/FALSE indicator of whether input data should be scaled to c(0, 1)
 #
-# OUTPUT: an Rdata file comtaining a list with the following attributes:
-#           model: the trained GP model
-#           EIR: the setting EIR
-#           seasonality: the setting seasonality
-#           biting_pattern: the mosquito biting pattern
+# OUTPUT: 
+#       Rdata file containing a list with the following attributes:
+#         'train_data', the dataset used to perform gaussian process regression
+#         'test_data', the dataset set aside as test data
+#         'GP_model', the gaussian process regression model fitted to train_data
+#       jpeg plot visualising performance attributes of the gaussian process regression
 #
-# created 28.11.2018
+# Created 28.11.2018
 # monica.golumbeanu@unibas.ch
+#
+# Adapted October 2021
+# lydia.braunack-mayer@swisstph.ch
+#
 #############################
 
-source("../../../analysisworkflow/3_GP_train/GP_toolbox.R")
-library(sjPlot)
+##############
+### HEADER ###
+##############
 
+# Source helper functions
+source("../../../analysisworkflow/3_GP_train/GP_toolbox.R")
+
+# Define script inputs
 args = commandArgs(TRUE)
 split_file = args[1]
 results_folder = args[2]
@@ -29,59 +45,58 @@ lower = args[5]
 upper = args[6]
 scale = args[7]
 
+# Sample script inputs, retained here to facilitate testing
+# split_file <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/postprocessing/seeds_E0LAIExampleLBM_wideseasonal_Mali_10_4.9167_exp_0.1.txt"
+# results_folder <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/gp/trained/inc_red_int/"
+# predicted <- "inc_red_int"
+# ranges_file <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/param_ranges.RData"
+# lower <- "0.001/0.001/0.001"
+# upper <- "10/10/10"
+# scale <- TRUE
 
-OM_result = read.table(split_file, sep="\t", header = TRUE, as.is = TRUE)
-exp_name = tools::file_path_sans_ext(basename(split_file))
-cv_file = paste(results_folder, exp_name,"_",predicted, "_cv.RData", sep="")
-ranges = load(ranges_file)
+
+#######################
+### SET UP EMULATOR ###
+#######################
+
+# Format script inputs
+input_data <- read.table(split_file, sep="\t", header = TRUE, as.is = TRUE)
+exp_name <- tools::file_path_sans_ext(basename(split_file))
+cv_file <- paste(results_folder, exp_name,"_",predicted, "_cv.RData", sep="")
+ranges <- load(ranges_file)
 param_ranges <- param_ranges_cont
+input_parameters <- rownames(param_ranges_cont)
 lower <- as.numeric(strsplit(lower, "/")[[1]])
 upper <- as.numeric(strsplit(upper, "/")[[1]])
-  
-if((predicted %in%colnames(OM_result)) == FALSE) {
-    stop(paste("Column ", predicted, "not found.", sep=""))
+
+# Check for errors in inputs
+if((predicted %in%colnames(input_data)) == FALSE) {
+  stop(paste("Column ", predicted, "not found.", sep=""))
 }
 
+# Define data used to train the gaussian process regression
+input_data <- input_data[, c(input_parameters, predicted)]
 
-# Select only the entries where the prevalence pre-deployment was not 0
-
-#to_del <-OM_result[which( OM_result$iprev_y5_1 == 0),"Scenario_Name"]
-#if (length(to_del) >0) {input_data = OM_result[-which(OM_result$Scenario_Name  %in%  to_del), ]
-#} else {input_data = OM_result
-#}
-
-input_data <- OM_result
-
-# Select relevant columns from dataframe such that the last column is the predicted one:
-
-
-# 5-fold cross-validation
-
-input_parameters <- rownames(param_ranges_cont)
-
-#split input_data into train and test
-n_seeds <- length(unique(input_data$seed))
-
-print(c("n_seeds: ", n_seeds))
-
-
-input_data <- input_data[,c(input_parameters,predicted)]
-#train GP
-
+# Set up scaling
 if (scale == TRUE) {
   scale <- param_ranges 
 } else {
   scale <- NULL
 }
 
-cv_result = cv_train_matern(input_data = input_data, K = 5, lower = lower, upper = upper, scale = scale)
 
-save= paste(results_folder, exp_name,"_",predicted, "_cv.jpg", sep="")
+######################
+### TRAIN EMULATOR ###
+######################
 
-test_GP_plot(cv_result,save)
+# Train gaussian process regression
+cv_result <- cv_train_matern(input_data = input_data, lower = lower, upper = upper, scale = scale)
 
-#store output
+# Generate plot of gaussian process regression performance
+save <- paste0(results_folder, exp_name, "_", predicted, "_cv.jpg")
+test_GP_plot(cv_result, save)
+
+# Store output
 cv_result$input_parameters <- input_parameters
 cv_result$predicted <- predicted
-
 save(cv_result, file = cv_file)

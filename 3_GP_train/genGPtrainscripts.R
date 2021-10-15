@@ -1,37 +1,41 @@
 ########################################
 # script genGPtrainscripts.R
 #
-# creates scripts for running OM and submits the jobs to cluster 
+# Contains function that generates scripts for training the emulator and submits the jobs to cluster 
 # INPUTS:
 #   exp: experiment name
 #   chunk_size: batch size for simulation submission
 
 # OUTPUTS:
-#	- OM scenario xml files and simulations in GROUP folder
-
+#	  OM scenario xml files and simulations in GROUP folder
+#
+# UPDATES:
+# lydia.braunack-mayer@swisstph.ch
+# 08.10.2021
+#
 ########################################
 
 genGPtrainscripts <- function(exp, predicted, lower, upper, scale){
   
-  
+  # Set up
   user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
+  GROUP <- "/scicore/home/penny/GROUP/M3TPP/"
+  ERROR_FOLDER = paste0(GROUP,exp,"/gp/trained/err/")
+  SIM_FOLDER <- paste0(GROUP,exp,"/")
   
- 
-  
-  GROUP = "/scicore/home/penny/GROUP/M3TPP/"
-  
-  SIM_FOLDER=paste0(GROUP,exp,"/")
-  
-  
+  # Generate .sh file to train each emulator
   sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/job_train_GP.sh"))
+  
   cat("#!/bin/bash","\n", sep ="")
   cat("#SBATCH --job-name=GPtrain","\n", sep ="")
   cat("#SBATCH --account=penny","\n", sep ="")
-  cat("#SBATCH -o /scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT/3_jobtrainGP.out","\n", sep ="")
+  cat("#SBATCH -o ", ERROR_FOLDER, "%A_%a.out","\n", sep ="")
   cat("#SBATCH --mem=2G","\n", sep ="")
-  cat("#SBATCH --qos=6hours","\n", sep ="")
+  cat("#SBATCH --qos=30min","\n", sep ="")
   cat("#SBATCH --cpus-per-task=1","\n", sep ="")
+  
   cat("###########################################","\n", sep ="")
+  
   cat("ml purge","\n", sep ="")
   cat("ml R/3.6.0-foss-2018b","\n", sep ="")
   
@@ -55,14 +59,15 @@ genGPtrainscripts <- function(exp, predicted, lower, upper, scale){
   
   sink()
   
+  # Prepare .sh file to submit job_train_GP.sh to cluster
   file.copy(paste0("/scicore/home/penny/",user,"/M3TPP/analysisworkflow/3_GP_train/GP_train_workflow.sh"), 
             paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/GP_train_workflow.sh"),overwrite=TRUE)
   
   setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
   
-  sys_command = paste("sbatch GP_train_workflow.sh", SIM_FOLDER, predicted, lower, upper, scale)
+  sys_command <- paste("sbatch GP_train_workflow.sh", SIM_FOLDER, predicted, lower, upper, scale)
   
-  # Run  command
+  # Submit job to cluster
   system(sys_command)
   
 }
