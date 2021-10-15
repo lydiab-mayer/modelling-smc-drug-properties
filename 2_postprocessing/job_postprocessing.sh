@@ -29,8 +29,21 @@ ml R/3.6.0-foss-2018b
 
 INPUT_DIR=$1
 OM_RESULTS_DIR=$2
-DEST_DIR=$3
-FOLLOW_UP=$4
+DATE=$3
+FMONTH=$4
+MONTHS=$5
+YEAR_COUNTERFACTUAL=$6
+YEAR_INTERVENTION=$7
+MIN_INT=$8
+
+echo "INPUT_DIR $INPUT_DIR"
+echo "OM_RESULTS_DIR $OM_RESULTS_DIR"
+echo "DATE $DATE"
+echo "FMONTH $FMONTH"
+echo "MONTHS $MONTHS"
+echo "YEAR_COUNTERFACTUAL $YEAR_COUNTERFACTUAL"
+echo "YEAR_INTERVENTION $YEAR_INTERVENTION"
+echo "MIN_INT $MIN_INT"
 
 # IMPORTANT: the number of files must equal to the task array length (index starts at 0)
 split_files=(${INPUT_DIR}*.txt)
@@ -40,4 +53,4 @@ ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)
 split_file=${split_files[$ID]}
 echo "Postprocessing for $split_file"
 
-Rscript calc_sim_outputs.R $OM_RESULTS_DIR $split_file $DEST_DIR $FOLLOW_UP
+Rscript calc_sim_outputs.R $OM_RESULTS_DIR $split_file $DATE $FMONTH $MONTHS $YEAR_COUNTERFACTUAL $YEAR_INTERVENTION $MIN_INT

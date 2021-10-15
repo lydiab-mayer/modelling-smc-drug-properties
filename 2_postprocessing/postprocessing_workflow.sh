@@ -24,8 +24,12 @@ ml purge
 ml R/3.6.0-foss-2018b
 
 SIM_FOLDER=$1
-FOLLOW_UP=$2
-YEARSBEFINT=$3
+DATE=$2
+FMONTH=$3
+MONTHS=$4
+YEAR_COUNTERFACTUAL=$5
+YEAR_INTERVENTION=$6
+MIN_INT=$7
 
 PARAM_TAB=$SIM_FOLDER"param_tab.txt"
 PARAM_CAT=$SIM_FOLDER"param_ranges_cat.RData"
@@ -46,4 +50,4 @@ echo  $SPLIT_FOLDER
 # Submit postprocessing array job
 split_files=(${SPLIT_FOLDER}*.txt)
 NUM=${#split_files[@]}
-sbatch -W --array=1-$NUM job_postprocessing.sh $SPLIT_FOLDER $OM_FOLDER $OUTPUT_FOLDER $FOLLOW_UP $YEARSBEFINT
+sbatch -W --array=1-$NUM job_postprocessing.sh $SPLIT_FOLDER $OM_FOLDER $DATE $FMONTH $MONTHS $YEAR_COUNTERFACTUAL $YEAR_INTERVENTION $MIN_INT
