@@ -46,12 +46,12 @@ upper = args[6]
 scale = args[7]
 
 # Sample script inputs, retained here to facilitate testing
-# split_file <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/postprocessing/seeds_E0LAIExampleLBM_wideseasonal_Mali_10_4.9167_exp_0.1.txt"
-# results_folder <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/gp/trained/inc_red_int/"
-# predicted <- "inc_red_int"
-# ranges_file <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/param_ranges.RData"
-# lower <- "0.001/0.001/0.001"
-# upper <- "10/10/10"
+# split_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/postprocessing/seeds_iTPP3tradeoffs_sharpseasonal_Mali_15_10_exp_0.241193660515256_May.txt"
+# results_folder <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/gp/trained/inc_red_int_Avg/"
+# predicted <- "inc_red_int_Avg"
+# ranges_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/param_ranges.RData"
+# lower <- "0.001/0.001/0.001/0.001"
+# upper <- "10/10/10/10"
 # scale <- TRUE
 
 

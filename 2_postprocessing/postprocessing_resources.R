@@ -96,9 +96,14 @@ calculate.monthly.outcome <- function(om.result, measure, age.group, time.step, 
   # Load required packages
   #require(dplyr)
   #require(tidyr)
-  
+
   # Format OpenMalaria output file
   colnames(om.result) <- c("time", "age_group", "measure", "value")
+  
+  # Error monitoring
+  if (!(measure %in% om.result$measure)) {
+    print(paste0("Data for measure ", measure, " could not be found. Check that this measure has been included in the SurveyOptions section of your xml."))
+  }
   
   # Translate from OpenMalaria 5-day time steps to years and months
   om.result$date <- time.to.date(om.result$time, time.step = time.step, date = date)
@@ -207,7 +212,6 @@ calculate.monthly.reduction <- function(om.outcome, id, fmonth, months, year.cou
   
 }
 
-
 report.monthly.results <- function(dir, om.result, date, fmonth, months, year.counterfactual, year.intervention, min.int, scenario.params) {
   
   # Define age groups 
@@ -228,9 +232,21 @@ report.monthly.results <- function(dir, om.result, date, fmonth, months, year.co
   inc.red.int$inc_red_int_Avg <- rowMeans(inc.red.int)
   rm(om.outcome)
   
+  # Calculate severe disease reduction
+  om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 78, age.group = age.int, time.step = 5, date = date, prevalence = FALSE)
+  sev.red.int <- calculate.monthly.reduction(om.outcome = om.outcome, id = "sev_red_int_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention)
+  sev.red.int$sev_red_int_Avg <- rowMeans(inc.red.int)
+  rm(om.outcome)  
+  
+  # Calculate mortality reduction
+  om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 74, age.group = age.int, time.step = 5, date = date, prevalence = FALSE)
+  mor.red.int <- calculate.monthly.reduction(om.outcome = om.outcome, id = "mor_red_int_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention)
+  mor.red.int$mor_red_int_Avg <- rowMeans(inc.red.int)
+  rm(om.outcome)
+  
   # Return outputs
-  out <- cbind.data.frame(scenario.params$Scenario_Name, scenario.params$SEED, prev.red.int, inc.red.int)
-  colnames(out) <- c("Scenario_Name", "seed", colnames(prev.red.int), colnames(inc.red.int))
+  out <- cbind.data.frame(scenario.params$Scenario_Name, scenario.params$SEED, prev.red.int, inc.red.int, sev.red.int, mor.red.int)
+  colnames(out) <- c("Scenario_Name", "seed", colnames(prev.red.int), colnames(inc.red.int), colnames(sev.red.int), colnames(mor.red.int))
   return(out)
   
 }
@@ -239,6 +255,16 @@ report.monthly.results <- function(dir, om.result, date, fmonth, months, year.co
 # -------------------------------------------------------------------------------------------------------------
 # DEFINE WRAPPER FUNCTIONS TO CALCULATE INCIDENCE AND PREVALENCE REDUCTIONS FOR MULTIPLE SIMULATIONS
 # -------------------------------------------------------------------------------------------------------------
+
+# Sample arguments, retained here for testing
+# dir <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/om/" 
+# param.file <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/postprocessing/split/E0LAIExampleLBM_sharpseasonal_Mali_10_4.9167_exp_0.1.txt"
+# date <- "2030-01-01"
+# fmonth <- "Jun"
+# months <- 2
+# year.counterfactual <- 2034
+# year.intervention <- 2039
+# min.int <- 0.25
 
 postprocess.om <- function(dir, param.file, date, fmonth, months, year.counterfactual, year.intervention, min.int) {
   
@@ -271,35 +297,9 @@ postprocess.om <- function(dir, param.file, date, fmonth, months, year.counterfa
                                     year.intervention = year.intervention,
                                     min.int = min.int, 
                                     scenario.params = param.table[i, ])
-      # 
-      # # Identify error to skip
-      # om.try <- try(report.monthly.results(dir = dir, 
-      #                                      om.result = om.result,
-      #                                      date = date,
-      #                                      fmonth = fmonth,
-      #                                      months =  months,
-      #                                      year.counterfactual =  year.counterfactual,
-      #                                      year.intervention = year.intervention,
-      #                                      min.int = min.int, 
-      #                                      scenario.params = param.table[i, ]), silent = TRUE)
-      # 
-      # # Skip error or calculate outputs
-      # if (class(om.try) != "try-error") {
-      #   
-      #   out <- report.monthly.results(dir = dir, 
-      #                                 om.result = om.result,
-      #                                 date = date,
-      #                                 fmonth = fmonth,
-      #                                 months =  months,
-      #                                 year.counterfactual =  year.counterfactual,
-      #                                 year.intervention = year.intervention,
-      #                                 min.int = min.int, 
-      #                                 scenario.params = param.table[i, ])
-      #   om.outcome <- data.frame(rbind(om.outcome, out), stringsAsFactors = FALSE)
-      #   
-      # } else {
-      #   message("Error")
-      # }
+
+      om.outcome <- data.frame(rbind(om.outcome, out), stringsAsFactors = FALSE)
+
     }
   }
   

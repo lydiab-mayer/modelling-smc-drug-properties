@@ -33,20 +33,20 @@ dir <- args[1]
 split_file <- args[2]
 date <- args[3]
 fmonth <- args[4]
-months <- args[5]
-year_counterfactual <- args[6]
-year_intervention <- args[7]
-min_int <- args[8]
+months <- as.numeric(args[5])
+year_counterfactual <- as.numeric(args[6])
+year_intervention <- as.numeric(args[7])
+min_int <- as.numeric(args[8])
 
 #Sample command arguments, retained here for testing
-dir <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/om/"
-split_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/postprocessing/split/iTPP3tradeoffs_sharpseasonal_Mali_15_10_exp_0.241193660515256_May.txt"
-date <- "2030-01-01"
-fmonth <- "May"
-months <- 5
-year_counterfactual <- 2034
-year_intervention <- 2039
-min_int <- 0.25
+# dir <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/om/"
+# split_file <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/postprocessing/split/E0LAIExampleLBM_sharpseasonal_Mali_10_4.9167_exp_0.1.txt"
+# date <- "2030-01-01"
+# fmonth <- "Jun"
+# months <- 2
+# year_counterfactual <- 2034
+# year_intervention <- 2039
+# min_int <- 0.25
 
 cat("Command arguments:")
 print(paste("dir:", dir))
