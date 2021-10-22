@@ -18,8 +18,8 @@
 ### lydia.burgert@unibas.ch 
 ###
 ### Adapted script:
-### Saved 01.09.2021
-### narimane.nekkab@unibas.ch
+### Saved 22.10.2021
+### lydia.braunack-mayer@swisstph.ch
 ###
 ### R version 3.6.0
 ###
@@ -43,7 +43,7 @@ library(dplyr)
 user = strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
 
 # Working directory
-setwd(paste0("/scicore/home/penny/",user,"/M3TPP"))
+setwd(paste0("/scicore/home/penny/", user, "/M3TPP"))
 
 # Source function scripts
 source(paste0("./analysisworkflow/2_postprocessing/genOMpostprocscripts.R"))
@@ -54,31 +54,29 @@ source(paste0("./analysisworkflow/2_postprocessing/genOMpostprocscripts.R"))
 ##################
 
 # Insert experiment name here
-exp ="..."
+exp = "..."
 
-# Modelling an implementation or trial setting?
-setting = "implementation"
-# setting = "trial"
-
+# Identify the minimum intervention age as a numeric, e.g. 0.25
+min_int <- ...
 
 ##################
 ### PARAMETERS ###
 ##################
 
-# Set trial weeks (2 values; start & end week)
-if(setting == "implementation"){
-  trialweeks = NA
-}else{
-  trialweeks= ... # i.e. c(42, 66)
-}
+# Identify the start date of your monitoring period as "YYYY-MM-DD", e.g. "2030-01-01"
+date <- "..."
 
-# Specify the number of years before your intervention is implemented
-# Used to calculate the pre-intervention incidence and prevalence 
-yearsbeforeInt= ... 
+# Identify the first month of intervention deployment as the month's 3 letter abbreviation, e.g. "Sep"
+fmonth <- "..."
 
-# Specify the number of follow-up years
-# Used to calculate the post-intervention prevalence and incidence 
-follow_up = ...
+# Identify the number of months the intervention is deployed for as a numeric, e.g. 5
+months <- ...
+
+# Identify the year to treat as the counterfactual as a numeric, i.e. the baseline year before intervention, e.g. 2034
+year_counterfactual <- ...
+
+# Identify the year to treat as the intervention as a numeric, i.e. the year for which incidence reduction will be calculated, e.g. 2039 
+year_intervention <- ...
 
 
 ##########################
@@ -86,6 +84,6 @@ follow_up = ...
 ##########################
 
 # Run
-genOMpostprocscripts(exp, setting, follow_up, trialweeks, yearsbeforeInt)
+genOMpostprocscripts(exp, date, fmonth, months, year_counterfactual, year_intervention, min_int)
 
 
