@@ -235,13 +235,13 @@ report.monthly.results <- function(dir, om.result, date, fmonth, months, year.co
   # Calculate severe disease reduction
   om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 78, age.group = age.int, time.step = 5, date = date, prevalence = FALSE)
   sev.red.int <- calculate.monthly.reduction(om.outcome = om.outcome, id = "sev_red_int_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention)
-  sev.red.int$sev_red_int_Avg <- rowMeans(inc.red.int)
+  sev.red.int$sev_red_int_Avg <- rowMeans(sev.red.int)
   rm(om.outcome)  
   
   # Calculate mortality reduction
   om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 74, age.group = age.int, time.step = 5, date = date, prevalence = FALSE)
   mor.red.int <- calculate.monthly.reduction(om.outcome = om.outcome, id = "mor_red_int_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention)
-  mor.red.int$mor_red_int_Avg <- rowMeans(inc.red.int)
+  mor.red.int$mor_red_int_Avg <- rowMeans(mor.red.int)
   rm(om.outcome)
   
   # Return outputs

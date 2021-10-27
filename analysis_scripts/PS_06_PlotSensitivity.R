@@ -14,15 +14,16 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_tradeoffs"
+exp <- "..."
 
 # !!! Insert your predicted parameters here. Note that this must match with one column name in post-processing files !!!
-pred_list <- "inc_red_int_Avg"
+pred_list <- "..."
 
 library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(ggalluvial)
+# library(wesanderson) # Load for access to nice colour palettes
 
 user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
 GROUP_dr <- "/scicore/home/penny/GROUP/M3TPP/"
@@ -38,10 +39,12 @@ param_ranges_cont
 # Define data to plot
 # ----------------------------------------------------------
 
+# Import settings
 setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/trained/sensitivity/seeds*"))
 setting <- setting[grepl(pred_list, setting, fixed = TRUE)]
 setting_id <- sub(paste0("_", pred_list, ".*"), "", sub(".*seeds_", "", setting))
 
+# Import total effect sizes for each setting
 df <- data.frame("S_eff" = c(), "T_eff" = c(), scenario = c())
 
 for (i in 1:length(setting)) {
@@ -60,57 +63,92 @@ for (i in 1:length(setting)) {
   
 }
 
-df$parameter <- as.factor(df$parameter); df$scenario <- as.factor(df$scenario)
-df <- df %>%
-  separate(col = scenario, 
-           into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing"),
-           sep = "_",
-           remove = FALSE)
+# Import median impact for each setting
+df_impact <- data.frame()
 
-df$Seasonality <- ifelse(df$Seasonality == "sharpseasonal", "Short season", "Long season")
-df$Access <- ifelse(df$Access == 0.04, "Low", "High")
-df$Agegroup <- paste0("Children 3m to ", df$Agegroup, "y")
-df$EIR <- ifelse(df$EIR == 1, "Low",
-                 ifelse(df$EIR == 4, "Moderate", "High"))
+for (i in 1:length(setting_id)) {
+  
+  temp <- read.table(paste0(GROUP_dr, exp, "/postprocessing/agg_", setting_id[i], ".txt"), header = TRUE, sep = "")
+  temp <- temp %>%
+    group_by(Seasonality, Biting_pattern, EIR, MaxAge, Decay, Access, Timing) %>%
+    summarise(inc_red_int_Med = median(inc_red_int_Avg),
+              sev_red_int_Med = median(sev_red_int_Avg),
+              mor_red_int_Med = median(mor_red_int_Avg))
+  temp$scenario <- setting_id[i]
+  
+  df_impact <- rbind(df_impact, as.data.frame(temp))
+  
+}
 
-df$Seasonality <- factor(df$Seasonality, levels = c("Short season", "Long season"))
-df$Access <- factor(df$Access, levels = c("Low", "High"))
-df$EIR <- factor(df$EIR, levels = c("Low", "Moderate", "High"))
+# Scale total effects by median impact for each setting
+df <- merge(df, df_impact, by = "scenario")
+df$T_eff_scaled <- df$T_eff * df$inc_red_int_Med
+
+# ----------------------------------------------------------
+# Format data for plotting - THIS MUST BE ADJUSTED FOR EACH EXPERIMENT
+# ----------------------------------------------------------
+# 
+# df$parameter <- as.factor(df$parameter); df$scenario <- as.factor(df$scenario)
+# df <- df %>%
+#   separate(col = scenario, 
+#            into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing"),
+#            sep = "_",
+#            remove = FALSE)
+# 
+# df$Seasonality <- ifelse(df$Seasonality == "sharpseasonal", "SHORT SEASON", "LONG SEASON")
+# df$Access <- ifelse(df$Access == 0.04, "LOW", "HIGH")
+# df$Agegroup <- paste0("CHILDREN 3M TO ", df$Agegroup, "Y")
+# df$EIR <- ifelse(df$EIR == 1, "LOW",
+#                  ifelse(df$EIR == 4, "MODERATE", "HIGH"))
+# df$parameter <- ifelse(df$parameter == "Coverage1", "Coverage of intervention cohort",
+#                        ifelse(df$parameter == "Coverage2", "Coverage of each round of treatment",
+#                               ifelse(df$parameter == "Efficacy", "Intervention initial efficacy",
+#                                      "Intervention duration of protection halflife")))
+# 
+# df$Seasonality <- factor(df$Seasonality, levels = c("SHORT SEASON", "LONG SEASON"))
+# df$Access <- factor(df$Access, levels = c("LOW", "HIGH"))
+# df$EIR <- factor(df$EIR, levels = c("LOW", "MODERATE", "HIGH"))
+
 
 # ----------------------------------------------------------
 # Define plot settings
 # ----------------------------------------------------------
 
 # !!! Define name of your plot !!!
-plot_name <- "Test plot 2 for sensitivity analysis"
+plot_name <- "..."
 
+cols <- c(...)
 
 # ----------------------------------------------------------
 # Generate plot
 # ----------------------------------------------------------
 
-p <- ggplot(df, aes(x = EIR, y = T_eff, alluvium = parameter))
+p <- ggplot(df, aes(x = ..., y = T_eff_scaled, alluvium = parameter))
 
 p <- p + geom_alluvium(aes(fill = parameter), colour = "white", alpha = 1, decreasing = FALSE)
 
-p <- p + facet_grid(Agegroup ~ Access + Seasonality)
+p <- p + geom_flow(fill = "white", alpha = 0.5)
+
+p <- p + facet_grid(... ~ ... + ...)
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid = element_blank(),
-               text = element_text(colour = "#323f4f", family = "Simplon Norm (Body)"),
+               text = element_text(family = "Courier"),
                strip.background = element_blank(),
                axis.line = element_blank(),
                axis.ticks = element_blank(),
+               axis.text.y = element_blank(),
                axis.title = element_text(face="bold"),
-               legend.key = element_blank())
+               legend.key = element_blank(),
+               legend.title = element_text(face = "bold"))
 
-p <- p + scale_y_continuous(labels = scales::percent_format(accurary = 1L))
+p <- p + scale_fill_manual(values = cols)
 
-p <- p + labs(x = "Scenario",
-              y = "Importance",
+p <- p + labs(x = "...",
+              y = "RELATIVE IMPORTANCE",
               title = plot_name,
-              fill = "Parameter")
+              fill = "PARAMETER")
 
 p
 
