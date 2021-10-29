@@ -7,11 +7,11 @@ TARGET_RANGE_SIZE=$5
 PARAM_RANGES_FILE=$SIM_FOLDER"param_ranges.RData"
 GP_FOLDER=$SIM_FOLDER"gp/trained/"$PRED"/"
 
-echo "SIM_FOLDER: $SIM_FOLDER"
-echo "PRED: $PRED"
-echo "SCALE: $SCALE"
-echo "NGRID: $NGRID"
-echo "TARGET_RANGE_SIZE: $TARGET_RANGE_SIZE"
+# echo "SIM_FOLDER: $SIM_FOLDER"
+# echo "PRED: $PRED"
+# echo "SCALE: $SCALE"
+# echo "NGRID: $NGRID"
+# echo "TARGET_RANGE_SIZE: $TARGET_RANGE_SIZE"
 
 # Submit GP optimization analysis array job
 gp_files=(${GP_FOLDER}*.RData)

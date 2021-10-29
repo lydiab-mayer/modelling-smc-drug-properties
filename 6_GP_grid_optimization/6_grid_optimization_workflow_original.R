@@ -37,17 +37,17 @@ setwd(paste0("/scicore/home/penny/", user, "/M3TPP"))
 source(paste0("./analysisworkflow/6_GP_grid_optimization/gengridoptimizationscripts.R"))
 
 # insert experiment name here
-exp <- "iTPP3_tradeoffs"
+exp <- "..."
 
 # same name as in the gp trained folder 
-pred_list <- c("inc_red_int_Avg")
+pred_list <- c("...")
 
 # specify whether, when training the GP, input parameters were scaled to c(0, 1) (TRUE) or used on their original scale (FALSE)
 scale <- TRUE
 
 # Set grid of parameter values to search
-ngrid <- "10/10/10/10"
-# ngrid = c("Coverage" = ..., "Halflife" = ..., "Efficacy" = ...)
+ngrid <- "100/100/100/100" # Set to 100 by default
+
 
 # Set target range size (1 is per 1% jumps, 10 by 10% etc.)
 target_range_size <- 10

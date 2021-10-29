@@ -40,15 +40,15 @@ ngrid <- as.numeric(strsplit(ngrid, "/")[[1]])
 # # Sample arguments, retained here for testing
 # sim_folder <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/"
 # scale <- TRUE
-# ngrid <- c(10, 10, 10, 10)
+# ngrid <- "31/31/51/21"
 # target_range_size <- 10
-# gp_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/gp/trained/inc_red_int_Avg/seeds_iTPP3tradeoffs_sharpseasonal_Mali_15_10_exp_0.04_May_inc_red_int_Avg_cv.RData"
-
-print(paste0("gp_file: ", gp_file))
-print(paste0("sim_folder: ", sim_folder))
-print(paste0("scale: ", scale))
-print(paste0("ngrid: ", ngrid))
-print(paste0("target_range_size: ", target_range_size))
+# gp_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs_4rounds/gp/trained/inc_red_int_Avg/seeds_iTPP3tradeoffs4rounds_sharpseasonal_Mali_15_10_exp_0.04_May_inc_red_int_Avg_cv.RData"
+# 
+# print(paste0("gp_file: ", gp_file))
+# print(paste0("sim_folder: ", sim_folder))
+# print(paste0("scale: ", scale))
+# print(paste0("ngrid: ", ngrid))
+# print(paste0("target_range_size: ", target_range_size))
 
 # Library
 library(dplyr)
@@ -70,6 +70,11 @@ param_ranges_cont
 #######################################################
 
 # # Sample call to function, retained here for testing
+# gp_file = "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/gp/trained/inc_red_int_Avg/seeds_iTPP3tradeoffs_wideseasonal_Mali_4_10_exp_0.241193660515256_May_inc_red_int_Avg_cv.RData"
+# scale = TRUE
+# ngrid = c(31, 31, 51, 21)
+# target_range_size = 10
+# param_ranges = param_ranges_cont
 # GP_grid_search_predictions(gp_file = "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/gp/trained/inc_red_int_Avg/seeds_iTPP3tradeoffs_wideseasonal_Mali_4_10_exp_0.241193660515256_May_inc_red_int_Avg_cv.RData",
 #                            scale = TRUE,
 #                            ngrid = c(10, 10, 10, 10),
@@ -110,17 +115,23 @@ GP_grid_search_predictions <- function(gp_file, scale, ngrid, target_range_size,
   }
   
   scenarios <- expand.grid(scenarios)
-  names(scenarios) <- rownames(param_ranges_cont)
+  names(scenarios) <- rownames(param_ranges)
   
   ####################
   ### OPTIMIZATION ###
   ####################
   
-  # Make predictions using emulator
-  preds <- predict(x = as.matrix(scenarios), object = gp_result)
-  scenarios$mean <- preds$mean
-  scenarios$sd2 <- preds$sd2
-  scenarios$nugs <- preds$nugs
+  scenarios$nugs <- scenarios$sd2 <- scenarios$mean <- NA
+  
+  # Make predictions using emulator - split into loop to reduce memory requirements
+  for (i in 1:min(c(nrow(scenarios), 101))) {
+    print(i)
+    index <- ((i - 1)*ceiling(nrow(scenarios)/101) + 1):min(c(nrow(scenarios), ceiling(i*nrow(scenarios)/101)))
+    preds <- predict(x = as.matrix(scenarios[index, rownames(param_ranges)]), object = gp_result)
+    scenarios[index, ]$mean <- preds$mean
+    scenarios[index, ]$sd2 <- preds$sd2
+    scenarios[index, ]$nugs <- preds$nugs
+  }
   
   # Covert parameter values back to original scale
   if(scale == TRUE){
@@ -168,7 +179,7 @@ result <- GP_grid_search_predictions(gp_file = gp_file,
                                      ngrid = ngrid,
                                      target_range_size = target_range_size,
                                      param_ranges = param_ranges_cont)
-  
+
 # Write to file
 pred <- basename(dirname(gp_file))
 saveRDS(result, file = paste0(sim_folder, "gp/GP_grid_optimization/", pred, "/opt_", opt_file, ".rds"))
