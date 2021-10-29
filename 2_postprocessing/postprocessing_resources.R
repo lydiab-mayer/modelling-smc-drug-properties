@@ -167,6 +167,100 @@ calculate.monthly.outcome <- function(om.result, measure, age.group, time.step, 
   
 }
 
+# # Sample arguments, retained here for testing
+# om.result <- read.table("/scicore/home/penny/GROUP/M3TPP/iTPP3TestCase/om/iTPP3TestCase_10_1_out.txt", header = FALSE)
+# measure <- 74
+# age.group <- 2:8
+# time.step <- 5
+# date <- "2030-01-01"
+# prevalence <- FALSE
+
+calculate.annual.outcome <- function(om.result, measure, age.group, time.step, date, prevalence){
+  
+  # Function to calculate incidence, prevalence or another outcome by year for a given age group
+  #
+  # Inputs: 
+  # om.result: the outputs of a single OpenMalaria simulation
+  # measure: the outcome measure
+  # age.group: an integer or integer vector containing the age groups of interest
+  # time.step: the time step used in OpenMalaria, a numeric in days. Usually 1 or 5
+  # date: the starting date of your OpenMalaria survey period in the format "%Y%m%d"
+  # prevalence: TRUE/FALSE indicating if prevalence vs. incidence or another metric should be outputted
+  #
+  # Outputs: data frame containing the outcome measure divided by the population size of the chosen age group
+  # per month
+  
+  # Load required packages
+  #require(dplyr)
+  #require(tidyr)
+  
+  # Format OpenMalaria output file
+  colnames(om.result) <- c("time", "age_group", "measure", "value")
+  
+  # Error monitoring
+  if (!(measure %in% om.result$measure)) {
+    print(paste0("Data for measure ", measure, " could not be found. Check that this measure has been included in the SurveyOptions section of your xml."))
+  }
+  
+  # Translate from OpenMalaria 5-day time steps to years
+  om.result$date <- time.to.date(om.result$time, time.step = time.step, date = date)
+  om.result$year <- as.numeric(format(om.result$date, "%Y"))
+  
+  # Remove first time step from OpenMalaria outputs
+  om.result <- om.result[om.result$time != 1, ]
+  
+  # Remove values for age groups other than those specified
+  om.result <- om.result[om.result$age_group %in% age.group, ]
+  
+  # Remove measures other than that population size and the specified outcome measure
+  om.result <- om.result[om.result$measure %in% c(0, measure), ]
+  
+  # Summarise all measures by summing up over age groups
+  om.result <- om.result[, -which(names(om.result) %in% c("age_group"))] %>%
+    group_by(measure, time, date, year) %>%
+    summarise(value = sum(value))
+  
+  if (prevalence) {
+    
+    # Summarise further by averaging over all measures by year
+    om.result <- om.result[, -which(names(om.result) %in% c("time", "date"))] %>%
+      group_by(measure, year) %>%
+      summarise(value = mean(value))
+    
+  } else {
+    
+    # Summarise further by summing over outcome measure by year
+    om.pop <- om.result[om.result$measure == 0, -which(names(om.result) %in% c("time", "date"))] %>%
+      group_by(measure, year) %>%
+      summarise(value = mean(value))
+    
+    om.measure <- om.result[om.result$measure == measure, -which(names(om.result) %in% c("time", "date"))] %>%
+      group_by(measure, year) %>%
+      summarise(value = sum(value))
+    
+    om.result <- rbind(om.pop, om.measure)
+    
+  }
+  
+  # Transform to long format
+  om.result <- pivot_wider(om.result, 
+                           id_cols = c(year),
+                           names_from = measure,
+                           values_from = value,
+                           names_prefix = "measure")
+  om.result <- as.data.frame(om.result)
+  
+  # Calculate outcome measure dividied by population size
+  om.result$value <- om.result[, paste0("measure", measure)] / om.result[, "measure0"]
+  
+  # Order resulting data frame
+  om.result <- om.result[order(om.result$year), ]
+  rownames(om.result) <- NULL
+  
+  return(om.result)
+  
+}
+
 calculate.monthly.reduction <- function(om.outcome, id, fmonth, months, year.counterfactual, year.intervention) {
 
   # Function to calculate incidence or prevalence reduction by month
@@ -212,7 +306,53 @@ calculate.monthly.reduction <- function(om.outcome, id, fmonth, months, year.cou
   
 }
 
-report.monthly.results <- function(dir, om.result, date, fmonth, months, year.counterfactual, year.intervention, min.int, scenario.params) {
+# # Sample arguments, retained here for testing
+# om.outcome <- calculate.annual.outcome(om.result = read.table("/scicore/home/penny/GROUP/M3TPP/iTPP3TestCase/om/iTPP3TestCase_10_1_out.txt", header = FALSE),
+#                                        measure = 78,
+#                                        age.group = 2:8,
+#                                        time.step = 5,
+#                                        date = "2030-01-01",
+#                                        prevalence = FALSE)
+# id <- "sev_red_int"
+# year.counterfactual <- 2034
+# year.intervention <- 2039
+
+calculate.annual.reduction <- function(om.outcome, id, year.counterfactual, year.intervention) {
+  
+  # Function to calculate incidence, prevalence or another outcome reduction by year
+  #
+  # Inputs: 
+  # om.outcome: the outputs the function calculate.monthly.outcome
+  # id: a string that will be used to name columns of the function outputs, e.g. "inc_red_int"
+  # year.counterfactual: the baseline year
+  # year.intervention: the year in which the intervention occurs 
+  #
+  # Outputs: data frame containing a single row with the reduction per month
+  
+  #require(tidyr)
+  
+  # Set up data
+  om.outcome <- om.outcome[om.outcome$year %in% c(year.counterfactual, year.intervention), c("year", "value")]
+  om.outcome$year[om.outcome$year == year.counterfactual] <- "counterfactual"
+  om.outcome$year[om.outcome$year == year.intervention] <- "intervention"
+  
+  # Calculate reduction
+  om.outcome <- pivot_wider(om.outcome,
+                            id_cols = c(year),
+                            names_from = year,
+                            values_from = value)
+  om.outcome$reduction <- ((om.outcome$counterfactual - om.outcome$intervention) / om.outcome$counterfactual) * 100
+  
+  # Format outputs
+  names(om.outcome)[names(om.outcome) == "reduction"] <- id
+  om.outcome <- as.data.frame(om.outcome)
+  
+  # Return outputs
+  return(om.outcome)
+  
+}
+
+report.results <- function(dir, om.result, date, fmonth, months, year.counterfactual, year.intervention, min.int, scenario.params) {
   
   # Define age groups 
   age.groups <- extract.agegroups(paste0(dir, "scaffold.xml"))
@@ -220,28 +360,26 @@ report.monthly.results <- function(dir, om.result, date, fmonth, months, year.co
   #age.210 <- seq(which(age.groups == 2), which(age.groups == 10) - 1)
   #age.05 <- seq(which(age.groups == 0), which(age.groups == 5) - 1)
   
-  # Calculate prevalence reduction
+  # Calculate monthly prevalence reduction
   om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 3, age.group = age.int, time.step = 5, date = date, prevalence = TRUE)
   prev.red.int <- calculate.monthly.reduction(om.outcome = om.outcome, id = "prev_red_int_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention)
   prev.red.int$prev_red_int_Avg <- rowMeans(prev.red.int)
   rm(om.outcome)
   
-  # Calculate incidence reduction
+  # Calculate monthly incidence reduction
   om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 14, age.group = age.int, time.step = 5, date = date, prevalence = FALSE)
   inc.red.int <- calculate.monthly.reduction(om.outcome = om.outcome, id = "inc_red_int_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention)
   inc.red.int$inc_red_int_Avg <- rowMeans(inc.red.int)
   rm(om.outcome)
   
-  # Calculate severe disease reduction
-  om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 78, age.group = age.int, time.step = 5, date = date, prevalence = FALSE)
-  sev.red.int <- calculate.monthly.reduction(om.outcome = om.outcome, id = "sev_red_int_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention)
-  sev.red.int$sev_red_int_Avg <- rowMeans(sev.red.int)
+  # Calculate annual severe disease reduction
+  om.outcome <- calculate.annual.outcome(om.result = om.result, measure = 78, age.group = age.int, time.step = 5, date = date, prevalence = FALSE)
+  sev.red.int <- calculate.annual.reduction(om.outcome = om.outcome, id = "sev_red_int", year.counterfactual = year.counterfactual, year.intervention = year.intervention)
   rm(om.outcome)  
   
-  # Calculate mortality reduction
-  om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 74, age.group = age.int, time.step = 5, date = date, prevalence = FALSE)
-  mor.red.int <- calculate.monthly.reduction(om.outcome = om.outcome, id = "mor_red_int_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention)
-  mor.red.int$mor_red_int_Avg <- rowMeans(mor.red.int)
+  # Calculate annual mortality reduction
+  om.outcome <- calculate.annual.outcome(om.result = om.result, measure = 74, age.group = age.int, time.step = 5, date = date, prevalence = FALSE)
+  mor.red.int <- calculate.annual.reduction(om.outcome = om.outcome, id = "mor_red_int", year.counterfactual = year.counterfactual, year.intervention = year.intervention)
   rm(om.outcome)
   
   # Return outputs
@@ -288,15 +426,15 @@ postprocess.om <- function(dir, param.file, date, fmonth, months, year.counterfa
       # Read in file
       om.result <- read.table(om.file, sep = "\t")
       
-      out <- report.monthly.results(dir = dir, 
-                                    om.result = om.result,
-                                    date = date,
-                                    fmonth = fmonth,
-                                    months =  months,
-                                    year.counterfactual =  year.counterfactual,
-                                    year.intervention = year.intervention,
-                                    min.int = min.int, 
-                                    scenario.params = param.table[i, ])
+      out <- report.results(dir = dir, 
+                            om.result = om.result,
+                            date = date,
+                            fmonth = fmonth,
+                            months =  months,
+                            year.counterfactual =  year.counterfactual,
+                            year.intervention = year.intervention,
+                            min.int = min.int, 
+                            scenario.params = param.table[i, ])
 
       om.outcome <- data.frame(rbind(om.outcome, out), stringsAsFactors = FALSE)
 
