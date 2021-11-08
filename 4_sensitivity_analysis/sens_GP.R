@@ -17,13 +17,9 @@ args = commandArgs(TRUE)
 gp_file = args[1]
 ranges_file = args[2]
 results_folder = args[3]
-scale = args[4]
-
-# Sample arguments, retained here for testing
-# gp_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/gp/trained/inc_red_int_Avg/seeds_iTPP3tradeoffs_sharpseasonal_Mali_15_10_exp_0.241193660515256_May_inc_red_int_Avg_cv.RData"
-# ranges_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/param_ranges.RData"
-# results_folder <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/gp/trained/"
-# scale <- TRUE
+scale = as.logical(args[4])
+print(paste0("results_folder:",results_folder))
+print(paste0("scale arg:",scale))
 
 exp_name = tools::file_path_sans_ext(basename(gp_file))
 sidx_file = paste(results_folder, exp_name, "_sidx.RData", sep="")
