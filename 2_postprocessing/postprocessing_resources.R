@@ -57,6 +57,7 @@ extract.agegroups <- function(path) {
   return(out)
 }
 
+
 time.to.date <- function(t, time.step, date) {
   # Function to convert the time step in an OpenMalaria outputs file to a date
   #
@@ -67,11 +68,23 @@ time.to.date <- function(t, time.step, date) {
   #
   # Outputs: a vector containing the dates corresponding to each time step
   
+  # Format inputs
   date <- as.Date(date, format = "%Y-%m-%d")
-  out <- date + (t - 1)*time.step
+  
+  # Create reference sequence of dates assuming no leap years
+  ref <- seq(from = date,
+             to = date + max(t)*time.step + ceiling(max(t)*time.step/365/4),
+             by = "day")
+  ref <- ref[strftime(ref, "%m-%d") != "02-29"]
+  
+  # Return sequence of dates incremented by time.step
+  out <- ref[t*time.step]
+
+  # Return outputs
   return(out)
   
 }
+#time.to.date(t = 1:1095, time.step = 5, date = "2030-01-01")
 
 
 # -------------------------------------------------------------------------------------------------------------
@@ -423,8 +436,14 @@ report.results <- function(dir, om.result, date, fmonth, months, year.counterfac
   # Define age groups 
   age.groups <- extract.agegroups(paste0(dir, "scaffold.xml"))
   age.int <- seq(which(age.groups == min.int), as.numeric(scenario.params["maxGroup"]))
-  #age.210 <- seq(which(age.groups == 2), which(age.groups == 10) - 1)
+  age.210 <- seq(which(age.groups == 2), which(age.groups == 10) - 1)
   #age.05 <- seq(which(age.groups == 0), which(age.groups == 5) - 1)
+  
+  # Calculate annual prevalence
+  om.outcome <- calculate.annual.outcome(om.result = om.result, measure = 3, age.group = age.210, time.step = 5, date = date, prevalence = TRUE)
+  prev_210 <- c(om.outcome[om.outcome$year == year.counterfactual, "value"])
+  names(prev_210) <- paste0("annual_prev_210_", year.counterfactual)
+  rm(om.outcome)
   
   # Calculate prevalence reduction
   om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 3, age.group = age.int, time.step = 5, date = date, prevalence = TRUE)
@@ -447,8 +466,8 @@ report.results <- function(dir, om.result, date, fmonth, months, year.counterfac
   rm(om.outcome)
   
   # Return outputs
-  out <- cbind.data.frame(scenario.params$Scenario_Name, scenario.params$SEED, prev.red.int, inc.red.int, sev.red.int, mor.red.int)
-  colnames(out) <- c("Scenario_Name", "seed", colnames(prev.red.int), colnames(inc.red.int), colnames(sev.red.int), colnames(mor.red.int))
+  out <- cbind.data.frame(scenario.params$Scenario_Name, scenario.params$SEED, prev_210, prev.red.int, inc.red.int, sev.red.int, mor.red.int)
+  colnames(out) <- c("Scenario_Name", "seed", names(prev_210), colnames(prev.red.int), colnames(inc.red.int), colnames(sev.red.int), colnames(mor.red.int))
   return(out)
   
 }
