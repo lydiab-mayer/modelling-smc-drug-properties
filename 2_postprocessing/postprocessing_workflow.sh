@@ -1,4 +1,7 @@
 #!/bin/bash
+#SBATCH --mem=2G
+#SBATCH --qos=6hours
+#SBATCH --cpus-per-task=1
 #
 ##############################
 # Main script for postprocessing OpenMalaria simulations on the cluster. 
@@ -46,7 +49,10 @@ mkdir -p $ERROR_FOLDER
 # split the parameter table by setting
 Rscript ../../../analysisworkflow/2_postprocessing/split_param_table.R $PARAM_TAB $SPLIT_FOLDER $PARAM_CAT
 
-echo  $SPLIT_FOLDER
+echo $PARAM_TAB
+echo $SPLIT_FOLDER
+echo $PARAM_CAT
+
 # Submit postprocessing array job
 split_files=(${SPLIT_FOLDER}*.txt)
 NUM=${#split_files[@]}
