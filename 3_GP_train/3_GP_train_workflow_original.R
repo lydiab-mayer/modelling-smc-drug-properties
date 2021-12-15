@@ -69,6 +69,10 @@ upper = "10/10/10" # default values chosen suitable for most problems, can be ad
 # Specify whether input parameters should be scaled to c(0, 1) (TRUE) or used on their original scale (FALSE)
 scale = TRUE
 
+# Specify whether a heteroskedastic (TRUE) GP should be fit to to the FULL postprocessing data,
+# or a homoskedastic (FALSE) GP should be fit to the AGGREGATED postprocessing data
+hetGP = TRUE
+
 
 ######################
 ### TRAIN EMULATOR ###
@@ -78,7 +82,7 @@ scale = TRUE
 for(i in pred_list){
   predicted = i
   print(i)
-  genGPtrainscripts(exp, predicted, lower, upper, scale)
+  genGPtrainscripts(exp, predicted, lower, upper, scale, hetGP)
 }
 
 

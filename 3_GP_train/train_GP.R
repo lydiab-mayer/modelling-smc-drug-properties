@@ -44,6 +44,7 @@ ranges_file = args[4]
 lower = args[5]
 upper = args[6]
 scale = args[7]
+hetGP = args[8]
 
 # Sample script inputs, retained here to facilitate testing
 # split_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/postprocessing/seeds_iTPP3tradeoffs_sharpseasonal_Mali_15_10_exp_0.241193660515256_May.txt"
@@ -90,7 +91,7 @@ if (scale == TRUE) {
 ######################
 
 # Train gaussian process regression
-cv_result <- cv_train_matern(input_data = input_data, lower = lower, upper = upper, scale = scale)
+cv_result <- cv_train_matern(input_data = input_data, lower = lower, upper = upper, scale = scale, hetGP = hetGP)
 
 # Generate plot of gaussian process regression performance
 save <- paste0(results_folder, exp_name, "_", predicted, "_cv.jpg")

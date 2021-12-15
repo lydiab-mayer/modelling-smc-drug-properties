@@ -40,9 +40,9 @@ ngrid <- as.numeric(strsplit(ngrid, "/")[[1]])
 # # Sample arguments, retained here for testing
 # sim_folder <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs_4rounds/"
 # scale <- TRUE
-# ngrid <- "31/31/51/21"
+# ngrid <- "10/10/10/10"
 # target_range_size <- 10
-# gp_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs_4rounds/gp/trained/inc_red_int_Tot/seeds_iTPP3tradeoffs4rounds_sharpseasonal_Mali_15_10_exp_0.04_May_inc_red_int_Tot_cv.RData"
+# gp_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs_4rounds/gp/trained/mor_red_int_Tot/agg_iTPP3tradeoffs4rounds_sharpseasonal_Mali_16_10_exp_0.04_May_mor_red_int_Tot_cv.RData"
 # ngrid <- as.numeric(strsplit(ngrid, "/")[[1]])
 
 print(paste0("gp_file: ", gp_file))
@@ -69,18 +69,6 @@ param_ranges_cont
 #######################################################
 ###      GRID SEARCH FUNCTION FOR OPTIMIZATION      ###
 #######################################################
-
-# # Sample call to function, retained here for testing
-# gp_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs_4rounds/gp/trained/inc_red_int_Tot/seeds_iTPP3tradeoffs4rounds_sharpseasonal_Mali_15_10_exp_0.04_May_inc_red_int_Tot_cv.RData"
-# scale = TRUE
-# ngrid = c(31, 31, 51, 21)
-# target_range_size = 10
-# param_ranges = param_ranges_cont
-# GP_grid_search_predictions(gp_file = "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs/gp/trained/inc_red_int_Avg/seeds_iTPP3tradeoffs_wideseasonal_Mali_4_10_exp_0.241193660515256_May_inc_red_int_Avg_cv.RData",
-#                            scale = TRUE,
-#                            ngrid = c(10, 10, 10, 10),
-#                            target_range_size = 10,
-#                            param_ranges = param_ranges_cont)
 
 # Create grid search optimization function
 GP_grid_search_predictions <- function(gp_file, scale, ngrid, target_range_size, param_ranges){
@@ -175,7 +163,8 @@ GP_grid_search_predictions <- function(gp_file, scale, ngrid, target_range_size,
 ###      Performing optimization with grid search for all predictors      ###
 #############################################################################
 
-opt_file <- sub("*_cv.RData", "", sub(".*seeds_", "", gp_file))
+opt_file <- sub(".*agg_", "", sub(".*seeds_", "", gp_file))
+opt_file <- sub("*_cv.RData", "", opt_file)
 print(paste0("Performing grid search and optimization for: ", opt_file))
 
 # Run

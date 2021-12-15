@@ -90,7 +90,7 @@ test_GP_plot <- function(cv_result, save) {
 }
 
 
-train_GP_matern <- function(train_data, lower, upper) {
+train_GP_matern <- function(train_data, lower, upper, hetGP = TRUE) {
   
   # ----------------------------------------------------------
   # This function uses gaussian process regression to train an OpenMalaria emulator
@@ -99,6 +99,7 @@ train_GP_matern <- function(train_data, lower, upper) {
   # train_data: data used to fit the gaussian process regression model
   # lower: lower input parameter bounds passed to mleHetGP() for mle optimisation
   # upper: upper input parameter bounds passed to mleHetGP() for mle optimisation
+  # hetGP: boolean indicating whether a heteroskedastic (TRUE) or homoskedastic (FALSE) model should be used
   #
   # Required packages:
   # hetGP
@@ -126,8 +127,15 @@ train_GP_matern <- function(train_data, lower, upper) {
                      rescale = FALSE, normalize = FALSE)
   
   # Fit GP regression model
-  GP_model <- mleHetGP(X = list(X0 = as.matrix(prdata$X0), Z0 = as.matrix(prdata$Z0), mult = prdata$mult),
-                       Z = prdata$Z, lower = lower, upper = upper, covtype = "Matern5_2")
+  if (hetGP == TRUE) {
+    print("Calling mleHetGP")
+    GP_model <- mleHetGP(X = list(X0 = as.matrix(prdata$X0), Z0 = as.matrix(prdata$Z0), mult = prdata$mult),
+                         Z = prdata$Z, lower = lower, upper = upper, covtype = "Matern5_2")    
+  } else {
+    print("Calling mleHomGP")
+    GP_model <- mleHomGP(X = list(X0 = as.matrix(prdata$X0), Z0 = as.matrix(prdata$Z0), mult = prdata$mult),
+                         Z = prdata$Z, lower = lower, upper = upper, covtype = "Matern5_2") 
+  }
   
   # Return function outputs
   return(GP_model)
@@ -135,7 +143,7 @@ train_GP_matern <- function(train_data, lower, upper) {
 }
 
 
-cv_train_matern <- function(input_data, lower, upper, scale, test_prop = 0.1) {
+cv_train_matern <- function(input_data, lower, upper, scale, test_prop = 0.1, hetGP = TRUE) {
 
   # ----------------------------------------------------------
   # This function splits data into test and train sets, and performs gaussian process regression on the train set
@@ -182,7 +190,7 @@ cv_train_matern <- function(input_data, lower, upper, scale, test_prop = 0.1) {
   train_data <- input_data[train_indices, ]
   
   # Train model on train set
-  trained_model <- train_GP_matern(train_data, lower, upper)
+  trained_model <- train_GP_matern(train_data, lower, upper, hetGP)
   print(summary(trained_model))
   
   # Return function outputs

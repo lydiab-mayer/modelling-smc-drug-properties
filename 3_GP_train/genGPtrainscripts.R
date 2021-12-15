@@ -15,7 +15,7 @@
 #
 ########################################
 
-genGPtrainscripts <- function(exp, predicted, lower, upper, scale){
+genGPtrainscripts <- function(exp, predicted, lower, upper, scale, hetGP){
   
   # Set up
   user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
@@ -46,16 +46,22 @@ genGPtrainscripts <- function(exp, predicted, lower, upper, scale){
   cat("LOWER=$5","\n", sep ="")
   cat("UPPER=$6","\n", sep ="")
   cat("SCALE=$7","\n", sep ="")
+  cat("HETGP=$8", "\n", sep = "")
   
   cat("# IMPORTANT: the number of files must equal to the task array length (index starts at 0)","\n", sep ="")
+  cat("if [ $HETGP = \"TRUE\" ]", "\n", sep = "")
+  cat("then", "\n", sep = "")
   cat("setting_postprocessing_results=(${INPUT_DIR}seeds_*.txt)","\n", sep ="")
+  cat("else", "\n", sep = "")
+  cat("setting_postprocessing_results=(${INPUT_DIR}agg_*.txt)","\n", sep ="")
+  cat("fi", "\n", sep = "")
   
   cat("# Select scenario file in array","\n", sep ="")
   cat("ID=$(expr ${SLURM_ARRAY_TASK_ID} - 1)","\n", sep ="")
   cat("setting_postprocessing_result=${setting_postprocessing_results[$ID]}","\n", sep ="")
   cat("echo \"Postprocessing $PREDICTED for $setting_postprocessing_result\"","\n", sep ="")
   
-  cat("Rscript ../../../analysisworkflow/3_GP_train/train_GP.R $setting_postprocessing_result $DEST_DIR $PREDICTED $RANGES_FILE $LOWER $UPPER $SCALE","\n", sep ="")
+  cat("Rscript ../../../analysisworkflow/3_GP_train/train_GP.R $setting_postprocessing_result $DEST_DIR $PREDICTED $RANGES_FILE $LOWER $UPPER $SCALE $HETGP","\n", sep ="")
   
   sink()
   
@@ -65,7 +71,7 @@ genGPtrainscripts <- function(exp, predicted, lower, upper, scale){
   
   setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
   
-  sys_command <- paste("sbatch GP_train_workflow.sh", SIM_FOLDER, predicted, lower, upper, scale)
+  sys_command <- paste("sbatch GP_train_workflow.sh", SIM_FOLDER, predicted, lower, upper, scale, hetGP)
   
   # Submit job to cluster
   system(sys_command)
