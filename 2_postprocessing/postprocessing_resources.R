@@ -152,10 +152,10 @@ calculate.monthly.outcome <- function(om.result, measure, age.group, time.step, 
   
   if (prevalence) {
 
-    # Summarise further by averaging over all measures by month
+    # Take a snapshot of prevalence at the end of the month
     om.result <- om.result[, -which(names(om.result) %in% c("time", "date"))] %>%
       group_by(measure, month, year, n) %>%
-      summarise(value = mean(value))
+      summarise(value = last(value))
 
   } else {
     
@@ -250,6 +250,8 @@ calculate.annual.outcome <- function(om.result, measure, age.group, time.step, d
   if (prevalence) {
     
     # Summarise further by averaging over all measures by year
+    # IMPORTANT: This calculation is DIFFERENT from the prevalence calculation in calculate.monthly.outcome,
+    # which takes a snapshot of prevalence at the end of the month
     om.result <- om.result[, -which(names(om.result) %in% c("time", "date"))] %>%
       group_by(measure, year) %>%
       summarise(value = mean(value))
@@ -301,6 +303,7 @@ calculate.annual.outcome <- function(om.result, measure, age.group, time.step, d
 # months <- 4
 # year.counterfactual <- 2034
 # year.intervention <- 2039
+# prevalence = TRUE
 
 calculate.monthly.reduction <- function(om.outcome, id, fmonth, months, year.counterfactual, year.intervention, prevalence = FALSE) {
 
@@ -333,7 +336,7 @@ calculate.monthly.reduction <- function(om.outcome, id, fmonth, months, year.cou
     om.total <- om.outcome %>%
       group_by(year) %>%
       summarise(npop = mean(npop),
-                value = sum(value*ntimesteps)/sum(ntimesteps))
+                value = mean(value)) # sum(value*ntimesteps)/sum(ntimesteps))
   } else {
     om.total <- om.outcome %>%
       group_by(year) %>%
@@ -445,12 +448,12 @@ report.results <- function(dir, om.result, date, fmonth, months, year.counterfac
   names(prev.210) <- paste0("annual_prev_210_", year.counterfactual)
   rm(om.outcome)
   
-  # Calculate prevalence reduction in intervention group
+  # Calculate monthly prevalence reduction in intervention group
   om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 3, age.group = age.int, time.step = 5, date = date, prevalence = TRUE)
   prev.red.int <- calculate.monthly.reduction(om.outcome = om.outcome, id = "prev_red_int_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention, prevalence = TRUE)
   rm(om.outcome)
   
-  # Calculate prevalence reduction in children 2 to 10 years old
+  # Calculate monthly prevalence reduction in children 2 to 10 years old
   om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 3, age.group = age.210, time.step = 5, date = date, prevalence = TRUE)
   prev.red.210 <- calculate.monthly.reduction(om.outcome = om.outcome, id = "prev_red_210_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention, prevalence = TRUE)
   rm(om.outcome)
@@ -471,7 +474,7 @@ report.results <- function(dir, om.result, date, fmonth, months, year.counterfac
   rm(om.outcome)
   
   # Return outputs
-  out <- cbind.data.frame(scenario.params$Scenario_Name, scenario.params$SEED, prev_210, prev.red.int, inc.red.int, sev.red.int, mor.red.int)
+  out <- cbind.data.frame(scenario.params$Scenario_Name, scenario.params$SEED, prev.210, prev.red.int, prev.red.210, inc.red.int, sev.red.int, mor.red.int)
   colnames(out) <- c("Scenario_Name", "seed", names(prev.210), colnames(prev.red.int), colnames(prev.red.210), colnames(inc.red.int), colnames(sev.red.int), colnames(mor.red.int))
   return(out)
   
