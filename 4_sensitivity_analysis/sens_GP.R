@@ -18,6 +18,7 @@ gp_file = args[1]
 ranges_file = args[2]
 results_folder = args[3]
 scale = as.logical(args[4])
+clinical_translation = as.logical(args[5])
 print(paste0("results_folder:",results_folder))
 print(paste0("scale arg:",scale))
 
@@ -33,6 +34,16 @@ load(ranges_file); param_ranges <- param_ranges_cont
 if (scale) {
   param_ranges[, 1] <- 0 
   param_ranges[, 2] <- 1 
+}
+
+# If performing clinical translation analysis, manually fix coverage
+if (clinical_translation) {
+  param_ranges["Coverage1", ] <- c(1, 1)
+  if (scale) {
+    param_ranges["Coverage2", ] <- c(0.8333333, 0.8333333) # 95% scaled to c(0, 1)
+  } else {
+    param_ranges["Coverage2", ] <- c(0.95, 0.95)
+  }
 }
 
 # Calculate the Sobol indices

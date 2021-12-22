@@ -3,7 +3,7 @@
 #SBATCH --account=smith
 #SBATCH -o /scicore/home/penny/burlyd00/smc_lai/JOB_OUT/sens_GP.out
 #SBATCH --mem=200G
-#SBATCH --qos=6hours
+#SBATCH --qos=30min
 #SBATCH --cpus-per-task=4
 
 #######################################

@@ -66,6 +66,9 @@ pred_list = c("prev_red_all","prev_red_210","prev_red_int","inc_red_05",
 # Or choose 1
 # pred_list = "prev_red_all"
 
+# Specify whether the clinical translation workflow should be used (TRUE)
+clinical_translation = TRUE
+
 ###############
 ### SCALING ###
 ###############
@@ -81,7 +84,7 @@ scale = TRUE
 for(i in pred_list){
   predicted = i
   print(i)
-  gensensanalysisscripts(exp, predicted)
+  gensensanalysisscripts(exp, predicted, scale, clinical_translation)
 }
 
 

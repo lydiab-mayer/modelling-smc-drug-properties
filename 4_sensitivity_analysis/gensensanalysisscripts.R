@@ -11,7 +11,7 @@
 
 ########################################
 
-gensensanalysisscripts <- function(exp, predicted, scale){
+gensensanalysisscripts <- function(exp, predicted, scale, clinical_translation){
   
   user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
   
@@ -30,12 +30,12 @@ gensensanalysisscripts <- function(exp, predicted, scale){
   sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/job_sens_GP.sh"))
   
   cat("#!/bin/bash","\n", sep ="")
-  cat("#SBATCH --job-name=sensanal","\n", sep ="")
+  cat("#SBATCH --job-name=sensanalysis","\n", sep ="")
   cat("#SBATCH --account=penny","\n", sep ="")
   cat("#SBATCH -o ",ERROR_FOLDER,"%A_%a.out","\n", sep ="")
   # cat("#SBATCH -o /scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/JOB_OUT/4_sensanalysis.out","\n", sep ="")
   cat("#SBATCH --mem=200G","\n", sep ="")
-  cat("#SBATCH --qos=6hours","\n", sep ="")
+  cat("#SBATCH --qos=30min","\n", sep ="")
   cat("#SBATCH --cpus-per-task=4","\n", sep ="")
   cat("###########################################","\n", sep ="")
   cat("ml purge","\n", sep ="")
@@ -45,6 +45,7 @@ gensensanalysisscripts <- function(exp, predicted, scale){
   cat("PARAM_RANGES_FILE=$2","\n", sep ="")
   cat("SENS_DEST_DIR=$3","\n", sep ="")
   cat("SCALE=$4","\n", sep ="")
+  cat("CLINICAL_TRANSLATION=$5","\n", sep ="")
   
   cat("# IMPORTANT: the number of files must equal to the task array length (index starts at 0)","\n", sep ="")
   cat("gp_files=(${GP_DIR}*.RData)","\n", sep ="")
@@ -58,7 +59,7 @@ gensensanalysisscripts <- function(exp, predicted, scale){
   cat("echo \"Postprocessing for $gp_file\" ","\n", sep ="")
   cat("echo \"Scale arg0: $SCALE\" ","\n", sep ="")
   
-  cat("Rscript ../../../analysisworkflow/4_sensitivity_analysis/sens_GP.R $gp_file $PARAM_RANGES_FILE $SENS_DEST_DIR $SCALE","\n", sep ="")
+  cat("Rscript ../../../analysisworkflow/4_sensitivity_analysis/sens_GP.R $gp_file $PARAM_RANGES_FILE $SENS_DEST_DIR $SCALE $CLINICAL_TRANSLATION","\n", sep ="")
   
   sink()
   
@@ -68,7 +69,7 @@ gensensanalysisscripts <- function(exp, predicted, scale){
   param_ranges_file = paste0(SIM_FOLDER,"param_ranges.RData")
   sens_folder = paste0(SIM_FOLDER,"gp/trained/sensitivity/")
   
-  sys_command = paste("bash GP_sens_workflow.sh", GP_folder, param_ranges_file, sens_folder, scale)
+  sys_command = paste("bash GP_sens_workflow.sh", GP_folder, param_ranges_file, sens_folder, scale, clinical_translation)
   
   # Run  command
   system(sys_command)
