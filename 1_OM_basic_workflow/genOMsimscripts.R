@@ -33,14 +33,14 @@ genOMsimscripts <- function(exp, chunk_size){
   sink(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/run_OM.sh"))
   
 cat("#!/bin/bash","\n", sep ="")
-cat("#SBATCH --job-name=CT","\n", sep ="")
+cat("#SBATCH --job-name=OMSimulation","\n", sep ="")
 cat("#SBATCH --account=penny","\n", sep ="")
 cat("#SBATCH --error=/dev/null","\n", sep ="")
 cat("#SBATCH --output=/dev/null","\n", sep ="")
 cat("#SBATCH --exclude=shi129", "\n", sep = "")
 #cat("#SBATCH -o ",ERROR_FOLDER,"%A_%a.out","\n", sep ="")
 cat("#SBATCH --mem=2G","\n", sep ="")
-cat("#SBATCH --qos=30min","\n", sep ="")
+#cat("#SBATCH --qos=30min","\n", sep ="")
 cat("#SBATCH --cpus-per-task=1","\n", sep ="")
 cat("###########################################","\n", sep ="")
 cat("# %A_%a.out","\n", sep ="")
@@ -201,7 +201,7 @@ sink()
 
     cat(" echo \"Creating $NUM-1 scenarios and running OM simulations... \" ","\n", sep ="")
     
-    cat("sbatch -W --array=1-$NUM ./run_OM.sh $PARAM_TABLE_FILE $SCAFFOLD_FILE $BASE_FOLDER $SCENARIOS_FOLDER $OM_FOLDER","\n\n", sep ="")
+    cat("sbatch -W --array=1-$NUM%380 ./run_OM.sh $PARAM_TABLE_FILE $SCAFFOLD_FILE $BASE_FOLDER $SCENARIOS_FOLDER $OM_FOLDER","\n\n", sep ="")
     
     # Close the sink!
     sink()
