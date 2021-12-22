@@ -1,4 +1,5 @@
 #!/bin/bash
+#SBATCH --qos=30min
 #
 ##############################
 # Main script for training a Gaussian process emulator. 

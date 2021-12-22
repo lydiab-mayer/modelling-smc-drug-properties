@@ -1,3 +1,5 @@
+#SBATCH --qos=30min
+
 SIM_FOLDER=$1
 PRED=$2
 SCALE=$3
