@@ -183,7 +183,7 @@ for(exp in exp_list) {
   # Generate plot - figure 3.3.2
   # ----------------------------------------------------------
     
-  p <- ggplot(df[(df$Access == "LOW ACCESS" & df$Seasonality == "LONG SEASON") & df$Agegroup == "CHILDREN 3 TO 59 MONTHS", ], 
+  p <- ggplot(df[(df$Access == "HIGH ACCESS" & df$Seasonality == "LONG SEASON") & df$Agegroup == "CHILDREN 3 TO 59 MONTHS", ], 
               aes(x = annual_prev, y = T_eff_scaled, fill = parameter, label = paste0(round(T_eff*100, 0), "%")))
     
   p <- p + geom_bar(position = "stack", stat = "identity", colour = "white")
@@ -246,7 +246,7 @@ for(exp in exp_list) {
   # Generate plot - figure 6.3.1
   # ----------------------------------------------------------
     
-  p <- ggplot(df[df$Access == "LOW ACCESS" & df$Seasonality == "LONG SEASON", ], 
+  p <- ggplot(df[df$Access == "HIGH ACCESS" & df$Seasonality == "LONG SEASON", ], 
               aes(x = annual_prev, y = T_eff_scaled, fill = parameter, label = paste0(round(T_eff*100, 0), "%")))
     
   p <- p + geom_bar(position = "stack", stat = "identity", colour = "white")

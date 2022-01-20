@@ -16,7 +16,7 @@ rm(list = ls())
 exp <- "iTPP3_tradeoffs_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
-pred <- "sev_red_int_Tot"
+pred <- "inc_red_int_Tot"
 
 library(ggplot2)
 library(tidyr)
@@ -37,7 +37,7 @@ if (!dir.exists(paste0("./Experiments/", exp, "/Outputs"))) dir.create(paste0(".
 
 setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
 (setting_id <- sub(".rds", "", sub("opt_", "", basename(setting))))
-index <- c(39, 47, 55, 35, 43)
+index <- c(40, 48, 56, 36, 44)
 setting_id[index]
 
 df <- data.frame()
@@ -98,9 +98,9 @@ p <- p + geom_rect(data = df_plot[1, ],
 
 # Add SP+AQ to plot
 p <- p + geom_rect(data = df_plot[1, ],
-                   aes(xmin = 30.5, xmax = 31.5, ymin = .995, ymax = 1.005),
-                   fill = "#C93312") +
-  geom_label(label = "SP+AQ", x = 31, y = 1, fill = "#C93312", label.size = NA, family = "Courier", fontface = "bold", colour = "white")
+                   aes(xmin = 20.5, xmax = 31.5, ymin = .825, ymax = 1.005),
+                   fill = "#C93312", alpha = 0.5) +
+  geom_label(label = "SP+AQ", x = 25.5, y = 0.915, fill = "#C93312", label.size = NA, family = "Courier", fontface = "bold", colour = "white")
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -128,7 +128,7 @@ p <- p + scale_y_continuous(labels = scales::number_format(accuracy = 1, scale =
   
 p <- p + labs(x = "DURATION OF PROTECTION (DAYS)",
               y = "INITIAL EFFICACY (%)",
-              title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 44%"))))
+              title = expression(paste(bold("ANNUAL BASELINE "), bolditalic("Pf"), bold("PR"["2-10"]), bold(" 26%"))))
 
 p <- p + guides(fill = guide_colorbar(title = "REDUCTION",
                                      frame.colour = "white"))
@@ -172,7 +172,7 @@ p1 <- p1 + scale_y_continuous(labels = scales::number_format(accuracy = 1, scale
 
 p1 <- p1 + labs(x = "",
               y = "",
-              title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 23%"))))
+              title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 13%"))))
 
 p1 <- p1 + guides(fill = "none")
 
@@ -211,7 +211,7 @@ p2 <- p2 + scale_y_continuous(labels = scales::number_format(accuracy = 1, scale
 
 p2 <- p2 + labs(x = "",
                 y = "",
-                title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 32%"))))
+                title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 18%"))))
 
 p2 <- p2 + guides(fill = "none")
 
@@ -248,7 +248,7 @@ p3 <- p3 + scale_y_continuous(labels = scales::number_format(accuracy = 1, scale
                     show.limits = TRUE) +
   scale_x_continuous(breaks = seq(10, 60, 10))
 
-p3 <- p3 + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 54%"))))
+p3 <- p3 + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 37%"))))
 
 p3 <- p3 + guides(fill = "none")
 
@@ -285,7 +285,7 @@ p4 <- p4 + scale_y_continuous(labels = scales::number_format(accuracy = 1, scale
                     show.limits = TRUE) +
   scale_x_continuous(breaks = seq(10, 60, 10))
 
-p4 <- p4 + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 64%"))))
+p4 <- p4 + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 49%"))))
 
 p4 <- p4 + guides(fill = "none")
 
@@ -354,7 +354,7 @@ p <- p + scale_y_continuous(labels = scales::number_format(accuracy = 1, scale =
 
 p <- p + labs(x = "DURATION OF PROTECTION (DAYS)",
               y = "INITIAL EFFICACY (%)",
-              title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 44%"))))
+              title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 26%"))))
 
 p <- p + guides(fill = guide_colorbar(title = "REDUCTION",
                                       frame.colour = "white"))

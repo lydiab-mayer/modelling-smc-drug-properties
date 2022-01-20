@@ -174,7 +174,7 @@ for (pred in pred_list) {
   # Generate plot - figure 3.3.4
   # ----------------------------------------------------------
   
-  p <- ggplot(df[df$Access == "LOW ACCESS" & (df$Agegroup == "CHILDREN 3 TO 59 MONTHS" & df$EIR == 8), ], 
+  p <- ggplot(df[df$Access == "HIGH ACCESS" & (df$Agegroup == "CHILDREN 3 TO 59 MONTHS" & df$EIR == 8), ], 
               aes(x = Rounds, y = T_eff_scaled, fill = parameter, label = paste0(round(T_eff*100, 0), "%")))
   
   p <- p + geom_bar(position = "stack", stat = "identity", colour = "white")

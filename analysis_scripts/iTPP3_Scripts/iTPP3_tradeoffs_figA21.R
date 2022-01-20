@@ -37,7 +37,7 @@ if (!dir.exists(paste0("./Experiments/", exp, "/Outputs"))) dir.create(paste0(".
 
 setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
 (setting_id <- sub(".rds", "", sub("opt_", "", basename(setting))))
-index <- c(53, 55)
+index <- c(34, 36)
 setting_id[index]
 
 df <- data.frame()
@@ -112,8 +112,7 @@ p <- p + scale_y_continuous(labels = scales::number_format(accuracy = 1, scale =
   scale_x_continuous(breaks = seq(10, 60, 10))
 
 p <- p + labs(x = "DURATION OF PROTECTION (DAYS)",
-              y = "INITIAL EFFICACY (%)",
-              title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 44%"))))
+              y = "INITIAL EFFICACY (%)")
 
 p <- p + guides(fill = guide_colorbar(title = "REDUCTION",
                                       frame.colour = "white"))
