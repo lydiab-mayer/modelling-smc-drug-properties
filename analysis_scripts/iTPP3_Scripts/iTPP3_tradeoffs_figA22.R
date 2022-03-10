@@ -65,11 +65,11 @@ for (i in index) {
 df$target_range <- floor(df$mean/5)*5
 
 # Format data in preparation for plotting
-df$Seasonality <- ifelse(df$Seasonality == "sharpseasonal", "SHORT SEASON", "LONG SEASON")
+df$Seasonality <- ifelse(df$Seasonality == "sharpseasonal", "FIVE-MONTH SEASON", "SIX-MONTH SEASON")
 df$Access <- ifelse(df$Access == 0.04, "LOW ACCESS", "HIGH ACCESS")
 df$Agegroup <- ifelse(df$Agegroup == 5, "CHILDREN 3 TO 59 MONTHS", "CHILDREN 3 TO 119 MONTHS")
 df$Agegroup <- factor(df$Agegroup, levels = c("CHILDREN 3 TO 59 MONTHS", "CHILDREN 3 TO 119 MONTHS"))
-df$Seasonality <- factor(df$Seasonality, levels = c("SHORT SEASON", "LONG SEASON"))
+df$Seasonality <- factor(df$Seasonality, levels = c("FIVE-MONTH SEASON", "SIX-MONTH SEASON"))
 df$Access <- factor(df$Access, levels = c("LOW ACCESS", "HIGH ACCESS"))
 
 # Filter data based on coverage
@@ -112,8 +112,7 @@ p <- p + scale_y_continuous(labels = scales::number_format(accuracy = 1, scale =
   scale_x_continuous(breaks = seq(10, 60, 10))
 
 p <- p + labs(x = "DURATION OF PROTECTION (DAYS)",
-              y = "INITIAL EFFICACY (%)",
-              title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 44%"))))
+              y = "INITIAL EFFICACY (%)")
 
 p <- p + guides(fill = guide_colorbar(title = "REDUCTION",
                                       frame.colour = "white"))

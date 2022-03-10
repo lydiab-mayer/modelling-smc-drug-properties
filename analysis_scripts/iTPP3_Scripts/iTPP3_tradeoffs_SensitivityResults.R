@@ -227,6 +227,53 @@ for(exp in exp_list) {
          width = 9.1,
          height = 4,
          dpi = 200)
+  
+  
+  p <- ggplot(df[(df$Access == "HIGH ACCESS" & df$Seasonality == "LONG SEASON") & df$Agegroup == "CHILDREN 3 TO 59 MONTHS", ], 
+              aes(x = annual_prev, y = T_eff_scaled, fill = parameter, label = paste0(round(T_eff*100, 0), "%")))
+  
+  p <- p + geom_bar(position = "stack", stat = "identity", colour = "white")
+  
+  p <- p + geom_text(aes(colour = parameter), 
+                     position = position_stack(vjust = 0.5),
+                     family = "Courier",
+                     fontface = "bold",
+                     show.legend = FALSE)
+  
+  p <- p + facet_wrap(.~ Outcome, scales = "free_x")
+  
+  p <- p + theme(panel.border = element_blank(), 
+                 panel.background = element_blank(),
+                 panel.grid = element_blank(),
+                 text = element_text(family = "Courier", size = 14),
+                 strip.background = element_blank(),
+                 axis.line = element_blank(),
+                 axis.ticks = element_blank(),
+                 axis.title.x = element_text(face = "bold", margin = margin(t = 10)),
+                 axis.title.y = element_text(face = "bold", margin = margin(r = 10)),
+                 strip.text = element_text(face = "bold"),
+                 legend.key = element_blank(),
+                 legend.title = element_text(face = "bold"),
+                 legend.position = "bottom")
+  
+  p <- p + scale_fill_manual(values = cols) + 
+    scale_colour_manual(values = text_cols) +
+    scale_y_continuous(breaks = seq(0, 100, 10), labels = paste0(seq(0, 100, 10), "%"))
+  
+  p <- p + labs(x = expression(paste(bold("BASELINE ANNUAL "), bolditalic("Pf"), bold("PR"["2-10"]))),
+                y = "MEDIAN REDUCTION (%)",
+                fill = "")
+  
+  p <- p + guides(fill = guide_legend(nrow = 2)) 
+  
+  p
+  
+  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Figures/iTPP3_", exp, "_FIG332_EXECSUMMARY.jpg"),
+         plot = last_plot(),
+         width = 9.1,
+         height = 3.5,
+         dpi = 200)
+  
     
     
   # ----------------------------------------------------------

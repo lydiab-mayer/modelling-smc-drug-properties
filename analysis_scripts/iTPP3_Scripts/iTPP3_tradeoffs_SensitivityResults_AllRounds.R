@@ -126,17 +126,17 @@ for (pred in pred_list) {
              sep = "_",
              remove = FALSE)
   
-  df$Seasonality <- ifelse(df$Seasonality == "sharpseasonal", "SHORT SEASON", "LONG SEASON")
-  df$Seasonality <- factor(df$Seasonality, levels = c("SHORT SEASON", "LONG SEASON"))
+  df$Seasonality <- ifelse(df$Seasonality == "sharpseasonal", "FIVE-MONTH SEASON", "SIX-MONTH SEASON")
+  df$Seasonality <- factor(df$Seasonality, levels = c("FIVE-MONTH SEASON", "SIX-MONTH SEASON"))
   
   df$Access <- ifelse(df$Access == 0.04, "LOW ACCESS", "HIGH ACCESS")
   df$Access <- factor(df$Access, levels = c("LOW ACCESS", "HIGH ACCESS"))
   
   df$Setting <- paste0(df$Seasonality, "-", df$Access)
-  df$Setting <- factor(df$Setting, levels = c("LONG SEASON-LOW ACCESS", 
-                                              "SHORT SEASON-LOW ACCESS", 
-                                              "LONG SEASON-HIGH ACCESS",
-                                              "SHORT SEASON-HIGH ACCESS"))
+  df$Setting <- factor(df$Setting, levels = c("SIX-MONTH SEASON-LOW ACCESS", 
+                                              "FIVE-MONTH SEASON-LOW ACCESS", 
+                                              "SIX-MONTH SEASON-HIGH ACCESS",
+                                              "FIVE-MONTH SEASON-HIGH ACCESS"))
   
   df$Agegroup <- factor(df$Agegroup, levels = c("5", "10"))
   df$Agegroup <- recode(df$Agegroup,

@@ -16,7 +16,7 @@ rm(list = ls())
 exp_list <- c("iTPP3_tradeoffs_3rounds", "iTPP3_tradeoffs_4rounds", "iTPP3_tradeoffs_5rounds")
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
-pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot", "mor_red_int_Tot")
+pred_list <- c("prev_red_int_Aug", "inc_red_int_Tot", "sev_red_int_Tot", "mor_red_int_Tot")
 
 library(ggplot2)
 library(tidyr)
@@ -94,21 +94,23 @@ prev$annual_prev <- paste0(round(prev$annual_prev*100, 0), "%")
 out <- merge(out, prev, by = c("Seasonality", "EIR", "Access"))
 
 # Format labels
-out$Seasonality <- ifelse(out$Seasonality == "sharpseasonal", "SHORT SEASON", "LONG SEASON")
+out$Seasonality <- ifelse(out$Seasonality == "sharpseasonal", "FIVE-MONTH SEASON", "SIX-MONTH SEASON")
 out$Access <- ifelse(out$Access == 0.04, "LOW ACCESS", "HIGH ACCESS")
 out$Agegroup <- paste0("CHILDREN 3M TO ", out$Agegroup, "Y")
-out$Seasonality <- factor(out$Seasonality, levels = c("SHORT SEASON", "LONG SEASON"))
+out$Seasonality <- factor(out$Seasonality, levels = c("FIVE-MONTH SEASON", "SIX-MONTH SEASON"))
 out$Access <- factor(out$Access, levels = c("LOW ACCESS", "HIGH ACCESS"))
 out$Outcome <- ifelse(out$Outcome == "inc", "CLINICAL INCIDENCE",
                       ifelse(out$Outcome == "sev", "SEVERE DISEASE",
-                             "MORTALITY"))
-out$Outcome <- factor(out$Outcome, levels = c("CLINICAL INCIDENCE",
+                             ifelse(out$Outcome == "prev", "PREVALENCE",
+                             "MORTALITY")))
+out$Outcome <- factor(out$Outcome, levels = c("PREVALENCE",
+                                              "CLINICAL INCIDENCE",
                                               "SEVERE DISEASE",
                                               "MORTALITY"))
 out$Experiment <- ifelse(out$Experiment == "iTPP3tradeoffs3rounds", "3 ROUNDS",
                          ifelse(out$Experiment == "iTPP3tradeoffs4rounds", "4 ROUNDS",
                                 "5 ROUNDS"))
-out$Experiment <- factor(out$Experiment, levels = c("5 ROUNDS", "4 ROUNDS", "3 ROUNDS"))
+#out$Experiment <- factor(out$Experiment, levels = c("5 ROUNDS", "4 ROUNDS", "3 ROUNDS"))
 
 head(out)
 
@@ -124,7 +126,7 @@ plot_name <- "FIG232"
 
 # Short season
 
-df_plot <- out[out$Seasonality == "SHORT SEASON" & (out$Access == "HIGH ACCESS" & out$Agegroup == "CHILDREN 3M TO 5Y"), ]
+df_plot <- out[out$Seasonality == "FIVE-MONTH SEASON" & (out$Access == "HIGH ACCESS" & out$Agegroup == "CHILDREN 3M TO 5Y"), ]
 
 p1 <- ggplot(df_plot, aes(x = Outcome, y = SPAQ, colour = annual_prev, shape = Experiment, group = Experiment))
 
@@ -157,12 +159,12 @@ p1 <- p1 + labs(x = "",
               y = "REDUCTION (%)",
               colour = expression(paste(bold("BASELINE ANNUAL "), bolditalic("Pf"), bold("PR"["2-10"]))),
               shape = "NUMBER OF ROUNDS OF SMC",
-              title = "SHORT SEASONAL PROFILE")
+              title = "FIVE-MONTH SEASONAL PROFILE")
 
 
 # Long season
 
-df_plot <- out[out$Seasonality == "LONG SEASON" & (out$Access == "HIGH ACCESS" & out$Agegroup == "CHILDREN 3M TO 5Y"), ]
+df_plot <- out[out$Seasonality == "SIX-MONTH SEASON" & (out$Access == "HIGH ACCESS" & out$Agegroup == "CHILDREN 3M TO 5Y"), ]
 
 p2 <- ggplot(df_plot, aes(x = Outcome, y = SPAQ, colour = annual_prev, shape = Experiment, group = Experiment))
 
@@ -194,7 +196,7 @@ p2 <- p2 + scale_colour_manual(values = cols) +
 p2 <- p2 + labs(x = "",
                 y = "REDUCTION (%)",
                 colour = expression(paste(bold("BASELINE ANNUAL "), bolditalic("Pf"), bold("PR"["2-10"]))),
-                title = "LONG SEASONAL PROFILE") +
+                title = "SIX-MONTH SEASONAL PROFILE") +
   guides(shape = "none")
 
 p1 + p2 + plot_layout(nrow = 2, ncol = 1)

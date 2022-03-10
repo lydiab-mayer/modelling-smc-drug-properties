@@ -16,7 +16,7 @@ rm(list = ls())
 exp_list <- c("iTPP3_tradeoffs_3rounds", "iTPP3_tradeoffs_4rounds", "iTPP3_tradeoffs_5rounds")
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
-pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot", "mor_red_int_Tot")
+pred_list <- c("prev_red_int_Aug", "inc_red_int_Tot", "sev_red_int_Tot", "mor_red_int_Tot")
 
 library(ggplot2)
 library(tidyr)
@@ -94,15 +94,17 @@ prev$annual_prev <- paste0(round(prev$annual_prev*100, 0), "%")
 out <- merge(out, prev, by = c("Seasonality", "EIR", "Access"))
 
 # Format labels
-out$Seasonality <- ifelse(out$Seasonality == "sharpseasonal", "SHORT SEASON", "LONG SEASON")
+out$Seasonality <- ifelse(out$Seasonality == "sharpseasonal", "FIVE-MONTH SEASON", "SIX-MONTH SEASON")
 out$Access <- ifelse(out$Access == 0.04, "LOW ACCESS", "HIGH ACCESS")
 out$Agegroup <- paste0("CHILDREN 3M TO ", out$Agegroup, "Y")
-out$Seasonality <- factor(out$Seasonality, levels = c("SHORT SEASON", "LONG SEASON"))
+out$Seasonality <- factor(out$Seasonality, levels = c("FIVE-MONTH SEASON", "SIX-MONTH SEASON"))
 out$Access <- factor(out$Access, levels = c("LOW ACCESS", "HIGH ACCESS"))
 out$Outcome <- ifelse(out$Outcome == "inc", "CLINICAL INCIDENCE",
                       ifelse(out$Outcome == "sev", "SEVERE DISEASE",
-                             "MORTALITY"))
-out$Outcome <- factor(out$Outcome, levels = c("CLINICAL INCIDENCE",
+                             ifelse(out$Outcome == "prev", "PREVALENCE",
+                             "MORTALITY")))
+out$Outcome <- factor(out$Outcome, levels = c("PREVALENCE",
+                                              "CLINICAL INCIDENCE",
                                               "SEVERE DISEASE",
                                               "MORTALITY"))
 out$Experiment <- ifelse(out$Experiment == "iTPP3tradeoffs3rounds", "3 ROUNDS",
@@ -124,7 +126,7 @@ plot_name <- "FIG232"
 
 # Short season
 
-df_plot <- out[out$Seasonality == "SHORT SEASON" & (out$Access == "HIGH ACCESS" & out$Agegroup == "CHILDREN 3M TO 5Y"), ]
+df_plot <- out[out$Seasonality == "FIVE-MONTH SEASON" & (out$Access == "HIGH ACCESS" & out$Agegroup == "CHILDREN 3M TO 5Y"), ]
 
 p1 <- ggplot(df_plot, aes(x = Outcome, y = SPAQ, colour = annual_prev, shape = Experiment, group = Experiment))
 
@@ -164,49 +166,6 @@ p1
 
 ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Presentation/Figures/iTPP3_", plot_name, ".jpg"),
        plot = last_plot(),
-       width = 6.5,
+       width = 6,
        height = 4,
        dpi = 400)
-
-# 
-# # Long season
-# 
-# df_plot <- out[out$Seasonality == "LONG SEASON" & (out$Access == "HIGH ACCESS" & out$Agegroup == "CHILDREN 3M TO 5Y"), ]
-# 
-# p2 <- ggplot(df_plot, aes(x = Outcome, y = SPAQ, colour = annual_prev, shape = Experiment, group = Experiment))
-# 
-# p2 <- p2 + geom_point(position = position_dodge(width = .75), size = 3)
-# 
-# p2 <- p2 + theme(panel.border = element_blank(), 
-#                  panel.background = element_blank(),
-#                  panel.grid.minor = element_blank(),
-#                  panel.grid.major.x = element_blank(),
-#                  panel.grid.major.y = element_line(colour = "lightgrey", linetype = "dotted"),
-#                  text = element_text(family = "Courier New", size = 12),
-#                  axis.line = element_blank(),
-#                  axis.ticks = element_blank(),
-#                  axis.title.x = element_text(face="bold", margin = margin(t = 10)),
-#                  axis.title.y = element_text(face="bold", margin = margin(r = 10)),
-#                  strip.background = element_blank(),
-#                  plot.title = element_text(face = "bold", hjust = 0.5),
-#                  legend.key = element_blank(),
-#                  legend.title = element_text(face = "bold", size = 10),
-#                  legend.text = element_text(size = 10),
-#                 # legend.position = "bottom",
-#                  legend.box = "vertical",
-#                  legend.margin = margin())
-# 
-# p2 <- p2 + scale_colour_manual(values = cols) +
-#   scale_shape_manual(values = shapes) +
-#   scale_y_continuous(breaks = seq(10, 90, 10), labels = paste0(seq(10, 90, 10), "%"), limits = c(40, 90))
-# 
-# p2 <- p2 + labs(x = "",
-#                 y = "REDUCTION (%)",
-#                 colour = expression(paste(bold("BASELINE ANNUAL "), bolditalic("Pf"), bold("PR"["2-10"]))),
-#                 title = "LONG SEASONAL PROFILE") +
-#   guides(shape = "none")
-# 
-# p1 + p2 + plot_layout(nrow = 2, ncol = 1)
-
-
-

@@ -70,11 +70,13 @@ for(exp in exp_list) {
     
     # Read in optimisation result
     df <- readRDS(setting[i])$scenario
-    df$CoverageAllRounds <- df$Coverage1*df$Coverage2^num_rounds[exp]
+   # df$CoverageAllRounds <- df$Coverage1*df$Coverage2^num_rounds[exp]
+    df$CoverageOneRound <- 1 - (1 - df$Coverage1) + df$Coverage1*((1 - df$Coverage2)^num_rounds[exp])
     
     # Extract minimum criteria for selected targets
     for (i in 1:length(targets)){
-      out_int[i + 1, 3] <- min(df[df$mean >= targets[i], "CoverageAllRounds"])
+ #     out_int[i + 1, 3] <- min(df[df$mean >= targets[i], "CoverageAllRounds"])
+      out_int[i + 1, 3] <- min(df[df$mean >= targets[i], "CoverageOneRound"])
       out_int[i + 1, 4] <- min(df[df$mean >= targets[i], "Halflife"])
       out_int[i + 1, 5] <- min(df[df$mean >= targets[i], "Efficacy"])
     }
@@ -146,8 +148,8 @@ df$Rounds <- recode(df$Rounds,
   
 df$Seasonality <- factor(df$Seasonality, levels = c("sharpseasonal", "wideseasonal"))
 df$Seasonality <- recode(df$Seasonality,
-                          "sharpseasonal" = "SHORT SEASON",
-                          "wideseasonal" = "LONG SEASON")
+                          "sharpseasonal" = "FIVE-MONTH SEASON",
+                          "wideseasonal" = "SIX-MONTH SEASON")
   
 df$Agegroup <- factor(df$Agegroup, levels = c("5", "10"))
 df$Agegroup <- recode(df$Agegroup,
@@ -251,13 +253,13 @@ p <- p + theme(panel.border = element_blank(),
 p <- p + scale_y_continuous(labels = scales::number_format(accuracy = 1, suffix = "%"), breaks = targets) +
   scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
                     na.value = "light grey",
-                    breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1.0),
+                    breaks = c(0.6, 0.7, 0.8, 0.9, 1.0),
                     labels = function(x) paste0(x*100, "%"),
-                    limits = c(0, 1.0),
+                    limits = c(0.6, 1.0),
                     show.limits = TRUE)
 
 p <- p + labs(title = "MINIMUM COVERAGE CRITERIA FOR CLINICAL INCIDENCE REDUCTION",  y = "TARGET REDUCTION", x = expression(paste(bold("BASELINE ANNUAL "), bolditalic("Pf"), bold("PR"["2-10"])))) +
-  guides(fill = guide_colourbar(title.position = "top", title.hjust = 0.5, title = "COVERAGE OF ALL SMC ROUNDS"))
+  guides(fill = guide_colourbar(title.position = "top", title.hjust = 0.5, title = "COVERAGE OF AT LEAST ONE\nSMC ROUND"))
 
 p
 
@@ -394,13 +396,13 @@ p <- p + theme(panel.border = element_blank(),
 p <- p + scale_y_continuous(labels = scales::number_format(accuracy = 1, suffix = "%"), breaks = targets) +
   scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
                     na.value = "light grey",
-                    breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1.0),
+                    breaks = c(0.6, 0.7, 0.8, 0.9, 1.0),
                     labels = function(x) paste0(x*100, "%"),
-                    limits = c(0, 1.0),
+                    limits = c(0.6, 1.0),
                     show.limits = TRUE)
 
 p <- p + labs(title = "MINIMUM COVERAGE CRITERIA FOR SEVERE DISEASE REDUCTION",  y = "TARGET REDUCTION", x = expression(paste(bold("BASELINE ANNUAL "), bolditalic("Pf"), bold("PR"["2-10"])))) +
-  guides(fill = guide_colourbar(title.position = "top", title.hjust = 0.5, title = "COVERAGE OF ALL SMC ROUNDS"))
+  guides(fill = guide_colourbar(title.position = "top", title.hjust = 0.5, title = "COVERAGE OF AT LEAST ONE\nSMC ROUND"))
 
 p
 
@@ -486,7 +488,7 @@ df_plot <- df_plot %>%
 #df_plot$sum_na <- 1 - ifelse(df_plot$sum_na == 0, 0, df_plot$sum_na / sum(df_plot$sum_na))
 
 
-df_plot <- df_plot[df_plot$Seasonality == "SHORT SEASON" & df_plot$Access == "HIGH ACCESS", ]
+df_plot <- df_plot[df_plot$Seasonality == "FIVE-MONTH SEASON" & df_plot$Access == "HIGH ACCESS", ]
 df_plot <- df_plot[df_plot$Target != 90, ]
 
 
@@ -518,13 +520,13 @@ p <- p + theme(panel.border = element_blank(),
 p <- p + scale_y_continuous(labels = scales::number_format(accuracy = 1, suffix = "%"), breaks = targets) +
   scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
                     na.value = "light grey",
-                    breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1.0),
+                    breaks = c(0.6, 0.7, 0.8, 0.9, 1.0),
                     labels = function(x) paste0(x*100, "%"),
-                    limits = c(0, 1.0),
+                    limits = c(0.6, 1.0),
                     show.limits = TRUE)
 
 p <- p + labs(title = "MINIMUM COVERAGE CRITERIA", y = "TARGET REDUCTION", x = expression(paste(bold("BASELINE ANNUAL "), bolditalic("Pf"), bold("PR"["2-10"])))) +
-  guides(fill = guide_colourbar(title.position="top", title.hjust = 0.5, title = "COVERAGE OF ALL SMC ROUNDS"))
+  guides(fill = guide_colourbar(title.position="top", title.hjust = 0.5, title = "COVERAGE OF AT LEAST\nONE SMC ROUND"))
 
 p
 

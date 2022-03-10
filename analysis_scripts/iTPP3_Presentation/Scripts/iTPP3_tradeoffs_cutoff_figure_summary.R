@@ -217,13 +217,13 @@ p <- p + theme(panel.border = element_blank(),
 p <- p + scale_y_continuous(labels = scales::number_format(accuracy = 1, suffix = "%"), breaks = targets) +
   scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
                     na.value = "light grey",
-                    breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1.0),
+                    breaks = c(0.6, 0.7, 0.8, 0.9, 1.0),
                     labels = function(x) paste0(x*100, "%"),
-                    limits = c(0, 1.0),
+                    limits = c(0.6, 1.0),
                     show.limits = TRUE)
 
 p <- p + labs(title = "MINIMUM COVERAGE CRITERIA", y = "TARGET REDUCTION", x = expression(paste(bold("BASELINE ANNUAL "), bolditalic("Pf"), bold("PR"["2-10"])))) +
-  guides(fill = guide_colourbar(title.position="top", title.hjust = 0.5, title = "COVERAGE OF ALL SMC ROUNDS"))
+  guides(fill = guide_colourbar(title.position="top", title.hjust = 0.5, title = "COVERAGE OF AT LEAST\nONE SMC ROUND"))
 
 p1 <- p
 
@@ -252,7 +252,7 @@ p <- p + theme(panel.border = element_blank(),
                legend.text = element_text(size = text_size),
                legend.title = element_text(face = "bold", size = text_size),
                legend.position = "right",
-               legend.margin = margin(t = 0, r = 17, b = 0, l = 0, unit = "pt"))
+               legend.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
 
 p <- p + scale_y_continuous(labels = scales::number_format(accuracy = 1, suffix = "%"), breaks = targets) +
   scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
@@ -292,7 +292,7 @@ p <- p + theme(panel.border = element_blank(),
                legend.text = element_text(size = text_size),
                legend.title = element_text(face = "bold", size = text_size),
                legend.position = "right",
-               legend.margin = margin(t = 0, r = 50, b = 0, l = 0, unit = "pt"))
+               legend.margin = margin(t = 0, r = 30, b = 0, l = 0, unit = "pt"))
   
 p <- p + scale_y_continuous(labels = scales::number_format(accuracy = 1, suffix = "%"), breaks = targets) +
   scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
