@@ -21,7 +21,7 @@ GP_DIR=$1
 PARAM_RANGES_FILE=$2
 SENS_DEST_DIR=$3
 SCALE=$4
-CLINICAL_TRANSLATION=$5
+MANUAL=$5
 
 # create destination directory
 mkdir -p $SENS_DEST_DIR
@@ -32,5 +32,5 @@ NUM=${#gp_files[@]}
 
 echo $NUM
 
-sbatch -W --array=1-$NUM job_sens_GP.sh $GP_DIR $PARAM_RANGES_FILE $SENS_DEST_DIR $SCALE $CLINICAL_TRANSLATION
+sbatch -W --array=1-$NUM job_sens_GP.sh $GP_DIR $PARAM_RANGES_FILE $SENS_DEST_DIR $SCALE $MANUAL
 

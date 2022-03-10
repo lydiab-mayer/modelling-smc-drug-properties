@@ -60,14 +60,17 @@ exp ="..."
 # Make sure GP exists or will get error
 
 # All current variables for loop --> may be updated in future
-pred_list = c("prev_red_all","prev_red_210","prev_red_int","inc_red_05",
-              "inc_red_int","inc_red_all","inc_red_int_5mo")
+pred_list = c("inc_red_int_Tot", "sev_red_int_Tot", "prev_red_int_Aug", "mor_red_int_Tot")
 
-# Or choose 1
-# pred_list = "prev_red_all"
+# Specify whether parameter ranges used for the sensitivity analysis should be specified manually, e.g. for clinical translation
+manual = TRUE
 
-# Specify whether the clinical translation workflow should be used (TRUE)
-clinical_translation = TRUE
+# If manual = TRUE, specify ranges to use
+param_ranges_cont = rbind(parameter1 = c(..., ...),
+                          parameter2 = c(..., ...),
+                          parameter3 = c(..., ...))
+ranges_file = paste0("/scicore/home/penny/GROUP/M3TPP/", exp, "/param_ranges_manual.RData")
+save(param_ranges_cont, file = ranges_file)
 
 ###############
 ### SCALING ###
@@ -84,7 +87,7 @@ scale = TRUE
 for(i in pred_list){
   predicted = i
   print(i)
-  gensensanalysisscripts(exp, predicted, scale, clinical_translation)
+  gensensanalysisscripts(exp, predicted, scale, manual)
 }
 
 

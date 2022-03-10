@@ -11,7 +11,7 @@
 
 ########################################
 
-gensensanalysisscripts <- function(exp, predicted, scale, clinical_translation){
+gensensanalysisscripts <- function(exp, predicted, scale, manual){
   
   user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
   
@@ -45,7 +45,7 @@ gensensanalysisscripts <- function(exp, predicted, scale, clinical_translation){
   cat("PARAM_RANGES_FILE=$2","\n", sep ="")
   cat("SENS_DEST_DIR=$3","\n", sep ="")
   cat("SCALE=$4","\n", sep ="")
-  cat("CLINICAL_TRANSLATION=$5","\n", sep ="")
+  cat("MANUAL=$5","\n", sep ="")
   
   cat("# IMPORTANT: the number of files must equal to the task array length (index starts at 0)","\n", sep ="")
   cat("gp_files=(${GP_DIR}*.RData)","\n", sep ="")
@@ -59,17 +59,23 @@ gensensanalysisscripts <- function(exp, predicted, scale, clinical_translation){
   cat("echo \"Postprocessing for $gp_file\" ","\n", sep ="")
   cat("echo \"Scale arg0: $SCALE\" ","\n", sep ="")
   
-  cat("Rscript ../../../analysisworkflow/4_sensitivity_analysis/sens_GP.R $gp_file $PARAM_RANGES_FILE $SENS_DEST_DIR $SCALE $CLINICAL_TRANSLATION","\n", sep ="")
+  cat("Rscript ../../../analysisworkflow/4_sensitivity_analysis/sens_GP.R $gp_file $PARAM_RANGES_FILE $SENS_DEST_DIR $SCALE $MANUAL","\n", sep ="")
   
   sink()
   
   setwd(paste0("/scicore/home/penny/",user,"/M3TPP/Experiments/",exp,"/OM_JOBS/"))
   
   GP_folder = paste0(SIM_FOLDER,"gp/trained/" ,predicted ,"/")
-  param_ranges_file = paste0(SIM_FOLDER,"param_ranges.RData")
+  
+  if (manual) {
+    param_ranges_file = paste0(SIM_FOLDER,"param_ranges_manual.RData")
+  } else {
+    param_ranges_file = paste0(SIM_FOLDER,"param_ranges.RData")
+  }
+  
   sens_folder = paste0(SIM_FOLDER,"gp/trained/sensitivity/")
   
-  sys_command = paste("bash GP_sens_workflow.sh", GP_folder, param_ranges_file, sens_folder, scale, clinical_translation)
+  sys_command = paste("bash GP_sens_workflow.sh", GP_folder, param_ranges_file, sens_folder, scale, manual)
   
   # Run  command
   system(sys_command)
