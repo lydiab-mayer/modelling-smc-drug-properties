@@ -443,18 +443,18 @@ report.results <- function(dir, om.result, date, fmonth, months, year.counterfac
   #age.05 <- seq(which(age.groups == 0), which(age.groups == 5) - 1) # Children 0 to 5 years old
   
   # Calculate annual prevalence in children 2 to 10 years old
-  om.outcome <- calculate.annual.outcome(om.result = om.result, measure = 3, age.group = age.210, time.step = 5, date = date, prevalence = TRUE)
+  om.outcome <- calculate.annual.outcome(om.result = om.result, measure = 1, age.group = age.210, time.step = 5, date = date, prevalence = TRUE)
   prev.210 <- c(om.outcome[om.outcome$year == year.counterfactual, "value"])
   names(prev.210) <- paste0("annual_prev_210_", year.counterfactual)
   rm(om.outcome)
   
   # Calculate monthly prevalence reduction in intervention group
-  om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 3, age.group = age.int, time.step = 5, date = date, prevalence = TRUE)
+  om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 1, age.group = age.int, time.step = 5, date = date, prevalence = TRUE)
   prev.red.int <- calculate.monthly.reduction(om.outcome = om.outcome, id = "prev_red_int_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention, prevalence = TRUE)
   rm(om.outcome)
   
   # Calculate monthly prevalence reduction in children 2 to 10 years old
-  om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 3, age.group = age.210, time.step = 5, date = date, prevalence = TRUE)
+  om.outcome <- calculate.monthly.outcome(om.result = om.result, measure = 1, age.group = age.210, time.step = 5, date = date, prevalence = TRUE)
   prev.red.210 <- calculate.monthly.reduction(om.outcome = om.outcome, id = "prev_red_210_", fmonth = fmonth, months = months, year.counterfactual = year.counterfactual, year.intervention = year.intervention, prevalence = TRUE)
   rm(om.outcome)
 
