@@ -12,7 +12,7 @@
 ### M3TPP PROJECT:
 ### Additional script for running optimization procedure
 ### of key performance characteristics from a grid search method
-### using a pre-train GP emulator
+### using a pre-trained GP emulator
 ### 
 ### Original script:
 ### Created 29.10.2021
@@ -32,18 +32,16 @@ args <- commandArgs(TRUE)
 gp_file <- args[1]
 sim_folder <- args[2]
 scale <- as.logical(args[3])
-ngrid <- args[4]
+ngrid <- as.numeric(args[4])
 target_range_size <- as.numeric(args[5])
 
-ngrid <- as.numeric(strsplit(ngrid, "/")[[1]])
-
 # # Sample arguments, retained here for testing
-# sim_folder <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs_4rounds/"
+# sim_folder <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_4rounds/"
 # scale <- TRUE
-# ngrid <- "10/10/10/10"
+# ngrid <- "1000"
 # target_range_size <- 10
-# gp_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_tradeoffs_4rounds/gp/trained/mor_red_int_Tot/agg_iTPP3tradeoffs4rounds_sharpseasonal_Mali_16_10_exp_0.04_May_mor_red_int_Tot_cv.RData"
-# ngrid <- as.numeric(strsplit(ngrid, "/")[[1]])
+# gp_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_4rounds/gp/trained/inc_red_int_Tot/seeds_iTPP3bloodstage4rounds_seas3mo_Mali_16_10_0.04_May_0.020831339_inc_red_int_Tot_cv.RData"
+# ngrid <- as.numeric(ngrid)
 
 print(paste0("gp_file: ", gp_file))
 print(paste0("sim_folder: ", sim_folder))
@@ -54,6 +52,7 @@ print(paste0("target_range_size: ", target_range_size))
 # Library
 library(dplyr)
 library(hetGP)
+library(tgp)
 
 
 ##################
@@ -96,14 +95,9 @@ GP_grid_search_predictions <- function(gp_file, scale, ngrid, target_range_size,
   gp_result_name <- load(gp_file)
   gp_result <- cv_result$GP_model
   
-  # Create scenarios
-  scenarios <- list()
-  
-  for (i in 1:D) {
-    scenarios[[i]] <- seq(scale_params[1, i], scale_params[2, i], length.out = ngrid[i])
-  }
-  
-  scenarios <- expand.grid(scenarios)
+  # Generate sample scenarios
+  scenarios <- lhs(ngrid, t(scale_params))
+  scenarios <- as.data.frame(scenarios)
   names(scenarios) <- rownames(param_ranges)
   
   ####################
@@ -111,20 +105,12 @@ GP_grid_search_predictions <- function(gp_file, scale, ngrid, target_range_size,
   ####################
   
   scenarios$nugs <- scenarios$sd2 <- scenarios$mean <- NA
-  
-  print(paste0("Preparing to generate predictions for a total of ", nrow(scenarios), " scenarios"))
-  
+
   # Make predictions using emulator - split into loop to reduce memory requirements
-  for (i in 1:min(c(nrow(scenarios), 101))) {
-    
-    index <- (floor((i - 1)*nrow(scenarios)/min(c(nrow(scenarios), 101))) + 1):floor(i*nrow(scenarios)/min(c(nrow(scenarios), 101)))
-    print(paste0("Generating predictions for scenarios ", min(index), " to ", max(index)))
-    preds <- predict(x = as.matrix(scenarios[index, rownames(param_ranges)]), object = gp_result)
-    scenarios[index, ]$mean <- preds$mean
-    scenarios[index, ]$sd2 <- preds$sd2
-    scenarios[index, ]$nugs <- preds$nugs
-    
-  }
+  preds <- predict(x = as.matrix(scenarios[, rownames(param_ranges)]), object = gp_result)
+  scenarios$mean <- preds$mean
+  scenarios$sd2 <- preds$sd2
+  scenarios$nugs <- preds$nugs
   
   # Covert parameter values back to original scale
   if(scale == TRUE){

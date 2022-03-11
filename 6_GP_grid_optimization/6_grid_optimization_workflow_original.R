@@ -46,11 +46,11 @@ pred_list <- c("...")
 scale <- TRUE
 
 # Set grid of parameter values to search
-ngrid <- "100/100/100/100" # Set to 100 by default
+ngrid <- "1000"
 
 
 # Set target range size (1 is per 1% jumps, 10 by 10% etc.)
-target_range_size <- 10
+target_range_size <- 5
 
 # loop run for each
 for(i in pred_list){
