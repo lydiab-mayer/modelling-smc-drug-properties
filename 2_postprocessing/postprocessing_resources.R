@@ -485,12 +485,12 @@ report.results <- function(dir, om.result, date, fmonth, months, year.counterfac
 # DEFINE WRAPPER FUNCTIONS TO CALCULATE INCIDENCE AND PREVALENCE REDUCTIONS FOR MULTIPLE SIMULATIONS
 # -------------------------------------------------------------------------------------------------------------
 
-# Sample arguments, retained here for testing
-# dir <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/om/" 
-# param.file <- "/scicore/home/penny/GROUP/M3TPP/E0_LAIExampleLBM/postprocessing/split/E0LAIExampleLBM_sharpseasonal_Mali_10_4.9167_exp_0.1.txt"
+# # Sample arguments, retained here for testing
+# dir <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_4rounds/om/"
+# param.file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_4rounds/postprocessing/split/iTPP3bloodstage4rounds_seas3mo_Mali_8_5_0.24_May_0.020831339.txt"
 # date <- "2030-01-01"
-# fmonth <- "Jun"
-# months <- 2
+# fmonth <- "May"
+# months <- 3
 # year.counterfactual <- 2034
 # year.intervention <- 2039
 # min.int <- 0.25
@@ -509,10 +509,12 @@ postprocess.om <- function(dir, param.file, date, fmonth, months, year.counterfa
   # For each row in param.table, process the corresponding OpenMalaria simulation
   for(i in 1:nrow(param.table)) {
     
+    skip <- FALSE
+    
     print(i)
     om.file <- paste(dir, "om/", param.table[i, ]$Scenario_Name, "_", param.table[i, ]$SEED, "_out.txt", sep = "")
     
-    if(file.exists(om.file) & file.info(om.file)$size > 0) {
+    tryCatch(if(file.exists(om.file) & file.info(om.file)$size > 0) {
       
       # Read in file
       om.result <- read.table(om.file, sep = "\t")
@@ -527,9 +529,10 @@ postprocess.om <- function(dir, param.file, date, fmonth, months, year.counterfa
                             min.int = min.int, 
                             scenario.params = param.table[i, ])
 
-      om.outcome <- data.frame(rbind(om.outcome, out), stringsAsFactors = FALSE)
-
-    }
+      om.outcome <- data.frame(rbind(om.outcome, out), stringsAsFactors = FALSE)}, 
+      error = function(e) {skip <<- TRUE})
+    
+    if (skip) {next}
   }
   
   # Summarize results over each seed
