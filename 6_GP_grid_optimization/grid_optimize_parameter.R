@@ -38,7 +38,7 @@ target_range_size <- as.numeric(args[5])
 # # Sample arguments, retained here for testing
 # sim_folder <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_4rounds/"
 # scale <- TRUE
-# ngrid <- "1000"
+# ngrid <- "100"
 # target_range_size <- 10
 # gp_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_4rounds/gp/trained/inc_red_int_Tot/seeds_iTPP3bloodstage4rounds_seas3mo_Mali_16_10_0.04_May_0.020831339_inc_red_int_Tot_cv.RData"
 # ngrid <- as.numeric(ngrid)
@@ -63,6 +63,7 @@ library(tgp)
 print("Loading parameter ranges")
 load(paste0(sim_folder, "param_ranges.RData"))
 param_ranges_cont
+# param_ranges <- param_ranges_cont # uncomment for testing
 
 
 #######################################################
@@ -96,9 +97,32 @@ GP_grid_search_predictions <- function(gp_file, scale, ngrid, target_range_size,
   gp_result <- cv_result$GP_model
   
   # Generate sample scenarios
-  scenarios <- lhs(ngrid, t(scale_params))
-  scenarios <- as.data.frame(scenarios)
-  names(scenarios) <- rownames(param_ranges)
+  
+  # # Uncomment to sample uniformly across the entire parameter space
+  # scenarios <- lhs(ngrid, t(scale_params))
+  # scenarios <- as.data.frame(scenarios)
+  # names(scenarios) <- rownames(param_ranges)
+  # end uncomment
+  
+  # Uncomment to sample uniformly across drug parameters only
+  if (scale == TRUE) {
+    params <- expand.grid("Coverage1" = seq(0.05, 0.25, 0.05)/0.3,
+                            "Coverage2" = seq(0.05, 0.25, 0.05)/0.3,
+                            "Slope" = (6 - 0.5)/(9 - 0.5))
+  } else {
+    params <- expand.grid("Coverage1" = seq(0.75, 0.95, 0.05), "Coverage2" = seq(0.75, 0.95, 0.05), "Slope" = 6)
+  }
+  ncov <- nrow(params)
+  params <- params[rep(seq_len(ncov), ngrid), ]
+  
+  samp <- lhs(ngrid, t(scale_params[, c("Halflife", "MaxKillingRate")]))
+  samp <- samp[rep(seq_len(ngrid), ncov), ]
+  colnames(samp) <- c("Halflife", "MaxKillingRate")
+  
+  scenarios <- cbind(params, samp)
+  scenarios <- scenarios[, rownames(param_ranges)]
+  rownames(scenarios) <- 1:nrow(scenarios)
+  # end uncomment
   
   ####################
   ### OPTIMIZATION ###
