@@ -33,6 +33,8 @@ param_ranges_cont
 # Define function to generate predictions
 predict.grid <- function(param.ranges, grid.ranges, ngrid, model, scale = TRUE) {
   
+  require(hetGP)
+  
   # Set up
   D <- nrow(param.ranges)
   scale.params <- t(param.ranges)
@@ -78,9 +80,6 @@ predict.grid <- function(param.ranges, grid.ranges, ngrid, model, scale = TRUE) 
   return(scenarios)
 }
 
-# Define common plotting features
-cols <- c("#C93312", "#425055")
-
 # Generate figures for each outcome
 
 #for (pred in pred_list){
@@ -92,7 +91,7 @@ pred <- pred_list
   
   setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
   (setting_id <- sub(".rds", "", sub("opt_", "", basename(setting))))
-  index <- 50
+  index <- 28 #54
   setting_id[index]
   
   # ----------------------------------------------------------
@@ -101,8 +100,8 @@ pred <- pred_list
   
   # Generate grid of predictions
   ngrid <- c(31, 1, 1, 1, 1)
-  grid_ranges_cont <- rbind(Coverage1 = c(0.7, 1,0),
-                            Coverage2 = 0.9,
+  grid_ranges_cont <- rbind(Coverage1 = c(0.7, 1.0),
+                            Coverage2 = 0.95,
                             Halflife = 15,
                             MaxKillingRate = 3.45,
                             Slope = 6)
@@ -137,9 +136,11 @@ pred <- pred_list
   
   # Plot parameter vs. prediction
   
+  col <- "#C93312"
+  
   p <- ggplot(df, aes(x = Coverage1, y = mean, ymin = cl, ymax = cu)) +
-    geom_ribbon(alpha = 0.3) +
-    geom_point()
+    geom_ribbon(alpha = 0.3, fill = col) +
+    geom_point(colour = col)
   
   p <- p + theme(panel.border = element_blank(), 
                  panel.background = element_blank(),
@@ -163,11 +164,9 @@ pred <- pred_list
     scale_y_continuous(breaks = seq(55, 95, by = 5),
                        limits = c(55, 95),
                        labels = paste0(seq(55, 95, by = 5), "%"),
-                       expand = expansion(mult = .03, add = 0)) +
-    scale_colour_manual(values = cols) +
-    scale_fill_manual(values = cols)
+                       expand = expansion(mult = .03, add = 0))
   
-  p <- p + labs(x = "PROGRAM REACH", y = "CLINICAL INCIDENCE REDUCTION")
+  p <- p + labs(x = "PROGRAM  REACH", y = "CLINICAL  INCIDENCE\nREDUCTION")
   
   p_coverage1 <- p
   
@@ -213,9 +212,12 @@ pred <- pred_list
   
   # Plot parameter vs. prediction
   
+  col_fill <- "#FAEFD1"
+  col_colour <- "#827d55"
+  
   p <- ggplot(df, aes(x = Coverage2, y = mean, ymin = cl, ymax = cu)) +
-    geom_ribbon(alpha = 0.3) +
-    geom_point()
+    geom_ribbon(alpha = 0.8, fill = col_fill) +
+    geom_point(colour = col_colour)
   
   p <- p + theme(panel.border = element_blank(), 
                  panel.background = element_blank(),
@@ -239,7 +241,7 @@ pred <- pred_list
                        limits = c(55, 95),
                        expand = expansion(mult = .03, add = 0))
   
-  p <- p + labs(x = "ROUND COVERAGE", y = "")
+  p <- p + labs(x = "ROUND  COVERAGE", y = "")
   
   p_coverage2 <- p
   
@@ -284,9 +286,11 @@ pred <- pred_list
   
   # Plot parameter vs. prediction
   
+  col <- "#899DA4"
+  
   p <- ggplot(df, aes(x = Halflife, y = mean, ymin = cl, ymax = cu)) +
-    geom_ribbon(alpha = 0.3) +
-    geom_point()
+    geom_ribbon(alpha = 0.3, fill = col) +
+    geom_point(colour = col)
   
   p <- p + theme(panel.border = element_blank(), 
                  panel.background = element_blank(),
@@ -297,7 +301,7 @@ pred <- pred_list
                  axis.line = element_blank(),
                  axis.ticks = element_blank(),
                  axis.text.x = element_text(margin = margin(t = 0)),
-                 axis.text.y = element_blank(),
+                 axis.text.y = element_text(margin = margin(r = 0)),
                  axis.title.x = element_text(margin = margin(t = 10)),
                  axis.title.y = element_text(margin = margin(r = 10)),
                  plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -308,9 +312,10 @@ pred <- pred_list
                               expand = expansion(mult = .03, add = 0)) + 
     scale_y_continuous(breaks = seq(55, 95, by = 5),
                        limits = c(55, 95),
+                       labels = paste0(seq(55, 95, by = 5), "%"),
                        expand = expansion(mult = .03, add = 0))
   
-  p <- p + labs(x = "CONCENTRATION\nHALF-LIFE (DAYS)", y = "")
+  p <- p + labs(x = "ELIMINATION\nHALF-LIFE  (DAYS)", y = "CLINICAL  INCIDENCE\nREDUCTION")
   
   p_halflife <- p
   
@@ -355,9 +360,11 @@ pred <- pred_list
   
   # Plot parameter vs. prediction
   
+  col <- "#DC863B"
+  
   p <- ggplot(df, aes(x = MaxKillingRate, y = mean, ymin = cl, ymax = cu)) +
-    geom_ribbon(alpha = 0.3) +
-    geom_point()
+    geom_ribbon(alpha = 0.3, fill = col) +
+    geom_point(colour = col)
   
   p <- p + theme(panel.border = element_blank(), 
                  panel.background = element_blank(),
@@ -381,7 +388,7 @@ pred <- pred_list
                        limits = c(55, 95),
                        expand = expansion(mult = .03, add = 0))
   
-  p <- p + labs(x = "MAXIMUM PARASITE\nKILLING RATE", y = "")
+  p <- p + labs(x = "Emax", y = "")
   
   p_maxkilling <- p
   
@@ -427,9 +434,11 @@ pred <- pred_list
   
   # Plot parameter vs. prediction
   
+  col <- "#425055"
+  
   p <- ggplot(df, aes(x = Slope, y = mean, ymin = cl, ymax = cu)) +
-    geom_ribbon(alpha = 0.3) +
-    geom_point()
+    geom_ribbon(alpha = 0.3, fill = col) +
+    geom_point(colour = col)
   
   p <- p + theme(panel.border = element_blank(), 
                  panel.background = element_blank(),
@@ -453,7 +462,7 @@ pred <- pred_list
                        limits = c(55, 95),
                        expand = expansion(mult = .03, add = 0))
   
-  p <- p + labs(x = "PD MODEL SLOPE", y = "")
+  p <- p + labs(x = "PD  MODEL  SLOPE", y = "")
   
   p_slope <- p
   
@@ -462,7 +471,7 @@ pred <- pred_list
   # Generate final figure
   # ----------------------------------------------------------
   
-  p_out <- p_coverage1 | p_coverage2 | p_halflife | p_maxkilling | p_slope
+  p_out <- (p_coverage1 | p_coverage2) / (p_halflife | p_maxkilling) + plot_annotation(title = "A") & theme(plot.title = element_text(family = "Times New Roman", face = "bold"))
   
   saveRDS(p_out, paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/uncertainty_", exp, "_", pred, ".rds"))
 
@@ -472,8 +481,8 @@ pred <- pred_list
 
 ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/uncertainty_", exp, "_", pred, ".jpg"),
        plot = p_out,
-       width = 9,
-       height = 3,
-       dpi = 500)
+       width = 4.5,
+       height = 5,
+       dpi = 400)
 
 

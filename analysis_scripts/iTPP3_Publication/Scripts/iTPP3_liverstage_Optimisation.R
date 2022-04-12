@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_bloodstage_4rounds"
+exp <- "iTPP3_tradeoffs_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred <- "inc_red_int_Tot"
@@ -34,11 +34,13 @@ param_ranges_cont
 # Define and load scenarios
 setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
 (setting_id <- sub(".rds", "", sub("opt_", "", basename(setting))))
-index <- c(38, 46, 54, 34, 42, 50) # c(12, 20, 28, 8, 16, 24)
+index <- c(12, 20, 28, 8, 16, 24)
 setting_id[index]
 
 # Define function to generate predictions
 predict.grid <- function(param.ranges, grid.ranges, ngrid, model, scale = TRUE) {
+  
+  require(hetGP)
   
   # Set up
   D <- nrow(param.ranges)
@@ -97,6 +99,291 @@ leg_title <- c("inc_red_int_Tot" = "CLINICAL\nINCIDENCE\nREDUCTION",
                "mor_red_int_Tot" = "MORTALITY\nREDUCTION")
 
 
+# ----------------------------------------------------------
+# Generate figure 3.3.3
+# ----------------------------------------------------------
+
+# Generate grid of predictions
+ngrid <- c(1, 1, 51, 21)
+grid_ranges_cont <- rbind(Coverage1 = c(0.9, 0.9),
+              Coverage2 = c(0.9, 0.9),
+              Halflife = c(10, 60),
+              Efficacy = c(0.8, 1.0))
+
+df <- data.frame()
+
+for (j in setting_id[index]) {
+  # Load GP model
+  load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
+  
+  # Generate model predictions
+  temp <- predict.grid(param.ranges = param_ranges_cont, 
+                     grid.ranges = grid_ranges_cont, 
+                     ngrid = ngrid, 
+                     model = cv_result$GP_model)
+  
+  temp$scenario <- j
+  
+  temp <- temp %>%
+    separate(col = scenario,
+             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
+             sep = "_",
+             remove = FALSE)
+  
+  df <- rbind(df, temp)
+  remove(temp)
+}
+  
+df$target_label <- factor(paste0(df$target, "%"), levels = rev(paste0(unique(df$target)[order(unique(df$target))], "%")))
+
+# ----------------------------------------------------------
+# Generate main heat map 
+# ----------------------------------------------------------
+
+df_plot <- df[df$EIR == 8, ]
+df_cols <- cols[names(cols) %in% unique(df$target_label)]
+
+
+### Plot with mean predictions ###
+
+p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
+  
+p <- p + geom_tile(colour = "white")
+
+p <- p + theme(panel.border = element_blank(), 
+               panel.background = element_blank(),
+               panel.grid = element_blank(),
+               text = element_text(family = "Times New Roman", size = 10),
+               strip.background = element_blank(),
+               axis.line = element_blank(),
+               axis.ticks = element_blank(),
+               axis.text.x = element_text(margin = margin(t = 0)),
+               axis.text.y = element_text(margin = margin(r = 0)),
+               axis.title.x = element_text(margin = margin(t = 10)),
+               axis.title.y = element_text(margin = margin(r = 10)),
+               plot.title = element_text(hjust = 0.5, face = "bold"),
+               legend.title = element_text(face = "bold"))
+  
+p <- p + scale_fill_manual(values = rev(df_cols),
+                           limits = levels(df$target_label)) +
+  # scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
+  #                          breaks = seq(min(df$target), max(df$target), 5),
+  #                          labels = function(x) paste0(x, "%"),
+  #                          limits = c(min(df$target), max(df$target)),
+  #                          show.limits = TRUE) +
+  scale_x_continuous(breaks = seq(5, 60, 5)) + 
+  scale_y_continuous(breaks = seq(0.8, 1.0, 0.05),
+                     labels = paste0(seq(80, 100, 5), "%"))
+  
+p <- p + labs(x = "DURATION  OF  PROTECTION  (DAYS)",
+              y = "INITIAL  EFFICACY  (%)",
+              title = expression(paste(bold("ANNUAL BASELINE "), bolditalic("Pf"), bold("PR"["2-10"]), bold(" 31%"))))
+
+p <- p + guides(fill = guide_legend(title = leg_title[pred]))
+
+p0 <- p
+
+
+# ----------------------------------------------------------
+# Generate panels for figure 3.3.3
+# ----------------------------------------------------------
+
+# PANEL 1
+
+df_plot <- df[df$EIR == 2, ]
+df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
+
+p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
+
+p <- p + geom_tile()
+
+p <- p + theme(panel.border = element_blank(), 
+               panel.background = element_blank(),
+               panel.grid = element_blank(),
+               text = element_text(family = "Times New Roman", size = 10),
+               strip.background = element_blank(),
+               axis.line = element_blank(),
+               axis.ticks = element_blank(),
+               axis.text.x = element_text(margin = margin(t = 0)),
+               axis.text.y = element_text(margin = margin(r = 0)),
+               axis.title = element_blank(),
+               plot.title = element_text(hjust = 0.5, face = "bold"),
+               legend.position = "none")
+
+p <- p + scale_fill_manual(values = rev(df_cols)) +
+  # scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
+  #                          breaks = seq(min(df$target), max(df$target), 5),
+  #                          labels = function(x) paste0(x, "%"),
+  #                          limits = c(min(df$target), max(df$target)),
+  #                          show.limits = TRUE) +
+  scale_x_continuous(breaks = seq(5, 20, 5)) + 
+  scale_y_continuous(breaks = seq(2, 30, 4))
+
+p <- p + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 11%"))))
+
+p1 <- p
+
+
+# PANEL 2
+
+df_plot <- df[df$EIR == 4, ]
+df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
+
+p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
+
+p <- p + geom_tile()
+
+p <- p + theme(panel.border = element_blank(), 
+               panel.background = element_blank(),
+               panel.grid = element_blank(),
+               text = element_text(family = "Times New Roman", size = 10),
+               strip.background = element_blank(),
+               axis.line = element_blank(),
+               axis.ticks = element_blank(),
+               axis.text.x = element_text(margin = margin(t = 0)),
+               axis.text.y = element_text(margin = margin(r = 0)),
+               axis.title = element_blank(),
+               plot.title = element_text(hjust = 0.5, face = "bold"),
+               legend.position = "none")
+
+p <- p + scale_fill_manual(values = rev(df_cols)) +
+  # scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
+  #                          breaks = seq(min(df$target), max(df$target), 5),
+  #                          labels = function(x) paste0(x, "%"),
+  #                          limits = c(min(df$target), max(df$target)),
+  #                          show.limits = TRUE) +
+  scale_x_continuous(breaks = seq(5, 20, 5)) + 
+  scale_y_continuous(breaks = seq(2, 30, 4))
+
+p <- p + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 19%"))))
+
+p2 <- p
+
+
+# PANEL 3
+
+df_plot <- df[df$EIR == 16, ]
+df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
+
+p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
+
+p <- p + geom_tile()
+
+p <- p + theme(panel.border = element_blank(), 
+               panel.background = element_blank(),
+               panel.grid = element_blank(),
+               text = element_text(family = "Times New Roman", size = 10),
+               strip.background = element_blank(),
+               axis.line = element_blank(),
+               axis.ticks = element_blank(),
+               axis.text.x = element_text(margin = margin(t = 0)),
+               axis.text.y = element_text(margin = margin(r = 0)),
+               axis.title = element_blank(),
+               plot.title = element_text(hjust = 0.5, face = "bold"),
+               # legend.key.width = unit(1, "cm"),
+               # legend.key.height = unit(1, "cm"),
+               legend.position = "none")
+
+p <- p + scale_fill_manual(values = rev(df_cols)) +
+# + scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
+#                            breaks = seq(min(df$target), max(df$target), 5),
+#                            labels = function(x) paste0(x, "%"),
+#                            limits = c(min(df$target), max(df$target)),
+#                            show.limits = TRUE) +
+  scale_x_continuous(breaks = seq(5, 20, 5)) + 
+  scale_y_continuous(breaks = seq(2, 30, 4))
+
+p <- p + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 44%"))))
+
+p3 <- p
+
+
+# PANEL 4
+
+df_plot <- df[df$EIR == 32, ]
+df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
+
+p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
+
+p <- p + geom_tile()
+
+p <- p + theme(panel.border = element_blank(), 
+               panel.background = element_blank(),
+               panel.grid = element_blank(),
+               text = element_text(family = "Times New Roman", size = 10),
+               strip.background = element_blank(),
+               axis.line = element_blank(),
+               axis.ticks = element_blank(),
+               axis.text.x = element_text(margin = margin(t = 0)),
+               axis.text.y = element_text(margin = margin(r = 0)),
+               axis.title = element_blank(),
+               plot.title = element_text(hjust = 0.5, face = "bold"),
+               # legend.key.width = unit(1, "cm"),
+               # legend.key.height = unit(1, "cm"),
+               legend.position = "none")
+
+p <- p + scale_fill_manual(values = rev(df_cols)) +
+# + scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
+#                            breaks = seq(min(df$target), max(df$target), 5),
+#                            labels = function(x) paste0(x, "%"),
+#                            limits = c(min(df$target), max(df$target)),
+#                            show.limits = TRUE) +
+  scale_x_continuous(breaks = seq(5, 20, 5)) + 
+  scale_y_continuous(breaks = seq(2, 30, 4))
+
+p <- p + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 57%"))))
+
+p4 <- p
+
+# PANEL 5
+
+df_plot <- df[df$EIR == 64, ]
+df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
+
+p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
+
+p <- p + geom_tile()
+
+p <- p + theme(panel.border = element_blank(), 
+               panel.background = element_blank(),
+               panel.grid = element_blank(),
+               text = element_text(family = "Times New Roman", size = 10),
+               strip.background = element_blank(),
+               axis.line = element_blank(),
+               axis.ticks = element_blank(),
+               axis.text.x = element_text(margin = margin(t = 0)),
+               axis.text.y = element_text(margin = margin(r = 0)),
+               axis.title = element_blank(),
+               plot.title = element_text(hjust = 0.5, face = "bold"),
+               # legend.key.width = unit(1, "cm"),
+               # legend.key.height = unit(1, "cm"),
+               legend.position = "none")
+
+p <- p + scale_fill_manual(values = rev(df_cols)) +
+  # scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
+  #                          breaks = seq(min(df$target), max(df$target), 5),
+  #                          labels = function(x) paste0(x, "%"),
+  #                          limits = c(min(df$target), max(df$target)),
+  #                          show.limits = TRUE) +
+  scale_x_continuous(breaks = seq(5, 20, 5)) + 
+  scale_y_continuous(breaks = seq(2, 30, 4))
+
+p <- p + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 70%"))))
+
+p5 <- p
+
+
+# ----------------------------------------------------------
+# Arrange final plot for figure 3.3.3
+# ----------------------------------------------------------
+
+p0 / (p1 | p2 | p3 | p4 | p5) + plot_layout(heights = unit(c(7, 1), c('cm', 'null')))
+
+ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/optim_", exp, "_", pred, ".jpg"),
+       plot = last_plot(),
+       width = 9.1,
+       height = 5,
+       dpi = 400)
 
 
 # ----------------------------------------------------------
@@ -104,12 +391,11 @@ leg_title <- c("inc_red_int_Tot" = "CLINICAL\nINCIDENCE\nREDUCTION",
 # ----------------------------------------------------------
 
 # Generate grid of predictions
-ngrid <- c(3, 3, 16, 29, 1)
+ngrid <- c(3, 3, 51, 21)
 grid_ranges_cont <- rbind(Coverage1 = c(0.75, 0.95),
                           Coverage2 = c(0.75, 0.95),
-                          Halflife = c(5, 20),
-                          MaxKillingRate = c(2, 30),
-                          Slope = c(6, 6))
+                          Halflife = c(10, 60),
+                          Efficacy = c(0.8, 1.0))
 
 df <- data.frame()
 
@@ -145,7 +431,7 @@ df$target_label <- factor(paste0(df$target, "%"), levels = rev(paste0(unique(df$
 df_plot <- df[df$EIR == 8, ]
 df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
 
-p <- ggplot(df_plot, aes(x = Halflife, y = MaxKillingRate, fill = target_label))
+p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
 
 p <- p + geom_tile()
 
@@ -166,12 +452,13 @@ p <- p + theme(panel.border = element_blank(),
                legend.title = element_text(face = "bold"))
 
 p <- p + scale_fill_manual(values = rev(df_cols)) +
-  scale_x_continuous(breaks = seq(5, 20, 5)) + 
-  scale_y_continuous(breaks = seq(2, 30, 4))
+  scale_x_continuous(breaks = seq(5, 60, 5)) + 
+  scale_y_continuous(breaks = seq(0.8, 1.0, 0.05),
+                     labels = paste0(seq(80, 100, 5), "%"))
 
-p <- p + labs(x = "ELIMINATION  HALF-LIFE  (DAYS)",
-              y = "Emax")#,
-#title = expression(paste(bold("ANNUAL BASELINE "), bolditalic("Pf"), bold("PR"["2-10"]), bold(" 34%"))))
+p <- p + labs(x = "DURATION  OF  PROTECTION  (DAYS)",
+              y = "INITIAL  EFFICACY  (%)")#,
+              #title = expression(paste(bold("ANNUAL BASELINE "), bolditalic("Pf"), bold("PR"["2-10"]), bold(" 34%"))))
 
 p <- p + guides(fill = guide_legend(title = leg_title[pred]))
 
@@ -181,375 +468,4 @@ ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/
        plot = last_plot(),
        width = 9.1,
        height = 5,
-       dpi = 300)
-
-# Identify point predictions reported in main body of paper
-
-df_point <- df_plot[df_plot$Halflife == 10 & df_plot$MaxKillingRate == 10, ]
-df_point[df_point$Coverage1 == "85% PROGRAM REACH" & df_point$Coverage2 == "85% ROUND COVERAGE", ]
-df_point[df_point$Coverage1 == "95% PROGRAM REACH" & df_point$Coverage2 == "85% ROUND COVERAGE", ]
-
-# ----------------------------------------------------------
-# Generate figure 3.3.3
-# ----------------------------------------------------------
-
-# Generate grid of predictions
-ngrid <- c(1, 1, 16, 29, 1)
-grid_ranges_cont <- rbind(Coverage1 = c(0.9, 0.9),
-              Coverage2 = c(0.9, 0.9),
-              Halflife = c(5, 20),
-              MaxKillingRate = c(2, 30),
-              Slope = c(6, 6))
-
-df <- data.frame()
-
-for (j in setting_id[index]) {
-  # Load GP model
-  load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
-  
-  # Generate model predictions
-  temp <- predict.grid(param.ranges = param_ranges_cont, 
-                     grid.ranges = grid_ranges_cont, 
-                     ngrid = ngrid, 
-                     model = cv_result$GP_model)
-  
-  temp$scenario <- j
-  
-  temp <- temp %>%
-    separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Outcome", "temp1", "temp2", "temp3"),
-             sep = "_",
-             remove = FALSE)
-  
-  df <- rbind(df, temp)
-  remove(temp)
-}
-  
-df$target_label <- factor(paste0(df$target, "%"), levels = rev(paste0(unique(df$target)[order(unique(df$target))], "%")))
-
-# ----------------------------------------------------------
-# Generate main heat map 
-# ----------------------------------------------------------
-
-df_plot <- df[df$EIR == 8, ]
-df_cols <- cols[names(cols) %in% unique(df$target_label)]
-
-
-### Plot with mean predictions ###
-
-p <- ggplot(df_plot, aes(x = Halflife, y = MaxKillingRate, fill = target_label))
-  
-p <- p + geom_tile(colour = "white")
-
-p <- p + theme(panel.border = element_blank(), 
-               panel.background = element_blank(),
-               panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = 10),
-               strip.background = element_blank(),
-               axis.line = element_blank(),
-               axis.ticks = element_blank(),
-               axis.text.x = element_text(margin = margin(t = 0)),
-               axis.text.y = element_text(margin = margin(r = 0)),
-               axis.title.x = element_text(margin = margin(t = 10)),
-               axis.title.y = element_text(margin = margin(r = 10)),
-               plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.title = element_text(face = "bold"))
-  
-p <- p + scale_fill_manual(values = rev(df_cols),
-                           limits = levels(df$target_label)) +
-  # scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
-  #                          breaks = seq(min(df$target), max(df$target), 5),
-  #                          labels = function(x) paste0(x, "%"),
-  #                          limits = c(min(df$target), max(df$target)),
-  #                          show.limits = TRUE) +
-  scale_x_continuous(breaks = seq(5, 20, 5)) + 
-  scale_y_continuous(breaks = seq(2, 30, 4))
-  
-p <- p + labs(x = "CONCENTRATION HALF-LIFE (DAYS)",
-              y = "MAXIMUM PARASITE KILLING RATE",
-              title = expression(paste(bold("ANNUAL BASELINE "), bolditalic("Pf"), bold("PR"["2-10"]), bold(" 34%"))))
-
-p <- p + guides(fill = guide_legend(title = leg_title[pred]))
-
-p0 <- p
-
-
-# ----------------------------------------------------------
-# Generate panels for figure 3.3.3
-# ----------------------------------------------------------
-
-# PANEL 1
-
-df_plot <- df[df$EIR == 2, ]
-df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
-
-p <- ggplot(df_plot, aes(x = Halflife, y = MaxKillingRate, fill = target_label))
-
-p <- p + geom_tile()
-
-p <- p + theme(panel.border = element_blank(), 
-               panel.background = element_blank(),
-               panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = 10),
-               strip.background = element_blank(),
-               axis.line = element_blank(),
-               axis.ticks = element_blank(),
-               axis.text.x = element_text(margin = margin(t = 0)),
-               axis.text.y = element_text(margin = margin(r = 0)),
-               axis.title = element_blank(),
-               plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.position = "none")
-
-p <- p + scale_fill_manual(values = rev(df_cols)) +
-  # scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
-  #                          breaks = seq(min(df$target), max(df$target), 5),
-  #                          labels = function(x) paste0(x, "%"),
-  #                          limits = c(min(df$target), max(df$target)),
-  #                          show.limits = TRUE) +
-  scale_x_continuous(breaks = seq(5, 20, 5)) + 
-  scale_y_continuous(breaks = seq(2, 30, 4))
-
-p <- p + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 12%"))))
-
-p1 <- p
-
-
-# PANEL 2
-
-df_plot <- df[df$EIR == 4, ]
-df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
-
-p <- ggplot(df_plot, aes(x = Halflife, y = MaxKillingRate, fill = target_label))
-
-p <- p + geom_tile()
-
-p <- p + theme(panel.border = element_blank(), 
-               panel.background = element_blank(),
-               panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = 10),
-               strip.background = element_blank(),
-               axis.line = element_blank(),
-               axis.ticks = element_blank(),
-               axis.text.x = element_text(margin = margin(t = 0)),
-               axis.text.y = element_text(margin = margin(r = 0)),
-               axis.title = element_blank(),
-               plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.position = "none")
-
-p <- p + scale_fill_manual(values = rev(df_cols)) +
-  # scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
-  #                          breaks = seq(min(df$target), max(df$target), 5),
-  #                          labels = function(x) paste0(x, "%"),
-  #                          limits = c(min(df$target), max(df$target)),
-  #                          show.limits = TRUE) +
-  scale_x_continuous(breaks = seq(5, 20, 5)) + 
-  scale_y_continuous(breaks = seq(2, 30, 4))
-
-p <- p + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 21%"))))
-
-p2 <- p
-
-
-# PANEL 3
-
-df_plot <- df[df$EIR == 16, ]
-df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
-
-p <- ggplot(df_plot, aes(x = Halflife, y = MaxKillingRate, fill = target_label))
-
-p <- p + geom_tile()
-
-p <- p + theme(panel.border = element_blank(), 
-               panel.background = element_blank(),
-               panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = 10),
-               strip.background = element_blank(),
-               axis.line = element_blank(),
-               axis.ticks = element_blank(),
-               axis.text.x = element_text(margin = margin(t = 0)),
-               axis.text.y = element_text(margin = margin(r = 0)),
-               axis.title = element_blank(),
-               plot.title = element_text(hjust = 0.5, face = "bold"),
-               # legend.key.width = unit(1, "cm"),
-               # legend.key.height = unit(1, "cm"),
-               legend.position = "none")
-
-p <- p + scale_fill_manual(values = rev(df_cols)) +
-# + scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
-#                            breaks = seq(min(df$target), max(df$target), 5),
-#                            labels = function(x) paste0(x, "%"),
-#                            limits = c(min(df$target), max(df$target)),
-#                            show.limits = TRUE) +
-  scale_x_continuous(breaks = seq(5, 20, 5)) + 
-  scale_y_continuous(breaks = seq(2, 30, 4))
-
-p <- p + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 47%"))))
-
-p3 <- p
-
-
-# PANEL 4
-
-df_plot <- df[df$EIR == 32, ]
-df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
-
-p <- ggplot(df_plot, aes(x = Halflife, y = MaxKillingRate, fill = target_label))
-
-p <- p + geom_tile()
-
-p <- p + theme(panel.border = element_blank(), 
-               panel.background = element_blank(),
-               panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = 10),
-               strip.background = element_blank(),
-               axis.line = element_blank(),
-               axis.ticks = element_blank(),
-               axis.text.x = element_text(margin = margin(t = 0)),
-               axis.text.y = element_text(margin = margin(r = 0)),
-               axis.title = element_blank(),
-               plot.title = element_text(hjust = 0.5, face = "bold"),
-               # legend.key.width = unit(1, "cm"),
-               # legend.key.height = unit(1, "cm"),
-               legend.position = "none")
-
-p <- p + scale_fill_manual(values = rev(df_cols)) +
-# + scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
-#                            breaks = seq(min(df$target), max(df$target), 5),
-#                            labels = function(x) paste0(x, "%"),
-#                            limits = c(min(df$target), max(df$target)),
-#                            show.limits = TRUE) +
-  scale_x_continuous(breaks = seq(5, 20, 5)) + 
-  scale_y_continuous(breaks = seq(2, 30, 4))
-
-p <- p + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 61%"))))
-
-p4 <- p
-
-# PANEL 5
-
-df_plot <- df[df$EIR == 64, ]
-df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
-
-p <- ggplot(df_plot, aes(x = Halflife, y = MaxKillingRate, fill = target_label))
-
-p <- p + geom_tile()
-
-p <- p + theme(panel.border = element_blank(), 
-               panel.background = element_blank(),
-               panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = 10),
-               strip.background = element_blank(),
-               axis.line = element_blank(),
-               axis.ticks = element_blank(),
-               axis.text.x = element_text(margin = margin(t = 0)),
-               axis.text.y = element_text(margin = margin(r = 0)),
-               axis.title = element_blank(),
-               plot.title = element_text(hjust = 0.5, face = "bold"),
-               # legend.key.width = unit(1, "cm"),
-               # legend.key.height = unit(1, "cm"),
-               legend.position = "none")
-
-p <- p + scale_fill_manual(values = rev(df_cols)) +
-  # scale_fill_stepsn(colours = c("#1b4d79", "#5880b1", "#f9a24b", "#f9d48e", "#ffedcb"),
-  #                          breaks = seq(min(df$target), max(df$target), 5),
-  #                          labels = function(x) paste0(x, "%"),
-  #                          limits = c(min(df$target), max(df$target)),
-  #                          show.limits = TRUE) +
-  scale_x_continuous(breaks = seq(5, 20, 5)) + 
-  scale_y_continuous(breaks = seq(2, 30, 4))
-
-p <- p + labs(title = expression(paste(bolditalic("Pf"), bold("PR"["2-10"]), bold(" 71%"))))
-
-p5 <- p
-
-
-# ----------------------------------------------------------
-# Arrange final plot for figure 3.3.3
-# ----------------------------------------------------------
-
-p0 / (p1 | p2 | p3 | p4 | p5) + plot_layout(heights = unit(c(7, 1), c('cm', 'null')))
-
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/optim_", exp, "_", pred, ".jpg"),
-       plot = last_plot(),
-       width = 9.1,
-       height = 5,
-       dpi = 300)
-
-
-# ----------------------------------------------------------
-# Generate slope figure
-# ----------------------------------------------------------
-
-# Generate grid of predictions
-ngrid <- c(1, 1, 16, 1, 8)
-grid_ranges_cont <- rbind(Coverage1 = 0.9,
-                          Coverage2 = 0.9,
-                          Halflife = c(5, 20),
-                          MaxKillingRate = 3.45,
-                          Slope = c(1, 8))
-
-df <- data.frame()
-
-for (j in setting_id[index]) {
-  # Load GP model
-  load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
-  
-  # Generate model predictions
-  temp <- predict.grid(param.ranges = param_ranges_cont, 
-                       grid.ranges = grid_ranges_cont, 
-                       ngrid = ngrid, 
-                       model = cv_result$GP_model)
-  
-  temp$scenario <- j
-  
-  temp <- temp %>%
-    separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Outcome", "temp1", "temp2", "temp3"),
-             sep = "_",
-             remove = FALSE)
-  
-  df <- rbind(df, temp)
-  remove(temp)
-}
-
-df$target_label <- factor(paste0(df$target, "%"), levels = rev(paste0(unique(df$target)[order(unique(df$target))], "%")))
-
-# Plot
-df_plot <- df[df$EIR == 8, ]
-df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
-
-p <- ggplot(df_plot, aes(x = Halflife, y = Slope, fill = target_label))
-
-p <- p + geom_tile()
-
-p <- p + theme(panel.border = element_blank(), 
-               panel.background = element_blank(),
-               panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = 10),
-               strip.background = element_blank(),
-               axis.line = element_blank(),
-               axis.ticks = element_blank(),
-               axis.text.x = element_text(margin = margin(t = 0)),
-               axis.text.y = element_text(margin = margin(r = 0)),
-               axis.title.x = element_text(margin = margin(t = 10)),
-               axis.title.y = element_text(margin = margin(r = 10)),
-               plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.title = element_text(face = "bold"))
-
-p <- p + scale_fill_manual(values = rev(df_cols)) +
-  scale_x_continuous(breaks = seq(5, 20, 5)) + 
-  scale_y_continuous(breaks = 1:8)
-
-p <- p + labs(x = "CONCENTRATION HALF-LIFE (DAYS)",
-              y = "PD MODEL SLOPE",
-              title = expression(paste(bold("ANNUAL BASELINE "), bolditalic("Pf"), bold("PR"["2-10"]), bold(" 34%"))))
-
-p <- p + guides(fill = guide_legend(title = leg_title[pred]))
-
-p
-
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/optim_", exp, "_", pred, "_slope.jpg"),
-       plot = last_plot(),
-       width = 9,
-       height = 3,
        dpi = 400)
