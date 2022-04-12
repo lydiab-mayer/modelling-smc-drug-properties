@@ -86,12 +86,12 @@ time.to.date <- function(t, time.step, date) {
 
 
 # -------------------------------------------------------------------------------------------------------------
-# DEFINE HELPER FUNCTIONS TO CALCULATE INCIDENCE AND PREVALENCE REDUCTIONS FOR A SINGLE SIMULATION
+# DEFINE HELPER FUNCTIONS
 # -------------------------------------------------------------------------------------------------------------
 
 # # Sample inputs, retained here for testing
 # om.result = read.table("/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_replication/om/iTPP3_bloodstage_replication_1_1_out.txt", header = FALSE)
-# measure = 3
+# measure = 14
 # age.group = 2:3
 # time.step = 5
 # date = "1970-01-01"
@@ -171,7 +171,7 @@ calculate.cpp.outcome <- function(om.result, measure, age.group, time.step, date
 
 format.cpp <- function(om.outcome, id, timesteps) {
 
-  # Function to format intervention cases per person at given time steps
+  # Function to calculate cumulative cases per person over given time steps
   #
   # Inputs: 
   # om.outcome: outputs of the function calculate.cpp.outcome
@@ -185,6 +185,9 @@ format.cpp <- function(om.outcome, id, timesteps) {
   # Set up data
   om.outcome <- om.outcome[om.outcome$time %in% timesteps, ]
 
+  # Calculate cumulative outcomes
+  om.outcome$cpp <- cumsum(om.outcome$cpp)
+  
   # Format function outputs
   om.outcome <- om.outcome[, c("time", "cpp")]
   om.outcome <- pivot_wider(om.outcome,
