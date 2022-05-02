@@ -150,8 +150,11 @@ calculate.cpp.outcome <- function(om.result, measure, age.group, time.step, date
                            names_prefix = "measure")
   om.result <- as.data.frame(om.result)
   
-  # Calculate cases per person in target population
-  om.result$cpp <- om.result[, paste0("measure", measure)] / om.result$measure0
+  # # Calculate cases per person in target population
+  # om.result$cpp <- om.result[, paste0("measure", measure)] / om.result$measure0
+  
+  # Retain number of cases in target population
+  om.result$cpp <- om.result[, paste0("measure", measure)]
   
   return(om.result)
   
@@ -160,11 +163,11 @@ calculate.cpp.outcome <- function(om.result, measure, age.group, time.step, date
 
 # # Sample arguments, retained here for testing
 # om.outcome <- calculate.cpp.outcome(om.result = read.table("/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_replication/om/iTPP3_bloodstage_replication_18_1_out.txt", header = FALSE),
-#                                     measure = 3,
+#                                     measure = 14,
 #                                     age.group = 2:3,
 #                                     time.step = 5,
 #                                     date = "1970-01-01")
-# id <- "cpp_"
+# id <- ""
 # timesteps <- 2906:2918 # 15 Oct 2009 to 15 Dec 2009
 # 
 # format.cpp(om.outcome, id, timesteps)
@@ -185,15 +188,17 @@ format.cpp <- function(om.outcome, id, timesteps) {
   # Set up data
   om.outcome <- om.outcome[om.outcome$time %in% timesteps, ]
 
-  # Calculate cumulative outcomes
-  om.outcome$cpp <- cumsum(om.outcome$cpp)
+  ### UNCOMMENT TO CALCULATE CUMULATIVE OUTCOMES ###
+  # # Calculate cumulative outcomes
+  # om.outcome$cpp <- cumsum(om.outcome$cpp)
+  ### END UNCOMMENT ###
   
   # Format function outputs
-  om.outcome <- om.outcome[, c("time", "cpp")]
+  om.outcome <- om.outcome[, c("time", "measure0", "cpp")]
   om.outcome <- pivot_wider(om.outcome,
                             id_cols = time,
                             names_from = time,
-                            values_from = cpp,
+                            values_from = c(measure0, cpp),
                             names_prefix = id)
   
   # Return outputs
@@ -223,7 +228,7 @@ report.results <- function(dir, om.result, date, timesteps, scenario.params) {
 
   # Calculate cases per person in intervention group
   om.outcome <- calculate.cpp.outcome(om.result = om.result, measure = 14, age.group = age.int, time.step = 5, date = date)
-  cpp <- format.cpp(om.outcome = om.outcome, id = "cpp_", timesteps = timesteps)
+  cpp <- format.cpp(om.outcome = om.outcome, id = "", timesteps = timesteps)
   rm(om.outcome)
   
   # Return outputs
