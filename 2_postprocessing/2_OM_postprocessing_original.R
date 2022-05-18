@@ -56,12 +56,12 @@ source(paste0("./analysisworkflow/2_postprocessing/genOMpostprocscripts.R"))
 # Insert experiment name here
 exp = "..."
 
-# Identify the minimum intervention age as a numeric, e.g. 0.25
-min_int <- ...
-
 ##################
 ### PARAMETERS ###
 ##################
+
+# Identify the minimum intervention age as a numeric, e.g. 0.25
+min_int <- ...
 
 # Identify the start date of your monitoring period as "YYYY-MM-DD", e.g. "2030-01-01"
 date <- "..."
@@ -78,6 +78,10 @@ year_counterfactual <- ...
 # Identify the year to treat as the intervention as a numeric, i.e. the year for which incidence reduction will be calculated, e.g. 2039 
 year_intervention <- ...
 
+# Write parameters to file
+if (!dir.exists(paste0("/scicore/home/penny/GROUP/M3TPP/", exp, "/postprocessing/"))) dir.create(paste0("/scicore/home/penny/GROUP/M3TPP/", exp, "/postprocessing/"))
+pp_param <- data.frame(min_int, date, fmonth, months, year_counterfactual, year_intervention)
+saveRDS(pp_param, paste0("/scicore/home/penny/GROUP/M3TPP/", exp, "/postprocessing/pp_param_values.RDS"))
 
 ##########################
 ### RUN POSTPROCESSING ###
