@@ -31,7 +31,6 @@ gp_file = "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_mixed/gp/trained/inc
 scale = TRUE
 
 
-
 ########################
 ### HELPER FUNCTIONS ###
 ########################
@@ -137,7 +136,7 @@ n_samples = 10
 variances = NULL
 
 ## Adaptive sampling
-for(as_runs in 1:5) {
+for(as_runs in 1:2) {
   
   cat("Initiate adaptive sampling run", as_runs)
 
@@ -151,9 +150,13 @@ for(as_runs in 1:5) {
   write.table(param_tab, tab_file, sep = "\t", quote = FALSE, col.names = TRUE, row.names = FALSE)
   variances = rbind(variances, new_points_obj$variances_vec)
   
-  # Create the new scenarios and run OpenMalaria simulations
+  # Create the new scenarios and submit OpenMalaria simulations to cluster
   cat("Generate OpenMalaria simulations run", as_runs)
   adaptive_design_genOMsimscripts(exp, QOS = "30min")
+  
+  # Wait until simulations are complete
+  count <- nrow(param_tab)
+  while (count < length(list.files(paste0(as_folder, "om/"), pattern = "*_out.txt"))) Sys.sleep(10)
   
   # Run postprocessing, get the new training data and update GP
   cat("Run OM postprocessing run", as_runs)
@@ -191,8 +194,11 @@ for(as_runs in 1:5) {
                               test_prop = 0.1,
                               hetGP = TRUE)
 
-  # Clean up error files before the next OpenMalaria run 
+  # Clean up simulation files before the next OpenMalaria run 
   system(paste0("rm -r ", as_folder, "err/"))
+  system(paste0("rm -r ", as_folder, "om/"))
+  system(paste0("rm -r ", as_folder, "base/"))
+  system(paste0("rm -r ", as_folder, "scenarios/"))
 }
 
 # Write results to file
