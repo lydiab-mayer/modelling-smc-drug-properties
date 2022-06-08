@@ -38,7 +38,7 @@ genOMpostprocscripts <- function(exp, date, fmonth, months, year_counterfactual,
   cat("#SBATCH --account=penny","\n", sep ="")
   cat("#SBATCH -o ",ERROR_FOLDER,"%A_%a.out","\n", sep ="")
   cat("#SBATCH --mem=2G","\n", sep ="")
-  cat("#SBATCH --qos=1day","\n", sep ="")
+  cat("#SBATCH --qos=6hours","\n", sep ="")
   cat("#SBATCH --cpus-per-task=1","\n", sep ="")
   cat("###########################################","\n", sep ="")
   cat("ml purge","\n", sep ="")
