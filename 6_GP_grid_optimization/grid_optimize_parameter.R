@@ -98,31 +98,31 @@ GP_grid_search_predictions <- function(gp_file, scale, ngrid, target_range_size,
   
   # Generate sample scenarios
   
-  # # Uncomment to sample uniformly across the entire parameter space
-  # scenarios <- lhs(ngrid, t(scale_params))
-  # scenarios <- as.data.frame(scenarios)
-  # names(scenarios) <- rownames(param_ranges)
+  # Uncomment to sample uniformly across the entire parameter space
+  scenarios <- lhs(ngrid, t(scale_params))
+  scenarios <- as.data.frame(scenarios)
+  names(scenarios) <- rownames(param_ranges)
   # end uncomment
   
-  # Uncomment to sample uniformly across drug parameters only
-  if (scale == TRUE) {
-    params <- expand.grid("Coverage1" = seq(0.05, 0.25, 0.05)/0.3,
-                            "Coverage2" = seq(0.05, 0.25, 0.05)/0.3,
-                            "Slope" = (6 - 0.5)/(9 - 0.5))
-  } else {
-    params <- expand.grid("Coverage1" = seq(0.75, 0.95, 0.05), "Coverage2" = seq(0.75, 0.95, 0.05), "Slope" = 6)
-  }
-  ncov <- nrow(params)
-  params <- params[rep(seq_len(ncov), ngrid), ]
-  
-  samp <- lhs(ngrid, t(scale_params[, c("Halflife", "MaxKillingRate")]))
-  samp <- samp[rep(seq_len(ngrid), ncov), ]
-  colnames(samp) <- c("Halflife", "MaxKillingRate")
-  
-  scenarios <- cbind(params, samp)
-  scenarios <- scenarios[, rownames(param_ranges)]
-  rownames(scenarios) <- 1:nrow(scenarios)
-  # end uncomment
+  # # Uncomment to sample uniformly across drug parameters only
+  # if (scale == TRUE) {
+  #   params <- expand.grid("Coverage1" = seq(0.05, 0.25, 0.05)/0.3,
+  #                           "Coverage2" = seq(0.05, 0.25, 0.05)/0.3,
+  #                           "Slope" = (6 - 0.5)/(9 - 0.5))
+  # } else {
+  #   params <- expand.grid("Coverage1" = seq(0.75, 0.95, 0.05), "Coverage2" = seq(0.75, 0.95, 0.05), "Slope" = 6)
+  # }
+  # ncov <- nrow(params)
+  # params <- params[rep(seq_len(ncov), ngrid), ]
+  # 
+  # samp <- lhs(ngrid, t(scale_params[, c("Halflife", "MaxKillingRate")]))
+  # samp <- samp[rep(seq_len(ngrid), ncov), ]
+  # colnames(samp) <- c("Halflife", "MaxKillingRate")
+  # 
+  # scenarios <- cbind(params, samp)
+  # scenarios <- scenarios[, rownames(param_ranges)]
+  # rownames(scenarios) <- 1:nrow(scenarios)
+  # # end uncomment
   
   ####################
   ### OPTIMIZATION ###
