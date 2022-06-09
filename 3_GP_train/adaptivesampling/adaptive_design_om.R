@@ -26,8 +26,8 @@ gp_file = args[2]
 scale = args[3]
 
 # Retained here for testing
-as_folder = "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_mixed/gp/as/"
-gp_file = "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_mixed/gp/trained/inc_red_int_Tot/seeds_iTPP3bloodstagemixed_seas3mo_sp_Mali_2_5_0.04_May_0.020831339_inc_red_int_Tot_cv.RData"
+as_folder = "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_4rounds/gp/as/"
+gp_file = "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_4rounds/gp/trained/inc_red_int_Tot/seeds_iTPP3bloodstage4rounds_seas3mo_Mali_8_5_0.24_May_0.020831339_inc_red_int_Tot_cv.RData"
 scale = TRUE
 
 
@@ -130,7 +130,7 @@ exp = basename(exp_dir)
 ## Initialization
 
 # Set number of new sampled points for updating the GP model
-n_samples = 10
+n_samples = 100
 
 # Initalize variances vector
 variances = NULL
@@ -146,7 +146,6 @@ for(as_runs in 1:2) {
   
   # Store files
   tab_file = paste0(as_folder, "param_tab.txt")
-  
   write.table(param_tab, tab_file, sep = "\t", quote = FALSE, col.names = TRUE, row.names = FALSE)
   variances = rbind(variances, new_points_obj$variances_vec)
   
