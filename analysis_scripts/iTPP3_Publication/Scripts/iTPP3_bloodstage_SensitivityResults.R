@@ -14,7 +14,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp_list <- c("iTPP3_bloodstage_4rounds")
+exp_list <- c("iTPP3_ChemoBlood_TreatLiver_4rounds")
 
 # !!! Insert your predicted parameters here. Note that this must match with one column name in post-processing files !!!
 pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot")
@@ -75,7 +75,7 @@ exp <- exp_list #for(exp in exp_list) {
     
   # Import aggregated impact for each setting
   
-  setting_id <- unique(sub("_Apr_0.020831339.*", "_Apr_0.020831339", sub("_May_0.020831339.*", "_May_0.020831339", setting_id)))
+  setting_id <- unique(sub("_Apr_0.02083134.*", "_Apr_0.02083134", sub("_May_0.02083134.*", "_May_0.02083134", setting_id)))
   df_impact <- data.frame()
     
   for (i in 1:length(setting_id)) {
@@ -152,7 +152,7 @@ exp <- exp_list #for(exp in exp_list) {
                          "Coverage1" = "Program reach [70% - 95%]",
                          "Coverage2" = "Round coverage [70% - 95%]",
                          "MaxKillingRate" = "Emax [2 - 30 units]",
-                         "Halflife" = "Elimination half-life [5 - 40 days]",
+                         "Halflife" = "Elimination half-life [1 - 20 days]",
                          "Slope" = "Slope [6 - 6]")
   
   df$Outcome <- factor(df$Outcome, levels = c("inc", "prev", "sev", "mor"))
@@ -235,8 +235,12 @@ exp <- exp_list #for(exp in exp_list) {
          height = 5,
          dpi = 400)
   
-
-    
+  # ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_", exp, "_presentation.jpg"),
+  #        plot = last_plot(),
+  #        width = 12,
+  #        height = 5,
+  #        dpi = 300)
+  #   
     
   # ----------------------------------------------------------
   # Generate supporting table with sensitivity results across scenarios

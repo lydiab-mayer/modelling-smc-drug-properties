@@ -111,7 +111,7 @@ RSS <- function(x, y) {
 df$RSS <- NULL
 
 for (i in 1:nrow(df)) {
-  df[i, "RSS"] <- RSS(SPAQ, df[i, 3:15])
+  df[i, "RSS"] <- RSS(SPAQ, as.numeric(df[i, 6:17]))
 }
 
 # Calculate cutoff for 'close' to SP-AQ
@@ -302,6 +302,9 @@ df_SPAQ <- df_SPAQ %>%
 df_plot_PKPD <- rbind(df_PKPD, df_SPAQ)
 df_plot_PKPD$drug <- factor(df_plot_PKPD$drug, levels = c("SP-AQ", "NEXT-GENERATION SMC"))
 
+# Convert days to weeks
+df_plot_PKPD$week <- df_plot_PKPD$t / 7
+
 
 ##################
 # GENERATE PLOTS #
@@ -312,7 +315,7 @@ df_plot_PKPD$drug <- factor(df_plot_PKPD$drug, levels = c("SP-AQ", "NEXT-GENERAT
 # ----------------------------------------------------------
 
 p <- ggplot(data = df_plot_pe[df_plot_pe$drug == "Next-gen SMC", ],
-            aes(x = weeks, y = mean, group = interaction(Halflife, Slope, MaxKillingRate, drug))) +
+            aes(x = weeks, y = mean, group = interaction(Halflife, drug))) +
   geom_line(colour = "#899DA4", linetype = "solid", alpha = 0.4, size = 0.2) 
 
 p <- p + geom_line(data = df[df$RSS <= cutoff, ], 
@@ -323,7 +326,7 @@ p <- p + geom_line(data = df[df$RSS <= cutoff, ],
 #                     alpha = 0.4, linetype = "dashed")
 
 p <- p + geom_line(data = df_plot_pe[df_plot_pe$drug %in% c("SP-AQ"), ],
-                   aes(x = weeks, y = mean, colour = drug))
+                   aes(x = weeks, y = mean), colour = "#781e0b", size = 1)
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -348,7 +351,7 @@ p <- p + scale_x_continuous(breaks = 0:8,
 
 p <- p + labs(x = "WEEKS  AFTER  FINAL  SMC  ROUND", 
               y = "PROTECTIVE  EFFICACY", 
-              title = "MODEL  VALIDATION  TO  EXISTING  SMC")
+              title = "MODEL  COMPARISON  TO  EXISTING  SMC")
 
 
 # ----------------------------------------------------------
@@ -356,7 +359,7 @@ p <- p + labs(x = "WEEKS  AFTER  FINAL  SMC  ROUND",
 # ----------------------------------------------------------
 
 
-q <- ggplot(df_plot_PKPD, aes(x = t, ymin = PD_min, ymax = PD_max, fill = drug, colour = drug)) +
+q <- ggplot(df_plot_PKPD, aes(x = week, ymin = PD_min, ymax = PD_max, fill = drug, colour = drug)) +
   geom_ribbon(alpha = 0.4)
 # q <- ggplot(df_plot[df_plot$drug == "NEXT-GENERATION SMC", ], aes(x = t, ymin = PD_min, ymax = PD_max)) +
 #   geom_ribbon(alpha = 0.4, fill = cols[3], colour = cols[3]) +
@@ -376,15 +379,16 @@ q <- q + theme(panel.border = element_blank(),
                legend.title = element_blank(),
                legend.position = "bottom")
 
-q <- q + scale_x_continuous(breaks = seq(0, 90, by = 30),
+q <- q + scale_x_continuous(breaks = seq(0, 12, by = 1),
+                            limits = c(0, 8),
                             expand = expansion(mult = .03, add = 0)) +
   scale_y_continuous(breaks = seq(0, 30, by = 5),
                      expand = expansion(mult = .03, add = 0)) +
   scale_colour_manual(values = cols[c(1, 3)]) +
   scale_fill_manual(values = cols[c(1, 3)])
 
-q <- q + labs(x = "TIME  (DAYS)", 
-              y = "PARASITE\nKILLING  RATE", 
+q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  ROUND",  
+              y = expression(E["max"]),
               title = "MODELLED  RANGE  OF  PK/PD  PROFILES")
 
 p / q + plot_annotation(title = "B. Next-generation SMC with dominant blood stage activity") &
@@ -392,6 +396,6 @@ p / q + plot_annotation(title = "B. Next-generation SMC with dominant blood stag
 
 ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_fig1_panelB.jpg"),
        plot = last_plot(),
-       width = 4.5,
+       width = 3.8,
        height = 5,
        dpi = 400)

@@ -14,7 +14,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp_list <- c("iTPP3_tradeoffs_4rounds")
+exp_list <- c("iTPP3_ChemoLiver_TreatLiverBlood_4rounds")
 
 # !!! Insert your predicted parameters here. Note that this must match with one column name in post-processing files !!!
 pred_list <- c("inc_red_int_Tot", "prev_red_int_Aug", "sev_red_int_Tot")
@@ -130,17 +130,17 @@ exp <- exp_list #for(exp in exp_list) {
   # Format data for plotting - MUST BE ADJUSTED FOR EACH EXPERIMENT
   # ----------------------------------------------------------
   
-  df$Seasonality <- factor(df$Seasonality, levels = c("sharpseasonal", "wideseasonal"))
-  df$Seasonality <- recode(df$Seasonality, "sharpseasonal" = "5 MONTH SEASON", "wideseasonal" = "6 MONTH SEASON")
+  df$Seasonality <- factor(df$Seasonality, levels = c("seas3mo", "seas5mo"))
+  df$Seasonality <- recode(df$Seasonality, "seas3mo" = "3 MONTH SEASON", "seas5mo" = "5 MONTH SEASON")
   
   df$Access <- factor(df$Access, levels = c("0.04", "0.24"))
   df$Access <- recode(df$Access, "0.04" = "LOW ACCESS", "0.24" = "HIGH ACCESS")
   
   df$Setting <- paste0(df$Seasonality, "\n", df$Access)
-  df$Setting <- factor(df$Setting, levels = c("5 MONTH SEASON\nLOW ACCESS", 
-                                              "5 MONTH SEASON\nHIGH ACCESS",
-                                              "6 MONTH SEASON\nLOW ACCESS",
-                                              "6 MONTH SEASON\nHIGH ACCESS"))
+  df$Setting <- factor(df$Setting, levels = c("3 MONTH SEASON\nLOW ACCESS", 
+                                              "3 MONTH SEASON\nHIGH ACCESS",
+                                              "5 MONTH SEASON\nLOW ACCESS",
+                                              "5 MONTH SEASON\nHIGH ACCESS"))
     
   df$Agegroup <- factor(df$Agegroup, levels = c("5", "10"))
   df$Agegroup <- recode(df$Agegroup,
@@ -186,8 +186,8 @@ exp <- exp_list #for(exp in exp_list) {
   # ----------------------------------------------------------
     
   df_plot <- df %>%
-    filter(Access == "HIGH ACCESS",
-           Seasonality == "5 MONTH SEASON",
+    filter(Access == "LOW ACCESS", #"HIGH ACCESS",
+           Seasonality == "3 MONTH SEASON",
            Agegroup == "CHILDREN 3 TO 59 MONTHS",
            Outcome %in% c("CLINICAL INCIDENCE", "PREVALENCE", "SEVERE DISEASE"))
   

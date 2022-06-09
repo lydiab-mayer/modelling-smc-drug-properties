@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_tradeoffs_4rounds"
+exp <- "iTPP3_ChemoLiver_TreatLiverBlood_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred <- "inc_red_int_Tot"
@@ -34,7 +34,7 @@ param_ranges_cont
 # Define and load scenarios
 setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
 (setting_id <- sub(".rds", "", sub("opt_", "", basename(setting))))
-index <- c(12, 20, 28, 8, 16, 24)
+index <- c(1, 3, 5, 6, 2, 4) #c(12, 20, 28, 8, 16, 24)
 setting_id[index]
 
 # Define function to generate predictions
@@ -190,7 +190,7 @@ p0 <- p
 
 # PANEL 1
 
-df_plot <- df[df$EIR == 2, ]
+df_plot <- df[df$EIR == 1, ]
 df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
 
 p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
@@ -226,7 +226,7 @@ p1 <- p
 
 # PANEL 2
 
-df_plot <- df[df$EIR == 4, ]
+df_plot <- df[df$EIR == 2, ]
 df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
 
 p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
@@ -262,7 +262,7 @@ p2 <- p
 
 # PANEL 3
 
-df_plot <- df[df$EIR == 16, ]
+df_plot <- df[df$EIR == 4, ]
 df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
 
 p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
@@ -300,7 +300,7 @@ p3 <- p
 
 # PANEL 4
 
-df_plot <- df[df$EIR == 32, ]
+df_plot <- df[df$EIR == 16, ]
 df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
 
 p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
@@ -337,7 +337,7 @@ p4 <- p
 
 # PANEL 5
 
-df_plot <- df[df$EIR == 64, ]
+df_plot <- df[df$EIR == 32, ]
 df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
 
 p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
@@ -428,7 +428,7 @@ df$Coverage2 <- factor(paste0(df$Coverage2*100, "% ROUND COVERAGE"),
 df$target_label <- factor(paste0(df$target, "%"), levels = rev(paste0(unique(df$target)[order(unique(df$target))], "%")))
 
 # Plot
-df_plot <- df[df$EIR == 8, ]
+df_plot <- df[df$EIR == 16, ]
 df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
 
 p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))

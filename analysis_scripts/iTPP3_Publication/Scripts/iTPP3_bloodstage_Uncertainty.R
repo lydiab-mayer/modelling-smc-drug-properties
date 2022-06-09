@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_bloodstage_4rounds"
+exp <- "iTPP3_ChemoBlood_TreatLiver_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred_list <- c("inc_red_int_Tot")
@@ -91,7 +91,7 @@ pred <- pred_list
   
   setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
   (setting_id <- sub(".rds", "", sub("opt_", "", basename(setting))))
-  index <- 28 #54
+  index <- 24#28
   setting_id[index]
   
   # ----------------------------------------------------------
@@ -101,8 +101,8 @@ pred <- pred_list
   # Generate grid of predictions
   ngrid <- c(31, 1, 1, 1, 1)
   grid_ranges_cont <- rbind(Coverage1 = c(0.7, 1.0),
-                            Coverage2 = 0.95,
-                            Halflife = 15,
+                            Coverage2 = 0.9,
+                            Halflife = 10,
                             MaxKillingRate = 3.45,
                             Slope = 6)
   
@@ -161,9 +161,9 @@ pred <- pred_list
                               limits = c(0.7, 1.0),
                               labels = paste0(seq(0.7, 1.0, by= 0.1)*100, "%"),
                               expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(55, 95, by = 5),
-                       limits = c(55, 95),
-                       labels = paste0(seq(55, 95, by = 5), "%"),
+    scale_y_continuous(breaks = seq(20, 100, by = 10),
+                       limits = c(20, 100),
+                       labels = paste0(seq(20, 100, by = 10), "%"),
                        expand = expansion(mult = .03, add = 0))
   
   p <- p + labs(x = "PROGRAM  REACH", y = "CLINICAL  INCIDENCE\nREDUCTION")
@@ -180,7 +180,7 @@ pred <- pred_list
   ngrid <- c(1, 31, 1, 1, 1)
   grid_ranges_cont <- rbind(Coverage1 = 0.9,
                             Coverage2 = c(0.7, 1.0),
-                            Halflife = 15,
+                            Halflife = 10,
                             MaxKillingRate = 3.45,
                             Slope = 6)
   
@@ -237,8 +237,8 @@ pred <- pred_list
   p <- p + scale_x_continuous(breaks = seq(0.7, 1.0, by= 0.1),
                               labels = paste0(seq(0.7, 1.0, by= 0.1)*100, "%"),
                               expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(55, 95, by = 5),
-                       limits = c(55, 95),
+    scale_y_continuous(breaks = seq(20, 100, by = 10),
+                       limits = c(20, 100),
                        expand = expansion(mult = .03, add = 0))
   
   p <- p + labs(x = "ROUND  COVERAGE", y = "")
@@ -251,10 +251,10 @@ pred <- pred_list
   # ----------------------------------------------------------
   
   # Generate grid of predictions
-  ngrid <- c(1, 1, 36, 1, 1)
+  ngrid <- c(1, 1, 20, 1, 1)
   grid_ranges_cont <- rbind(Coverage1 = 0.9,
                             Coverage2 = 0.9,
-                            Halflife = c(5, 40),
+                            Halflife = c(1, 20),
                             MaxKillingRate = 3.45,
                             Slope = 6)
   
@@ -307,12 +307,12 @@ pred <- pred_list
                  plot.title = element_text(hjust = 0.5, face = "bold"),
                  legend.title = element_text(face = "bold"))
   
-  p <- p + scale_x_continuous(breaks = seq(0, 40, by = 10),
-                              limits = c(0, 40),
+  p <- p + scale_x_continuous(breaks = seq(0, 20, by = 5),
+                              limits = c(0, 20),
                               expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(55, 95, by = 5),
-                       limits = c(55, 95),
-                       labels = paste0(seq(55, 95, by = 5), "%"),
+    scale_y_continuous(breaks = seq(20, 100, by = 10),
+                       limits = c(20, 100),
+                       labels = paste0(seq(20, 100, by = 10), "%"),
                        expand = expansion(mult = .03, add = 0))
   
   p <- p + labs(x = "ELIMINATION\nHALF-LIFE  (DAYS)", y = "CLINICAL  INCIDENCE\nREDUCTION")
@@ -328,7 +328,7 @@ pred <- pred_list
   ngrid <- c(1, 1, 1, 29, 1)
   grid_ranges_cont <- rbind(Coverage1 = 0.9,
                             Coverage2 = 0.9,
-                            Halflife = 15,
+                            Halflife = 10,
                             MaxKillingRate = c(2, 30),
                             Slope = 6)
   
@@ -381,11 +381,11 @@ pred <- pred_list
                  plot.title = element_text(hjust = 0.5, face = "bold"),
                  legend.title = element_text(face = "bold"))
   
-  p <- p + scale_x_continuous(breaks = seq(0, 30, by = 10),
+  p <- p + scale_x_continuous(breaks = seq(0, 30, by = 5),
                               limits = c(0, 30),
                               expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(55, 95, by = 5),
-                       limits = c(55, 95),
+    scale_y_continuous(breaks = seq(20, 100, by = 10),
+                       limits = c(20, 100),
                        expand = expansion(mult = .03, add = 0))
   
   p <- p + labs(x = "Emax", y = "")
@@ -402,7 +402,7 @@ pred <- pred_list
   ngrid <- c(1, 1, 1, 1, 9)
   grid_ranges_cont <- rbind(Coverage1 = 0.9,
                             Coverage2 = 0.9,
-                            Halflife = 15,
+                            Halflife = 10,
                             MaxKillingRate = 3.45,
                             Slope = c(1, 8))
   
@@ -458,8 +458,8 @@ pred <- pred_list
   p <- p + scale_x_continuous(breaks = seq(0, 8, by = 2),
                               limits = c(0, 8),
                               expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(55, 95, by = 5),
-                       limits = c(55, 95),
+    scale_y_continuous(breaks = seq(20, 100, by = 10),
+                       limits = c(20, 100),
                        expand = expansion(mult = .03, add = 0))
   
   p <- p + labs(x = "PD  MODEL  SLOPE", y = "")
@@ -473,16 +473,20 @@ pred <- pred_list
   
   p_out <- (p_coverage1 | p_coverage2) / (p_halflife | p_maxkilling) + plot_annotation(title = "A") & theme(plot.title = element_text(family = "Times New Roman", face = "bold"))
   
-  saveRDS(p_out, paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/uncertainty_", exp, "_", pred, ".rds"))
+#  saveRDS(p_out, paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/uncertainty_", exp, "_", pred, ".rds"))
 
 #}
 
 
 
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/uncertainty_", exp, "_", pred, ".jpg"),
-       plot = p_out,
-       width = 4.5,
-       height = 5,
-       dpi = 400)
+# ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/uncertainty_", exp, "_", pred, ".jpg"),
+#        plot = p_out,
+#        width = 4.5,
+#        height = 5,
+#        dpi = 400)
 
-
+  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/uncertainty_", exp, "_", pred, "presentation.jpg"),
+         plot = p_out,
+         width = 12,
+         height = 5,
+         dpi = 300)
