@@ -20,8 +20,8 @@ library(ggplot2)
 library(patchwork)
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp_list <-c("iTPP3_bloodstage_3rounds", "iTPP3_bloodstage_4rounds", "iTPP3_bloodstage_5rounds")
-num_rounds <- c("iTPP3_bloodstage_3rounds" = 3, "iTPP3_bloodstage_4rounds" = 4, "iTPP3_bloodstage_5rounds" = 5)
+exp_list <-c("iTPP3_ChemoBlood_TreatLiver_3rounds", "iTPP3_ChemoBlood_TreatLiver_4rounds", "iTPP3_ChemoBlood_TreatLiver_5rounds")
+num_rounds <- c("iTPP3_ChemoBlood_TreatLiver_3rounds" = 3, "iTPP3_ChemoBlood_TreatLiver_4rounds" = 4, "iTPP3_ChemoBlood_TreatLiver_5rounds" = 5)
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot")
@@ -105,9 +105,9 @@ for(exp in exp_list) {
 # Merge results across experiments
 
 # !!! Note that this must be updated manually should the list of experiments be changed !!!
-df3 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_bloodstage_3rounds_cutoff_criteria.rds"))
-df4 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_bloodstage_4rounds_cutoff_criteria.rds"))
-df5 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_bloodstage_5rounds_cutoff_criteria.rds"))
+df3 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_ChemoBlood_TreatLiver_3rounds_cutoff_criteria.rds"))
+df4 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_ChemoBlood_TreatLiver_4rounds_cutoff_criteria.rds"))
+df5 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_ChemoBlood_TreatLiver_5rounds_cutoff_criteria.rds"))
 
 df <- rbind(df3, df4, df5)
 remove(df3, df4, df5)
@@ -163,7 +163,8 @@ df$Endpoint <- recode(df$Endpoint,
                       "sev" = "SEVERE DISEASE REDUCTION",
                       "prev" = "PREVALENCE REDUCTION",
                       "mor" = "MORTALITY REDUCTION")
-  
+
+df$Rounds <- sub("iTPP3ChemoBloodTreatLiver", "", df$Rounds)  
 df$Rounds <- factor(df$Rounds, levels = c("3rounds", "4rounds", "5rounds"))
 df$Rounds <- recode(df$Rounds,
                      "3rounds" = "3 SMC ROUNDS",
@@ -236,7 +237,7 @@ p <- p + theme(panel.border = element_blank(),
                legend.title.align = 0.5,
                legend.position = "bottom")
 
-p <- p + scale_fill_manual(values = cols[c(2, 4, 6, 7, 8, 10, 12)], 
+p <- p + scale_fill_manual(values = cols[c(4, 6, 8, 12)], 
                     na.value = "light grey",
                     labels = c(levels(df_plot$Halflife), 
                                "Target not met in\nparameter space")) +
@@ -248,7 +249,7 @@ p <- p + labs(y = "TARGET  REDUCTION", x = expression(paste("BASELINE ANNUAL ", 
 p + plot_annotation(title = "B.  MINIMUM  ELIMINATION  HALF-LIFE  CRITERIA") & 
   theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = text_size))
 
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_cutoff_criteria_halflife.jpg"),
+ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig4_panelB_", exp, ".jpg"),
        plot = last_plot(),
        width = 9.1,
        height = 4.5,

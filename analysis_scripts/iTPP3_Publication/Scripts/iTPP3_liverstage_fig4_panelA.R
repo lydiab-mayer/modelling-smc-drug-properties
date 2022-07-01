@@ -20,8 +20,8 @@ library(ggplot2)
 library(patchwork)
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp_list <-c("iTPP3_ChemoBlood_TreatLiver_3rounds", "iTPP3_ChemoBlood_TreatLiver_4rounds", "iTPP3_ChemoBlood_TreatLiver_5rounds")
-num_rounds <- c("iTPP3_ChemoBlood_TreatLiver_3rounds" = 3, "iTPP3_ChemoBlood_TreatLiver_4rounds" = 4, "iTPP3_ChemoBlood_TreatLiver_5rounds" = 5)
+exp_list <-c("iTPP3_ChemoLiver_TreatLiverBlood_3rounds", "iTPP3_ChemoLiver_TreatLiverBlood_4rounds", "iTPP3_ChemoLiver_TreatLiverBlood_5rounds")
+num_rounds <- c("iTPP3_ChemoLiver_TreatLiverBlood_3rounds" = 3, "iTPP3_ChemoLiver_TreatLiverBlood_4rounds" = 4, "iTPP3_ChemoLiver_TreatLiverBlood_5rounds" = 5)
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot")
@@ -37,7 +37,7 @@ setwd(paste0("/scicore/home/penny/", user, "/M3TPP/"))
 # load(paste0(GROUP_dr, exp, "/param_ranges.RData"))
 # param_ranges_cont
 
-varnames <- c("CoverageAllRounds", "CoverageOneRound", "Halflife", "MaxKillingRate", "Slope")
+varnames <- c("CoverageAllRounds", "CoverageOneRound", "Halflife", "Efficacy")
 
 out <- data.frame()
 #out <- matrix(nrow = 1, ncol = 4 + length(varnames))
@@ -122,17 +122,17 @@ df <- data.frame(lapply(df, function(x) gsub("Inf", NA, x)), stringsAsFactors = 
 
 # Format performance characteristics as numeric
 df <- df %>%
-  mutate(across(c(Target, CoverageAllRounds, CoverageOneRound, Halflife, MaxKillingRate, Slope), as.numeric))
+  mutate(across(c(Target, CoverageAllRounds, CoverageOneRound, Halflife, Efficacy), as.numeric))
 
 # Replace minimum characterstics outside of considered range with NA
-df$Halflife[df$Halflife >= 40] <- NA
-df$MaxKillingRate[df$MaxKillingRate >= 30] <- NA
+df$Halflife[df$Halflife >= 60] <- NA
+df$MaxKillingRate[df$Efficacy >= 1] <- NA
   
 # Add additional columns for each scenario factor
 df$Scenario <- sub("_red_int_Tot", "", sub("iTPP3bloodstage", "", df$Scenario))
 df <- df %>%
   separate(col = Scenario,
-           into = c("Rounds", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Endpoint"),
+           into = c("Rounds", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Endpoint"),
            sep= "_")
   
 # Merge in baseline prevalence
@@ -161,7 +161,7 @@ df$Endpoint <- recode(df$Endpoint,
                       "prev" = "PREVALENCE REDUCTION",
                       "mor" = "MORTALITY REDUCTION")
   
-df$Rounds <- sub("iTPP3bloodstage", "", df$Rounds)
+df$Rounds <- sub("iTPP3ChemoLiverTreatLiverBlood", "", df$Rounds)
 df$Rounds <- factor(df$Rounds, levels = c("3rounds", "4rounds", "5rounds"))
 df$Rounds <- recode(df$Rounds,
                      "3rounds" = "3 SMC ROUNDS",
@@ -197,7 +197,7 @@ df_plot <- df %>%
   summarise(CoverageAllRounds = max(CoverageAllRounds, na.rm = FALSE),
             CoverageOneRound = max(CoverageOneRound, na.rm = FALSE),
             Halflife = max(Halflife, na.rm = FALSE),
-            MaxKillingRate = max(MaxKillingRate, na.rm = FALSE))
+            Efficacy = max(Efficacy, na.rm = FALSE))
 
 # Transform min criteria to factor variables
 df_plot <- df_plot %>%
@@ -205,12 +205,12 @@ df_plot <- df_plot %>%
          CoverageAllRounds = ifelse(is.na(CoverageAllRounds), NA, paste0(floor(CoverageAllRounds/.1)*.1*100, "%")),
          CoverageOneRound = ifelse(is.na(CoverageOneRound), NA, paste0(floor(CoverageOneRound/.05)*.05*100, "%")),
          Halflife = floor(Halflife/5)*5,
-         MaxKillingRate = floor(MaxKillingRate/5)*5)
+         Efficacy = floor(Efficacy/5)*5)
 
 # Correct minimum values and set factor levels
 df_plot <- df_plot %>%
   mutate(Halflife = as.factor(ifelse(Halflife <= 5, 5, Halflife)),
-         MaxKillingRate = as.factor(ifelse(MaxKillingRate <= 5, 1, MaxKillingRate)))
+         Efficacy = as.factor(ifelse(Efficacy <= 5, 1, Efficacy)))
 
 # Subset data
 df_plot <- df_plot %>%
@@ -239,7 +239,8 @@ p <- p + theme(panel.border = element_blank(),
 
 p <- p + scale_fill_manual(values = cols[c(1, 2, 4, 6, 7, 8, 10, 12)],
                            na.value = "light grey",
-                           labels = c(unique(df_plot$CoverageAllRounds)[1:(length(unique(df_plot$CoverageAllRounds)) - 1)], "Target not met in\nparameter space")) +
+                           labels = c(paste0(seq(20, 90, 10), "%"), "Target not met in\nparameter space")) +
+                          # labels = c(unique(df_plot$CoverageAllRounds)[1:(length(unique(df_plot$CoverageAllRounds)) - 1)], "Target not met in\nparameter space")) +
   scale_y_discrete(labels = c("50%", "", "60%", "", "70%", "", "80%", "", "90%"))
 
 p <- p + labs(y = "TARGET\nREDUCTION", x = expression(paste("BASELINE ANNUAL ", italic("Pf"), "PR"["2-10"]))) +
@@ -264,9 +265,9 @@ q <- q + theme(panel.border = element_blank(),
                legend.title.align = 0.5,
                legend.position = "bottom")
 
-q <- q + scale_fill_manual(values = cols[c(1, 2, 4, 6, 8, 12)],
+q <- q + scale_fill_manual(values = cols[c(1, 2, 4, 6, 8, 10, 12)],
                            na.value = "light grey",
-                           labels = c(unique(df_plot$CoverageOneRound)[1:(length(unique(df_plot$CoverageOneRound)) - 1)], "Target not met in\nparameter space")) +
+                           labels = c(paste0(seq(70, 100, 5), "%"), "Target not met in\nparameter space")) +
   scale_y_discrete(labels = c("50%", "", "60%", "", "70%", "", "80%", "", "90%"))
 
 q <- q + labs(y = "", x = expression(paste("BASELINE ANNUAL ", italic("Pf"), "PR"["2-10"]))) +

@@ -120,7 +120,6 @@ exp <- exp_list #for(exp in exp_list) {
   prev <- read.csv(paste0("./Experiments/", exp, "/Outputs/Prevalence_prior_to_intervention.csv"))
   prev <- prev[, c("Seasonality", "EIR", "Access", "MaxAge", "annual_prev_210_2034")]
   names(prev) <- c("Seasonality", "EIR", "Access", "Agegroup", "annual_prev")
-  prev$annual_prev <- paste0(round(prev$annual_prev*100, 0), "%")
   
   # Merge into data
   df <- merge(df, prev, by = c("Seasonality", "EIR", "Access", "Agegroup"))
@@ -161,8 +160,10 @@ exp <- exp_list #for(exp in exp_list) {
                        "prev" = "PREVALENCE",
                        "sev" = "SEVERE DISEASE",
                        "mor" = "MORTALITY")
-    
-  df$annual_prev <- factor(df$annual_prev)
+  
+  index <- order(unique(round(df$annual_prev*100, 0)))
+  df$annual_prev_lab <- paste0(round(df$annual_prev*100, 0), "%")
+  df$annual_prev_lab <- factor(df$annual_prev_lab, levels = unique(df$annual_prev_lab)[index])
     
     
   # ----------------------------------------------------------
@@ -190,7 +191,7 @@ exp <- exp_list #for(exp in exp_list) {
   df_plot <- df_plot[df_plot$Outcome %in% c("CLINICAL INCIDENCE", "SEVERE DISEASE", "PREVALENCE"), ]
   df_plot <- df_plot[df_plot$parameter != "Slope [6 - 6]", ]
   
-  p <- ggplot(df_plot, aes(x = annual_prev, y = T_eff_scaled, fill = parameter, label = label))
+  p <- ggplot(df_plot, aes(x = annual_prev_lab, y = T_eff_scaled, fill = parameter, label = label))
     
   p <- p + geom_bar(position = "stack", stat = "identity", colour = "white")
   
@@ -229,7 +230,7 @@ exp <- exp_list #for(exp in exp_list) {
     
   p
     
-  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_", exp, "_FIG2.jpg"),
+  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig2_panelB_", exp, ".jpg"),
          plot = last_plot(),
          width = 4.5,
          height = 5,
@@ -252,7 +253,7 @@ exp <- exp_list #for(exp in exp_list) {
     
   tab$minmax <- paste0(round(tab$min*100, 0), "% to ", round(tab$max*100, 0), "%")
   names(tab) <- c("Key performance property", "Outcome", "Max", "Min", "Range of attributable outcome variation")
-  write.csv(tab[, c(1, 2, 5)], file = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_", exp, "_TABsens.csv"))
+  write.csv(tab[, c(1, 2, 5)], file = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/tabsens_", exp, ".csv"))
     
     
   # ----------------------------------------------------------
@@ -263,7 +264,7 @@ exp <- exp_list #for(exp in exp_list) {
   df_plot <- df_plot[df_plot$Outcome %in% c("CLINICAL INCIDENCE", "SEVERE DISEASE", "PREVALENCE"), ]
   df_plot <- df_plot[df_plot$parameter != "Slope [6 - 6]", ]
   
-  p <- ggplot(df_plot, aes(x = annual_prev, y = T_eff_scaled, fill = parameter, label = label))
+  p <- ggplot(df_plot, aes(x = annual_prev_lab, y = T_eff_scaled, fill = parameter, label = label))
     
   p <- p + geom_bar(position = "stack", stat = "identity", colour = "white")
     
@@ -299,7 +300,7 @@ exp <- exp_list #for(exp in exp_list) {
     
   p
     
-  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_", exp,"_FIG22.jpg"),
+  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/figS2_2_", exp, ".jpg"),
          plot = last_plot(),
          width = 9.1,
          height = 9.1,
@@ -311,7 +312,7 @@ exp <- exp_list #for(exp in exp_list) {
   # Generate plot - supplement figure 2.4
   # ----------------------------------------------------------
   
-  df_plot <- df[df$Agegroup == "CHILDREN 3 TO 59 MONTHS" & df$EIR == 16, ]
+  df_plot <- df[df$Agegroup == "CHILDREN 3 TO 59 MONTHS" & df$EIR == 8, ]
   df_plot <- df_plot[df_plot$Outcome %in% c("CLINICAL INCIDENCE", "PREVALENCE", "SEVERE DISEASE"), ]
   df_plot <- df_plot[df_plot$parameter != "Slope [6 - 6]", ]
   
@@ -339,7 +340,8 @@ exp <- exp_list #for(exp in exp_list) {
                  legend.key = element_blank(),
                  legend.position = "bottom")
   
-  p <- p + scale_fill_manual(values = cols) + 
+  p <- p + scale_fill_manual(breaks =,
+                             values = cols) + 
       scale_colour_manual(values = text_cols) +
       scale_y_continuous(breaks = seq(0, 100, 10), labels = paste0(seq(0, 100, 10), "%"))
     
@@ -351,7 +353,7 @@ exp <- exp_list #for(exp in exp_list) {
     
   p
     
-  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_", exp, "_FIG24.jpg"),
+  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/figS2_4_", exp, ".jpg"),
          plot = last_plot(),
          width = 9.1,
          height = 7,

@@ -17,7 +17,7 @@ rm(list = ls())
 exp_list <- c("iTPP3_ChemoLiver_TreatLiverBlood_4rounds")
 
 # !!! Insert your predicted parameters here. Note that this must match with one column name in post-processing files !!!
-pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot")
+pred_list <- c("inc_red_int_Tot", "prev_red_int_Aug", "sev_red_int_Tot")
 
 library(ggplot2)
 library(dplyr)
@@ -120,6 +120,7 @@ exp <- exp_list #for(exp in exp_list) {
   prev <- read.csv(paste0("./Experiments/", exp, "/Outputs/Prevalence_prior_to_intervention.csv"))
   prev <- prev[, c("Seasonality", "EIR", "Access", "MaxAge", "annual_prev_210_2034")]
   names(prev) <- c("Seasonality", "EIR", "Access", "Agegroup", "annual_prev")
+  prev$annual_prev <- paste0(round(prev$annual_prev*100, 0), "%")
   
   # Merge into data
   df <- merge(df, prev, by = c("Seasonality", "EIR", "Access", "Agegroup"))
@@ -136,10 +137,10 @@ exp <- exp_list #for(exp in exp_list) {
   df$Access <- recode(df$Access, "0.04" = "LOW ACCESS", "0.24" = "HIGH ACCESS")
   
   df$Setting <- paste0(df$Seasonality, "\n", df$Access)
-  df$Setting <- factor(df$Setting, levels = c("5 MONTH SEASON\nLOW ACCESS", 
-                                              "5 MONTH SEASON\nHIGH ACCESS",
-                                              "3 MONTH SEASON\nLOW ACCESS",
-                                              "3 MONTH SEASON\nHIGH ACCESS"))
+  df$Setting <- factor(df$Setting, levels = c("3 MONTH SEASON\nLOW ACCESS", 
+                                              "3 MONTH SEASON\nHIGH ACCESS",
+                                              "5 MONTH SEASON\nLOW ACCESS",
+                                              "5 MONTH SEASON\nHIGH ACCESS"))
     
   df$Agegroup <- factor(df$Agegroup, levels = c("5", "10"))
   df$Agegroup <- recode(df$Agegroup,
@@ -150,19 +151,17 @@ exp <- exp_list #for(exp in exp_list) {
   df$parameter <- recode(df$parameter,
                          "Coverage1" = "Program reach [70% - 95%]",
                          "Coverage2" = "Round coverage [70% - 95%]",
-                         "Halflife" = "Duration of protection half-life [10 - 60 days]",
+                         "Halflife" = "Duration of protection [10 - 60 days]",
                          "Efficacy" = "Initial efficacy [80% - 100%]")
   
   df$Outcome <- factor(df$Outcome, levels = c("inc", "prev", "sev", "mor"))
   df$Outcome <- recode(df$Outcome,
                        "inc" = "CLINICAL INCIDENCE",
-                       "prev" = "PREVALENCE",
                        "sev" = "SEVERE DISEASE",
+                       "prev" = "PREVALENCE",
                        "mor" = "MORTALITY")
-  
-  index <- order(unique(round(df$annual_prev*100, 0)))
-  df$annual_prev_lab <- paste0(round(df$annual_prev*100, 0), "%")
-  df$annual_prev_lab <- factor(df$annual_prev_lab, levels = unique(df$annual_prev_lab)[index])
+    
+  df$annual_prev <- factor(df$annual_prev)
     
     
   # ----------------------------------------------------------
@@ -174,7 +173,7 @@ exp <- exp_list #for(exp in exp_list) {
   text_cols <- c("#5f1909", "#323d42", "#827d55", "#7f4a1b", "white")
   
   # Define y-axis labels
-  y_axis <- c("MEDIAN INCIDENCE REDUCTION", "MEDIAN SEVERE DISEASE REDUCTION")
+  y_axis <- c("MEDIAN INCIDENCE REDUCTION", "MEDIAN PREVALENCE REDUCTION", "MEDIAN SEVERE DISEASE REDUCTION")
   names(y_axis) <- pred_list
   
   fontsize <- 10
@@ -183,13 +182,16 @@ exp <- exp_list #for(exp in exp_list) {
     
   
   # ----------------------------------------------------------
-  # Generate plot - figure 2
+  # Generate plot - figure S2.1
   # ----------------------------------------------------------
     
-  df_plot <- df[(df$Access == "HIGH ACCESS" & df$Seasonality == "5 MONTH SEASON") & df$Agegroup == "CHILDREN 3 TO 59 MONTHS", ]
-  df_plot <- df_plot[df_plot$Outcome %in% c("CLINICAL INCIDENCE", "SEVERE DISEASE", "PREVALENCE"), ]
+  df_plot <- df %>%
+    filter(Access == "LOW ACCESS", #"HIGH ACCESS",
+           Seasonality == "3 MONTH SEASON",
+           Agegroup == "CHILDREN 3 TO 59 MONTHS",
+           Outcome %in% c("CLINICAL INCIDENCE", "PREVALENCE", "SEVERE DISEASE"))
   
-  p <- ggplot(df_plot, aes(x = annual_prev_lab, y = T_eff_scaled, fill = parameter, label = label))
+  p <- ggplot(df_plot, aes(x = annual_prev, y = T_eff_scaled, fill = parameter, label = label))
     
   p <- p + geom_bar(position = "stack", stat = "identity", colour = "white")
   
@@ -199,13 +201,12 @@ exp <- exp_list #for(exp in exp_list) {
                      size = fontsize*0.28,
                      show.legend = FALSE)
     
-  p <- p + facet_wrap(Outcome ~ ., scales = "free_x", ncol = 1)
+  p <- p + facet_wrap(.~ Outcome, scales = "free_x")
     
   p <- p + theme(panel.border = element_blank(), 
                  panel.background = element_blank(),
                  panel.grid = element_blank(),
                  text = element_text(family = "Times New Roman", size = fontsize),
-                 title = element_text(face = "bold"),
                  strip.background = element_blank(),
                  axis.line = element_blank(),
                  axis.ticks = element_blank(),
@@ -217,32 +218,27 @@ exp <- exp_list #for(exp in exp_list) {
   
   p <- p + scale_fill_manual(values = cols) + 
     scale_colour_manual(values = text_cols) +
-    scale_y_continuous(breaks = seq(0, 100, 20), labels = paste0(seq(0, 100, 20), "%"))
+    scale_y_continuous(breaks = seq(0, 100, 10), labels = paste0(seq(0, 100, 10), "%"))
   
   p <- p + labs(x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "PR"["2-10"])),
-                y = "MEDIAN  REDUCTION  (%)",
-                fill = "",
-                title = "B")
+                y = "MEDIAN  REDUCTION (%)",
+                fill = "")
     
   p <- p + guides(fill = guide_legend(nrow = 2)) 
     
   p
     
-  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig2_panelB_", exp, ".jpg"),
+  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/figS2_1_", exp, ".jpg"),
          plot = last_plot(),
-         width = 4.5,
+         width = 9.1,
          height = 5,
          dpi = 400)
   
-  # ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_", exp, "_presentation.jpg"),
-  #        plot = last_plot(),
-  #        width = 12,
-  #        height = 5,
-  #        dpi = 300)
-  #   
+
+    
     
   # ----------------------------------------------------------
-  # Generate supporting table with sensitivity results across scenarios
+  # Generate table - table A.2.1
   # ----------------------------------------------------------
     
   tab <- df %>%
@@ -255,13 +251,15 @@ exp <- exp_list #for(exp in exp_list) {
     
     
   # ----------------------------------------------------------
-  # Generate plot - supplement figure 2.2
+  # Generate plot - figure S2.3
   # ----------------------------------------------------------
     
-  df_plot <- df[df$Access == "HIGH ACCESS" & df$Seasonality == "5 MONTH SEASON", ]
-  df_plot <- df_plot[df_plot$Outcome %in% c("CLINICAL INCIDENCE", "SEVERE DISEASE", "PREVALENCE"), ]
+  df_plot <- df %>%
+    filter(Access == "HIGH ACCESS",
+           Seasonality == "5 MONTH SEASON",
+           Outcome %in% c("CLINICAL INCIDENCE", "PREVALENCE", "SEVERE DISEASE"))
   
-  p <- ggplot(df_plot, aes(x = annual_prev_lab, y = T_eff_scaled, fill = parameter, label = label))
+  p <- ggplot(df_plot, aes(x = annual_prev, y = T_eff_scaled, fill = parameter, label = label))
     
   p <- p + geom_bar(position = "stack", stat = "identity", colour = "white")
     
@@ -289,15 +287,15 @@ exp <- exp_list #for(exp in exp_list) {
     scale_colour_manual(values = text_cols) +
     scale_y_continuous(breaks = seq(0, 100, 10), labels = paste0(seq(0, 100, 10), "%"))
     
-  p <- p + labs(x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "PR"["2-10"])),
-                y = "MEDIAN  REDUCTION  (%)",
+  p <- p + labs(x = expression(paste("BASELINE ANNUAL ", italic("Pf"), "PR"["2-10"])),
+                y = "MEDIAN REDUCTION (%)",
                 fill = "")
     
   p <- p + guides(fill = guide_legend(nrow = 2)) 
     
   p
     
-  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/figS2_2_", exp, ".jpg"),
+  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/figS2_3_", exp, ".jpg"),
          plot = last_plot(),
          width = 9.1,
          height = 9.1,
@@ -306,11 +304,13 @@ exp <- exp_list #for(exp in exp_list) {
     
     
   # ----------------------------------------------------------
-  # Generate plot - supplement figure 2.4
+  # Generate plot - figure S2.5
   # ----------------------------------------------------------
   
-  df_plot <- df[df$Agegroup == "CHILDREN 3 TO 59 MONTHS" & df$EIR == 8, ]
-  df_plot <- df_plot[df_plot$Outcome %in% c("CLINICAL INCIDENCE", "PREVALENCE", "SEVERE DISEASE"), ]
+  df_plot <- df %>%
+    filter(Agegroup == "CHILDREN 3 TO 59 MONTHS",
+           EIR == 16,
+           Outcome %in% c("CLINICAL INCIDENCE", "PREVALENCE", "SEVERE DISEASE"))
   
   p <- ggplot(df_plot, aes(x = Setting, y = T_eff_scaled, fill = parameter, label = label))
     
@@ -321,7 +321,7 @@ exp <- exp_list #for(exp in exp_list) {
                      size = fontsize*0.28,
                      show.legend = FALSE)
     
-  p <- p + facet_wrap(.~ Outcome, scales = "free_x", ncol = 1)
+  p <- p + facet_wrap(.~ Outcome, scales = "free_x", ncol = 1, nrow = 3)
     
   p <- p + theme(panel.border = element_blank(), 
                  panel.background = element_blank(),
@@ -336,23 +336,22 @@ exp <- exp_list #for(exp in exp_list) {
                  legend.key = element_blank(),
                  legend.position = "bottom")
   
-  p <- p + scale_fill_manual(breaks =,
-                             values = cols) + 
+  p <- p + scale_fill_manual(values = cols) + 
       scale_colour_manual(values = text_cols) +
       scale_y_continuous(breaks = seq(0, 100, 10), labels = paste0(seq(0, 100, 10), "%"))
     
   p <- p + labs(x = "SCENARIO",
-                y = "MEDIAN  REDUCTION  (%)",
+                y = "MEDIAN REDUCTION (%)",
                 fill = "")
     
   p <- p + guides(fill = guide_legend(nrow = 2)) 
     
   p
     
-  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/figS2_4_", exp, ".jpg"),
+  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_", exp, "_FIGS25.jpg"),
          plot = last_plot(),
          width = 9.1,
          height = 7,
-         dpi = 400)
+         dpi = 300)
 
 #}
