@@ -91,7 +91,7 @@ pred <- pred_list
   
   setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization_uniform_sample/", pred, "/*"))
   (setting_id <- sub(".rds", "", sub("opt_", "", basename(setting))))
-  index <- 24
+  index <- 48 #24
   setting_id[index]
   
   # ----------------------------------------------------------
@@ -160,9 +160,9 @@ pred <- pred_list
                               limits = c(0.7, 1.0),
                               labels = paste0(seq(0.7, 1.0, by= 0.1)*100, "%"),
                               expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(20, 100, by = 10),
-                       limits = c(20, 100),
-                       labels = paste0(seq(20, 100, by = 10), "%"),
+    scale_y_continuous(breaks = seq(0, 100, by = 10),
+                       limits = c(0, 100),
+                       labels = paste0(seq(0, 100, by = 10), "%"),
                        expand = expansion(mult = .03, add = 0))
   
   p <- p + labs(x = "PROGRAM  REACH", y = "CLINICAL  INCIDENCE\nREDUCTION")
@@ -235,8 +235,8 @@ pred <- pred_list
   p <- p + scale_x_continuous(breaks = seq(0.7, 1.0, by= 0.1),
                               labels = paste0(seq(0.7, 1.0, by= 0.1)*100, "%"),
                               expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(20, 100, by = 10),
-                       limits = c(20, 100),
+    scale_y_continuous(breaks = seq(0, 100, by = 10),
+                       limits = c(0, 100),
                        expand = expansion(mult = .03, add = 0))
   
   p <- p + labs(x = "ROUND  COVERAGE", y = "")
@@ -307,9 +307,9 @@ pred <- pred_list
   p <- p + scale_x_continuous(breaks = seq(10, 60, by = 10),
                               limits = c(10, 60),
                               expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(20, 100, by = 10),
-                       limits = c(20, 100),
-                       labels = paste0(seq(20, 100, by = 10), "%"),
+    scale_y_continuous(breaks = seq(0, 100, by = 10),
+                       limits = c(0, 100),
+                       labels = paste0(seq(0, 100, by = 10), "%"),
                        expand = expansion(mult = .03, add = 0))
   
   p <- p + labs(x = "DURATION  OF\nPROTECTION  (DAYS)", y = "CLINICAL  INCIDENCE\nREDUCTION")
@@ -381,8 +381,8 @@ pred <- pred_list
                               limits = c(0.8, 1),
                               labels = paste0(seq(80, 100, by = 5), "%"),
                               expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(20, 100, by = 10),
-                       limits = c(20, 100),
+    scale_y_continuous(breaks = seq(0, 100, by = 10),
+                       limits = c(0, 100),
                        expand = expansion(mult = .03, add = 0))
   
   p <- p + labs(x = "INITIAL  EFFICACY", y = "")

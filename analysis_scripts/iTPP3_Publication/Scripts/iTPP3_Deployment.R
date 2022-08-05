@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_bloodstage_4rounds"
+exp <- "iTPP3_ChemoBlood_4rounds"
 
 # Load required libraries
 library(ggplot2)
@@ -47,7 +47,7 @@ setting_id <- 7:8
 setting[setting_id, ]
 
 # !!! Define which random seeds you want to visualise !!! Should be defined as an integer or integer vector
-seeds <- 1:10
+seeds <- 1:5
 
 # !!! Define which time steps you want to visualise !!! Should be defined as an integer vector
 timesteps <- 1:73
@@ -62,8 +62,8 @@ c(paste0("Total input EIR: ", sum(df$Average$input.EIR)), paste0("Total simulate
 
 df$Average$scenario_id <- as.factor(df$Average$scenario_id)
 df$Average$scenario_id <- recode(df$Average$scenario_id, 
-                                 "iTPP3_bloodstage_4rounds_7" = "3 MONTH",
-                                 "iTPP3_bloodstage_4rounds_8" = "5 MONTH")
+                                 "iTPP3_ChemoBlood_4rounds_7" = "3 MONTH",
+                                 "iTPP3_ChemoBlood_4rounds_8" = "5 MONTH")
 # ----------------------------------------------------------
 # Define plot settings
 # ----------------------------------------------------------
@@ -97,7 +97,7 @@ p <- p + theme(panel.border = element_blank(),
                  axis.title.x = element_text(margin = margin(t = 10)),
                  plot.title = element_text(hjust = 0.5, face = "bold"),
                  legend.title = element_text(face = "bold"),
-               legend.position = "right",
+               legend.position = "bottom",
                legend.key = element_blank()) +
   scale_colour_manual(values = c("#DC863B", "#C93312")) +
   scale_x_continuous(breaks = seq(0, 12, by = 2),
@@ -105,14 +105,14 @@ p <- p + theme(panel.border = element_blank(),
 
 # Define plot titles
 p <- p + labs(x = "MONTH",
-              y = "EIR",
-              colour = "SEASONAL\nPROFILE")
+              y = "ENTOMOLOGICAL  INNOCULATION  RATE",
+              colour = "SEASONAL  PROFILE")
 
 p
 
 # Save plot
 ggsave(filename= paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_Deployment.jpg"),
        plot = last_plot(),
-       width = 3,
-       height = 1.5,
+       width = 9.1,
+       height = 3,
        dpi = 400)

@@ -337,7 +337,7 @@ p <- p + theme(panel.border = element_blank(),
                axis.ticks = element_blank(),
                axis.title.x = element_text(margin = margin(t = 10)),
                axis.title.y = element_text(margin = margin(r = 10)),
-               plot.title = element_text(hjust = 0.5, face = "bold"),
+               plot.title = element_blank(),
                legend.position = "none") +
   scale_colour_manual(values = cols) +
   scale_fill_manual(values = cols)
@@ -350,8 +350,7 @@ p <- p + scale_x_continuous(breaks = 0:8,
                      expand = expansion(mult = .03, add = 0))
 
 p <- p + labs(x = "WEEKS  AFTER  FINAL  SMC  ROUND", 
-              y = "PROTECTIVE  EFFICACY", 
-              title = "MODEL  COMPARISON  TO  EXISTING  SMC")
+              y = "PROTECTIVE  EFFICACY")
 
 
 # ----------------------------------------------------------
@@ -375,7 +374,7 @@ q <- q + theme(panel.border = element_blank(),
                axis.ticks = element_blank(),
                axis.title.x = element_text(margin = margin(t = 10)),
                axis.title.y = element_text(margin = margin(r = 10)),
-               plot.title = element_text(hjust = 0.5, face = "bold"),
+               plot.title = element_blank(),
                legend.title = element_blank(),
                legend.position = "bottom")
 
@@ -388,14 +387,15 @@ q <- q + scale_x_continuous(breaks = seq(0, 12, by = 1),
   scale_fill_manual(values = cols[c(1, 3)])
 
 q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  ROUND",  
-              y = expression(E["max"]),
-              title = "MODELLED  RANGE  OF  PK/PD  PROFILES")
+              y = expression(E["max"]))
 
-p / q + plot_annotation(title = "B. Next-generation SMC with dominant blood stage activity") &
-  theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = 10))
+p + q + plot_annotation(title = "B. Next-generation SMC with dominant blood stage activity") +
+  plot_layout(guides = "collect") &
+  theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = 10),
+        legend.position = "none")
 
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_fig1_panelB.jpg"),
+ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig1_panelB.jpg"),
        plot = last_plot(),
-       width = 3.8,
-       height = 5,
+       width = 9.1,
+       height = 2.5,
        dpi = 400)

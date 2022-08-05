@@ -246,13 +246,31 @@ exp <- exp_list #for(exp in exp_list) {
   # ----------------------------------------------------------
     
   tab <- df %>%
+    select(-label)
+  
+  temp <- tab %>%
+    filter(parameter %in% c("Program reach [70% - 95%]", "Round coverage [70% - 95%]")) %>%
+    group_by(Seasonality, EIR, Access, Agegroup, Outcome) %>%
+    mutate(S_eff = sum(S_eff),
+           T_eff = sum(T_eff),
+           T_eff_scaled = sum(T_eff_scaled),
+           parameter = "Combined coverage")
+  
+  temp <- as.data.frame(unique(temp))
+  
+  tab$parameter <- as.character(tab$parameter)
+  
+  tab <- rbind(tab, temp)
+  
+  tab <- tab %>%
     group_by(parameter, Outcome) %>%
     summarise(max = max(S_eff), min = min(S_eff))
-    
+  
   tab$minmax <- paste0(round(tab$min*100, 0), "% to ", round(tab$max*100, 0), "%")
   names(tab) <- c("Key performance property", "Outcome", "Max", "Min", "Range of attributable outcome variation")
   write.csv(tab[, c(1, 2, 5)], file = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/tabsens_", exp, ".csv"))
-    
+  
+  
     
   # ----------------------------------------------------------
   # Generate plot - supplement figure 2.2

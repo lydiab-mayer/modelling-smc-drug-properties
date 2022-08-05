@@ -14,7 +14,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp_list <- c("iTPP3_ChemoBlood_TreatLiver_4rounds")
+exp_list <- c("iTPP3_ChemoBlood_4rounds")
 
 # !!! Insert your predicted parameters here. Note that this must match with one column name in post-processing files !!!
 pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot")
@@ -248,6 +248,23 @@ exp <- exp_list #for(exp in exp_list) {
   # ----------------------------------------------------------
     
   tab <- df %>%
+    select(-label)
+  
+  temp <- tab %>%
+    filter(parameter %in% c("Program reach [70% - 95%]", "Round coverage [70% - 95%]")) %>%
+    group_by(Seasonality, EIR, Access, Agegroup, Outcome) %>%
+    mutate(S_eff = sum(S_eff),
+           T_eff = sum(T_eff),
+           T_eff_scaled = sum(T_eff_scaled),
+           parameter = "Combined coverage")
+  
+  temp <- as.data.frame(unique(temp))
+  
+  tab$parameter <- as.character(tab$parameter)
+  
+  tab <- rbind(tab, temp)
+  
+  tab <- tab %>%
     group_by(parameter, Outcome) %>%
     summarise(max = max(S_eff), min = min(S_eff))
     

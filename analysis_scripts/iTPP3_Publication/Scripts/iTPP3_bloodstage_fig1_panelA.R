@@ -389,13 +389,16 @@ q <- q + scale_x_continuous(breaks = seq(0, 12, by = 1),
 
 q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  ROUND", 
               y = expression(E["max"]),
-              title = "MODELLED  RANGE  OF  PK/PD  PROFILES")
+              title = "MODELLED  RANGE  OF  TIME  VS.  EFFECT  PROFILES")
 
-p / q + plot_annotation(title = "A. Next-generation SMC with only blood stage activity") &
-  theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = 10))
+p + q + plot_annotation(title = "A. Next-generation SMC with blood stage activity only") +
+  plot_layout(guides = "collect") &
+  theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = 10),
+        legend.position = "none")
+  
 
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_fig1_panelA.jpg"),
+ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig1_panelA.jpg"),
        plot = last_plot(),
-       width = 3.8,
-       height = 5,
+       width = 9.1,
+       height = 2.5,
        dpi = 400)

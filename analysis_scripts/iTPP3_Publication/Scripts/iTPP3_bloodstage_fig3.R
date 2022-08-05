@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_ChemoBlood__TreatLiver_4rounds"
+exp <- "iTPP3_ChemoBlood_TreatLiver_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred <- "inc_red_int_Tot"
@@ -160,6 +160,11 @@ p <- ggplot(df_plot, aes(x = Halflife, y = MaxKillingRate, fill = target_label))
 p <- p + geom_tile()
 
 p <- p + facet_grid(Coverage2 ~ Coverage1)
+
+#p <- p + geom_rect(aes(xmin = 4.74, xmax = 8.81, ymin = 2.28, ymax = 29.96), #uncomment for blood stage only
+p <- p + geom_rect(aes(xmin = 5.12, xmax = 8.81, ymin = 2.28, ymax = 29.96),
+                   colour = "white", fill = NA) +
+  annotate(geom = "text", x = 6.9, y = 15, colour = "white", label = "SP-AQ", size = 2,family = "Times New Roman")
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),

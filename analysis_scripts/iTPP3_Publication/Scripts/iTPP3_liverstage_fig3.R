@@ -159,6 +159,10 @@ p <- p + geom_tile()
 
 p <- p + facet_grid(Coverage2 ~ Coverage1)
 
+p <- p + geom_rect(aes(xmin = 23.78, xmax = 29.83, ymin = 0.80, ymax = 1),
+                   colour = "white", fill = NA) +
+  annotate(geom = "text", x = 26.5, y = 0.9, colour = "white", label = "SP-AQ", size = 2,family = "Times New Roman")
+
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid = element_blank(),
