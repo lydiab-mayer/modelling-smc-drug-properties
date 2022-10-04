@@ -140,13 +140,14 @@ pred <- pred_list
   
   p <- ggplot(df, aes(x = Coverage1, y = mean, ymin = cl, ymax = cu)) +
     geom_ribbon(alpha = 0.3, fill = col) +
-    geom_point(colour = col)
+    geom_point(colour = col, size = 5)
   
   p <- p + theme(panel.border = element_blank(), 
-                 panel.background = element_blank(),
+                 plot.background = element_rect(fill = "#f1f2f2", colour = "#f1f2f2"),
+                 panel.background = element_rect(fill = "#f1f2f2"),
                  panel.grid.major = element_line(colour = "grey95"),
                  panel.grid.minor = element_blank(),
-                 text = element_text(family = "Times New Roman", size = 10),
+                 text = element_text(family = "Arial", size = 18),
                  strip.background = element_blank(),
                  axis.line = element_blank(),
                  axis.ticks = element_blank(),
@@ -160,10 +161,10 @@ pred <- pred_list
   p <- p + scale_x_continuous(breaks = seq(0.7, 1.0, by= 0.1),
                               limits = c(0.7, 1.0),
                               labels = paste0(seq(0.7, 1.0, by= 0.1)*100, "%"),
-                              expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(0, 100, by = 10),
+                              expand = expansion(mult = .07, add = 0)) + 
+    scale_y_continuous(breaks = seq(0, 100, by = 20),
                        limits = c(0, 100),
-                       labels = paste0(seq(0, 100, by = 10), "%"),
+                       labels = paste0(seq(0, 100, by = 20), "%"),
                        expand = expansion(mult = .03, add = 0))
   
   p <- p + labs(x = "PROGRAM  REACH", y = "CLINICAL  INCIDENCE\nREDUCTION")
@@ -217,13 +218,14 @@ pred <- pred_list
   
   p <- ggplot(df, aes(x = Coverage2, y = mean, ymin = cl, ymax = cu)) +
     geom_ribbon(alpha = 0.8, fill = col_fill) +
-    geom_point(colour = col_colour)
+    geom_point(colour = col_colour, size = 5)
   
   p <- p + theme(panel.border = element_blank(), 
-                 panel.background = element_blank(),
+                 plot.background = element_rect(fill = "#f1f2f2", colour = "#f1f2f2"),
+                 panel.background = element_rect(fill = "#f1f2f2"),
                  panel.grid.major = element_line(colour = "grey95"),
                  panel.grid.minor = element_blank(),
-                 text = element_text(family = "Times New Roman", size = 10),
+                 text = element_text(family = "Arial", size = 18),
                  strip.background = element_blank(),
                  axis.line = element_blank(),
                  axis.ticks = element_blank(),
@@ -236,8 +238,8 @@ pred <- pred_list
   
   p <- p + scale_x_continuous(breaks = seq(0.7, 1.0, by= 0.1),
                               labels = paste0(seq(0.7, 1.0, by= 0.1)*100, "%"),
-                              expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(0, 100, by = 10),
+                              expand = expansion(mult = .05, add = 0)) + 
+    scale_y_continuous(breaks = seq(0, 100, by = 20),
                        limits = c(0, 100),
                        expand = expansion(mult = .03, add = 0))
   
@@ -290,13 +292,14 @@ pred <- pred_list
   
   p <- ggplot(df, aes(x = Halflife, y = mean, ymin = cl, ymax = cu)) +
     geom_ribbon(alpha = 0.3, fill = col) +
-    geom_point(colour = col)
+    geom_point(colour = col, size = 5)
   
   p <- p + theme(panel.border = element_blank(), 
-                 panel.background = element_blank(),
+                 plot.background = element_rect(fill = "#f1f2f2", colour = "#f1f2f2"),
+                 panel.background = element_rect(fill = "#f1f2f2"),
                  panel.grid.major = element_line(colour = "grey95"),
                  panel.grid.minor = element_blank(),
-                 text = element_text(family = "Times New Roman", size = 10),
+                 text = element_text(family = "Arial", size = 18),
                  strip.background = element_blank(),
                  axis.line = element_blank(),
                  axis.ticks = element_blank(),
@@ -310,12 +313,12 @@ pred <- pred_list
   p <- p + scale_x_continuous(breaks = seq(0, 20, by = 5),
                               limits = c(0, 20),
                               expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(0, 100, by = 10),
+    scale_y_continuous(breaks = seq(0, 100, by = 20),
                        limits = c(0, 100),
-                       labels = paste0(seq(0, 100, by = 10), "%"),
+                       labels = paste0(seq(0, 100, by = 20), "%"),
                        expand = expansion(mult = .03, add = 0))
   
-  p <- p + labs(x = "ELIMINATION\nHALF-LIFE  (DAYS)", y = "CLINICAL  INCIDENCE\nREDUCTION")
+  p <- p + labs(x = "ELIMINATION  HALF-LIFE  (DAYS)", y = "CLINICAL  INCIDENCE\nREDUCTION")
   
   p_halflife <- p
   
@@ -364,13 +367,14 @@ pred <- pred_list
   
   p <- ggplot(df, aes(x = MaxKillingRate, y = mean, ymin = cl, ymax = cu)) +
     geom_ribbon(alpha = 0.3, fill = col) +
-    geom_point(colour = col)
+    geom_point(colour = col, size = 5)
   
   p <- p + theme(panel.border = element_blank(), 
-                 panel.background = element_blank(),
+                 plot.background = element_rect(fill = "#f1f2f2", colour = "#f1f2f2"),
+                 panel.background = element_rect(fill = "#f1f2f2"),
                  panel.grid.major = element_line(colour = "grey95"),
                  panel.grid.minor = element_blank(),
-                 text = element_text(family = "Times New Roman", size = 10),
+                 text = element_text(family = "Arial", size = 18),
                  strip.background = element_blank(),
                  axis.line = element_blank(),
                  axis.ticks = element_blank(),
@@ -384,11 +388,11 @@ pred <- pred_list
   p <- p + scale_x_continuous(breaks = seq(0, 30, by = 5),
                               limits = c(0, 30),
                               expand = expansion(mult = .03, add = 0)) + 
-    scale_y_continuous(breaks = seq(0, 100, by = 10),
+    scale_y_continuous(breaks = seq(0, 100, by = 20),
                        limits = c(0, 100),
                        expand = expansion(mult = .03, add = 0))
   
-  p <- p + labs(x = "Emax", y = "")
+  p <- p + labs(x = expression(E["max"]), y = "")
   
   p_maxkilling <- p
   
@@ -438,13 +442,14 @@ pred <- pred_list
   
   p <- ggplot(df, aes(x = Slope, y = mean, ymin = cl, ymax = cu)) +
     geom_ribbon(alpha = 0.3, fill = col) +
-    geom_point(colour = col)
+    geom_point(colour = col, size = 5)
   
   p <- p + theme(panel.border = element_blank(), 
-                 panel.background = element_blank(),
+                 plot.background = element_rect(fill = "#f1f2f2", colour = "#f1f2f2"),
+                 panel.background = element_rect(fill = "#f1f2f2"),
                  panel.grid.major = element_line(colour = "grey95"),
                  panel.grid.minor = element_blank(),
-                 text = element_text(family = "Times New Roman", size = 10),
+                 text = element_text(family = "Arial", size = 18),
                  strip.background = element_blank(),
                  axis.line = element_blank(),
                  axis.ticks = element_blank(),
@@ -471,16 +476,10 @@ pred <- pred_list
   # Generate final figure
   # ----------------------------------------------------------
   
-  p_out <- (p_coverage1 | p_coverage2) / (p_halflife | p_maxkilling) + plot_annotation(title = "A") & theme(plot.title = element_text(family = "Times New Roman", face = "bold"))
+  p_out <- (p_coverage1 | p_coverage2) / (p_halflife | p_maxkilling) + plot_annotation(theme = theme(plot.background = element_rect(fill = "#f1f2f2")))
   
-  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig2_panelA_", exp, ".jpg"),
+  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig2_POSTER_", exp, ".jpg"),
          plot = p_out,
-         width = 4.5,
-         height = 5,
-         dpi = 400)
-  
-  ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig2_panelA_", exp, "_execsummary.jpg"),
-         plot = p_out,
-         width = 9,
-         height = 4,
+         width = 17.4,
+         height = 6.2,
          dpi = 400)

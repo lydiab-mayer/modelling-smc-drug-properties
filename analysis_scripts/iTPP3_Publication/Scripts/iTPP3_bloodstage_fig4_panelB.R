@@ -203,7 +203,7 @@ df_plot <- df %>%
 df_plot <- df_plot %>%
   mutate(Target = paste0(Target, "%"),
          Coverage1 = as.factor(paste0(Coverage1*100, "% PROGRAM REACH")),
-         Coverage2 = as.factor(paste0(Coverage2*100, "% ROUND\nCOVERAGE")),
+         Coverage2 = as.factor(paste0(Coverage2*100, "% ROUND COVERAGE")),
          Halflife = floor(Halflife/5)*5,
          MaxKillingRate = floor(MaxKillingRate/5)*5)
 
@@ -219,7 +219,7 @@ text_size <- 10
 
 p <- ggplot(df_plot, aes(x = annual_prev, y = Target, fill = Halflife))
 
-p <- p + geom_tile(colour = "white")
+p <- p + geom_tile(colour = "white", size = 1.5)
 
 p <- p + facet_grid(Coverage2 ~ Coverage1)
 
@@ -235,7 +235,8 @@ p <- p + theme(panel.border = element_blank(),
                axis.text.y = element_text(margin = margin(r = 0)),
                legend.title = element_text(face = "bold", size = text_size),
                legend.title.align = 0.5,
-               legend.position = "bottom")
+               legend.position = "bottom",
+               legend.key = element_blank())
 
 p <- p + scale_fill_manual(values = cols[c(4, 6, 8, 12)], 
                     na.value = "light grey",
@@ -252,7 +253,7 @@ p + plot_annotation(title = "B.  MINIMUM  ELIMINATION  HALF-LIFE  CRITERIA") &
 ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig4_panelB_", exp, ".jpg"),
        plot = last_plot(),
        width = 9.1,
-       height = 4.5,
-       dpi = 400)
+       height = 6,
+       dpi = 300)
 
 

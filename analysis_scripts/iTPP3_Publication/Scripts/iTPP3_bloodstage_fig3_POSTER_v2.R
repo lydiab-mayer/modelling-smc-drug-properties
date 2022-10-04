@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_ChemoLiver_TreatLiverBlood_4rounds"
+exp <- "iTPP3_ChemoBlood_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred <- "inc_red_int_Tot"
@@ -79,9 +79,9 @@ predict.grid <- function(param.ranges, grid.ranges, ngrid, model, scale = TRUE) 
   scenarios$se <- sqrt(scenarios$sd2 + scenarios$nugs)
   scenarios$cl <- qnorm(0.05, scenarios$mean, scenarios$se)
   scenarios$cu <- qnorm(0.95, scenarios$mean, scenarios$se)
-  # 
-  # # Calculate target reduction
-  # scenarios$target <- floor(scenarios$mean / 10) * 10
+  
+  # Calculate target reduction
+  scenarios$target <- floor(scenarios$mean / 5) * 5
   
   return(scenarios)
 }
@@ -96,7 +96,7 @@ cols <- c("0%" = "#010203", "10%" = "#0f1f2f", "20%" = "#1d3d5d", "30%" = "#2957
           "100%" = "#fff4e1")
 
 # Define legend titles
-leg_title <- c("inc_red_int_Tot" = "CLINICAL\nINCIDENCE\nREDUCTION",
+leg_title <- c("inc_red_int_Tot" = "CLINICAL INCIDENCE REDUCTION",
                "sev_red_int_Tot" = "SEVERE\nDISEASE\nREDUCTION",
                "prev_red_int_Aug" = "PREVALENCE\nREDUCTION",
                "mor_red_int_Tot" = "MORTALITY\nREDUCTION")
@@ -109,11 +109,12 @@ leg_title <- c("inc_red_int_Tot" = "CLINICAL\nINCIDENCE\nREDUCTION",
 # ----------------------------------------------------------
 
 # Generate grid of predictions
-ngrid <- c(3, 3, 51, 21)
+ngrid <- c(3, 3, 20, 29, 1)
 grid_ranges_cont <- rbind(Coverage1 = c(0.75, 0.95),
                           Coverage2 = c(0.75, 0.95),
-                          Halflife = c(10, 60),
-                          Efficacy = c(0.8, 1))
+                          Halflife = c(1, 20),
+                          MaxKillingRate = c(2, 30),
+                          Slope = c(6, 6))
 
 df <- data.frame()
 
@@ -131,7 +132,7 @@ for (j in setting_id[index]) {
   
   temp <- temp %>%
     separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
+             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Outcome", "temp1", "temp2", "temp3"),
              sep = "_",
              remove = FALSE)
   
@@ -145,6 +146,9 @@ df$Coverage1 <- factor(paste0(df$Coverage1*100, "% PROGRAM REACH"),
 df$Coverage2 <- factor(paste0(df$Coverage2*100, "% ROUND COVERAGE"),
                        levels = c("95% ROUND COVERAGE", "85% ROUND COVERAGE", "75% ROUND COVERAGE"))
 
+# For poster, show only 95% round coverage
+df <- df[df$Coverage2 == "95% ROUND COVERAGE", ]
+
 # Set target reduction bands
 df$target <- round(df$mean / 10, 0)*10 #floor(round(df$mean, 0) / 10) * 10
 df$target[df$target < 0] <- 0
@@ -154,19 +158,21 @@ df$target_label <- factor(paste0(df$target, "%"), levels = rev(paste0(unique(df$
 df_plot <- df[df$EIR == 8, ]
 df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
 
-p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
+p <- ggplot(df_plot, aes(x = Halflife, y = MaxKillingRate, fill = target_label))
 
 p <- p + geom_tile()
 
-p <- p + facet_grid(Coverage2 ~ Coverage1)
+p <- p + facet_grid(. ~ Coverage1)
 
-p <- p + geom_rect(aes(xmin = 23.78, xmax = 29.83, ymin = 0.80, ymax = 1), colour = "white", fill = NA, size = 0.7) +
-  annotate(geom = "label", x = 26.5, y = 0.9, fill = "white", label = "SP-AQ", size = 2.5, label.size = 0, family = "Times New Roman")
+p <- p + geom_rect(aes(xmin = 4.74, xmax = 8.81, ymin = 2.28, ymax = 29.96), colour = "white", fill = NA, size = 0.7) + #uncomment for blood stage only
+#p <- p + geom_rect(aes(xmin = 5.12, xmax = 8.81, ymin = 2.28, ymax = 29.96), colour = "white", fill = NA, size = 0.7) + #uncomment for dominant blood stage
+  annotate(geom = "label", x = 6.9, y = 15, fill = "white", label = "SP-AQ", size = 5, label.size = 0, family = "Arial")
 
 p <- p + theme(panel.border = element_blank(), 
-               panel.background = element_blank(),
+               plot.background = element_rect(fill = "#f1f2f2", colour = "#f1f2f2"),
+               panel.background = element_rect(fill = "#f1f2f2"),
                panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = 10),
+               text = element_text(family = "Arial", size = 24),
                strip.background = element_blank(),
                axis.line = element_blank(),
                axis.ticks = element_blank(),
@@ -175,31 +181,23 @@ p <- p + theme(panel.border = element_blank(),
                axis.title.x = element_text(margin = margin(t = 10)),
                axis.title.y = element_text(margin = margin(r = 10)),
                plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.title = element_text(face = "bold"),
+               legend.background = element_rect(fill = "#f1f2f2"),
+         #      legend.title = element_text(face = "bold"),
                legend.position = "bottom")
 
 p <- p + scale_fill_manual(values = rev(df_cols)) +
-  scale_x_continuous(breaks = seq(10, 60, 10)) + 
-  scale_y_continuous(breaks = seq(0.8, 1, 0.05),
-                     labels = paste0(seq(80, 100, 5), "%"))
+  scale_x_continuous(breaks = seq(2, 20, 4)) + 
+  scale_y_continuous(breaks = seq(0, 30, 10))
 
-p <- p + labs(x = "DURATION  OF  PROTECTION  HALF-LIFE  (DAYS)",
-              y = "INITIAL  EFFICACY")
+p <- p + labs(x = "ELIMINATION  HALF-LIFE  (DAYS)",
+              y = expression(E["max"]))
 
 p <- p + guides(fill = guide_legend(title = leg_title[pred], nrow = 1, reverse = TRUE))
 
 p
 
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig3_", exp, ".jpg"),
+ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig3_POSTER", exp, ".jpg"),
        plot = last_plot(),
-       width = 9.1,
-       height = 7,
-       dpi = 300)
-
-
-# Identify point predictions reported in main body of paper
-
-df_point <- df_plot[df_plot$Halflife == 30 & df_plot$Efficacy == 0.9, ]
-df_point[df_point$Coverage1 == "85% PROGRAM REACH" & df_point$Coverage2 == "85% ROUND COVERAGE", ]
-df_point[df_point$Coverage1 == "95% PROGRAM REACH" & df_point$Coverage2 == "85% ROUND COVERAGE", ]
-
+       width = 17.7,
+       height = 4.5,
+       dpi = 400)

@@ -389,7 +389,7 @@ q <- q + scale_x_continuous(breaks = seq(0, 12, by = 1),
   scale_fill_manual(values = cols[c(1, 3)])
 
 q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  ROUND",  
-              y = expression(E["max"]))
+              y = "KILLING  RATE")
 
 p + q + plot_annotation(title = "Next-generation SMC with dominant blood stage activity") +
   plot_layout(guides = "collect") &

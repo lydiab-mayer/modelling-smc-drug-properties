@@ -223,7 +223,7 @@ df_plot <- df_plot %>%
 
 p <- ggplot(df_plot, aes(x = annual_prev, y = Target, fill = CoverageAllRounds))
 
-p <- p + geom_tile(colour = "white")
+p <- p + geom_tile(colour = "white", size = 1.5)
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -235,14 +235,15 @@ p <- p + theme(panel.border = element_blank(),
                axis.text.y = element_text(margin = margin(r = 0)),
                legend.title = element_text(face = "bold", size = text_size),
                legend.title.align = 0.5,
-               legend.position = "bottom")
+               legend.position = "bottom",
+               legend.key = element_blank())
 
 p <- p + scale_fill_manual(values = cols[c(1, 2, 4, 6, 7, 8, 10, 12)],
                            na.value = "light grey",
                            labels = c(unique(df_plot$CoverageAllRounds)[1:(length(unique(df_plot$CoverageAllRounds)) - 1)], "Target not met in\nparameter space")) +
   scale_y_discrete(labels = c("50%", "", "60%", "", "70%", "", "80%", "", "90%"))
 
-p <- p + labs(y = "TARGET\nREDUCTION", x = expression(paste("BASELINE ANNUAL ", italic("Pf"), "PR"["2-10"]))) +
+p <- p + labs(y = "TARGET  REDUCTION", x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "PR"["2-10"]))) +
   guides(fill = guide_legend(title.position = "top", title.hjust = 0.5, title = "COVERAGE  OF  ALL  SMC  ROUNDS", nrow = 2))
 
 
@@ -250,7 +251,7 @@ p <- p + labs(y = "TARGET\nREDUCTION", x = expression(paste("BASELINE ANNUAL ", 
 
 q <- ggplot(df_plot, aes(x = annual_prev, y = Target, fill = CoverageOneRound))
 
-q <- q + geom_tile(colour = "white")
+q <- q + geom_tile(colour = "white", size = 1.5)
 
 q <- q + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -262,14 +263,15 @@ q <- q + theme(panel.border = element_blank(),
                axis.text.y = element_text(margin = margin(r = 0)),
                legend.title = element_text(face = "bold", size = text_size),
                legend.title.align = 0.5,
-               legend.position = "bottom")
+               legend.position = "bottom",
+               legend.key = element_blank())
 
 q <- q + scale_fill_manual(values = cols[c(1, 2, 4, 6, 8, 12)],
                            na.value = "light grey",
                            labels = c(unique(df_plot$CoverageOneRound)[1:(length(unique(df_plot$CoverageOneRound)) - 1)], "Target not met in\nparameter space")) +
   scale_y_discrete(labels = c("50%", "", "60%", "", "70%", "", "80%", "", "90%"))
 
-q <- q + labs(y = "", x = expression(paste("BASELINE ANNUAL ", italic("Pf"), "PR"["2-10"]))) +
+q <- q + labs(y = "", x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "PR"["2-10"]))) +
   guides(fill = guide_legend(title.position = "top", title.hjust = 0.5, title = "COVERAGE OF AT LEAST ONE SMC ROUND", nrow = 2))
 
 # Arrange figure panels
@@ -280,5 +282,5 @@ p + q + plot_annotation(title = "A.  MINIMUM  COVERAGE  CRITERIA") &
 ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig4_panelA_", exp, ".jpg"),
        plot = last_plot(),
        width = 9.1,
-       height = 3,
-       dpi = 400)
+       height = 4,
+       dpi = 300)

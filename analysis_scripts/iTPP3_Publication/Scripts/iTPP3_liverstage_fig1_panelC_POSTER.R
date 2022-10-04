@@ -16,7 +16,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_ChemoBlood_TreatLiver_replication"
+exp <- "iTPP3_ChemoLiver_TreatLiverBlood_replication"
 
 # Load required libraries
 library(ggplot2)
@@ -59,16 +59,16 @@ for (i in setting) {
 # ----------------------------------------------------------
 
 # Index so that outputs for intervention/control groups for a given experiment are consecutive
-df <- df[order(df$EIR, df$IC50, df$Halflife, df$MaxKillingRate, df$Slope, df$seed), ]
+df <- df[order(df$EIR, df$Halflife, df$Efficacy, df$seed), ]
 
 # Calculate pe between consecutive rows
 df <- df %>%
-  group_by(EIR, IC50, Halflife, MaxKillingRate, Slope, seed) %>%
+  group_by(EIR, Halflife, Efficacy, seed) %>%
   summarise(across(contains("cpp"), ~ 1 - tail(.x, 1)/head(.x, 1), .names = "pe_{col}"))
 
 # Aggregate over seeds
 df <- df %>%
-  group_by(EIR, IC50, Halflife, MaxKillingRate, Slope) %>%
+  group_by(EIR, Halflife, Efficacy) %>%
   summarise(across(contains("cpp"), mean))
 
 # Set pe to zero if < 0
@@ -91,7 +91,7 @@ zongo <- read.csv("./analysisworkflow/analysis_scripts/iTPP3_Publication/zongo_d
 # Add dummy columns to match columns in simulation database
 df$linetype <- "mean"
 df$drug <- "Next-gen SMC"
-zongo$EIR <- zongo$IC50 <- zongo$Halflife <- zongo$MaxKillingRate <- zongo$Slope <- 0
+zongo$EIR <- zongo$Halflife <- zongo$Efficacy <- 0
 
 
 # ----------------------------------------------------------
@@ -111,7 +111,7 @@ RSS <- function(x, y) {
 df$RSS <- NULL
 
 for (i in 1:nrow(df)) {
-  df[i, "RSS"] <- RSS(SPAQ, as.numeric(df[i, 6:17]))
+  df[i, "RSS"] <- RSS(SPAQ, as.numeric(df[i, 4:15]))
 }
 
 # Calculate cutoff for 'close' to SP-AQ
@@ -125,10 +125,8 @@ nextgen <- df %>%
   group_by() %>%
   summarise(Halflife_max = max(Halflife),
             Halflife_min = min(Halflife),
-            MaxKillingRate_max = max(MaxKillingRate),
-            MaxKillingRate_min = min(MaxKillingRate),
-            Slope_max = max(Slope),
-            Slope_min = min(Slope))
+            Efficacy_max = max(Efficacy),
+            Efficacy_min = min(Efficacy))
 
 # Format resulting dataframe
 nextgen <- as.data.frame(t(nextgen))
@@ -157,7 +155,7 @@ df <- as.data.frame(df)
 # Merge with zongo trial data
 df_plot_pe <- df %>% select(-RSS)
 df_plot_pe <- rbind(zongo, df_plot_pe)
-df_plot_pe <- pivot_wider(df_plot_pe, id_cols = c(drug, x, Slope, MaxKillingRate, Halflife, IC50, EIR), names_from = linetype, values_from = y)
+df_plot_pe <- pivot_wider(df_plot_pe, id_cols = c(drug, x, Efficacy, Halflife, EIR), names_from = linetype, values_from = y)
 df_plot_pe$drug <- factor(df_plot_pe$drug, levels = c("SP-AQ", "DHA-PPQ", "Next-gen SMC"))
 
 # Add column for weeks
@@ -174,86 +172,26 @@ df_plot_pe$weeks <- round(df_plot_pe$x*5/7, 1)
 # ----------------------------------------------------------
 
 # Define model PK/PD components
-PK <- function(t, C_0, halflife) {
-  # t = time
-  # C_0 = concentration at time 0
-  # halflife = Time t at which half the initial concentration remains
-  
-  C_0 * exp(-(log(2)/halflife)*t)
+decay <- function(t, halflife, efficacy) {
+  efficacy * exp( -(t/halflife)^5.4 * log(2) )
 }
-
-PD <- function(C, Emax, IC50, n) {
-  # C = Initial concentration
-  # Emax = Maximum parasite killing rate
-  # IC50 = Drug concentration at which half the maximum killing rate is achieved
-  # n = slope
-  
-  Emax * C^n / (C^n + IC50^n)
-}
-
-# Define fixed parameter values
-dose <- 18 # dose in mg/kg
-weight <- 20 # weight of child receiving drug in kg - set for demonstration purposes
-vol <- 173 # volume of distribution in l/kg
-C_0 <- (dose*weight) / (vol*weight)
-IC50 <- 0.020831339
 
 
 # ----------------------------------------------------------
 # Generate complete database of PK/PD profiles
 # ----------------------------------------------------------
 
-# Create grid of scenarios
-
-ngrid <- c(4, 8, 8)
-grid_ranges_cont <- rbind(Halflife = c(1, 20),
-                          MaxKillingRate = c(2, 30),
-                          Slope = c(1, 8))
-
-D <- nrow(grid_ranges_cont)
-grid_ranges <- t(grid_ranges_cont)
-scenarios <- list()
-
-for (i in 1:D) {
-  scenarios[[i]] <- seq(grid_ranges[1, i], grid_ranges[2, i], length.out = ngrid[i])
-}
-
-scenarios <- expand.grid(scenarios)
-names(scenarios) <- rownames(grid_ranges_cont)
-head(scenarios)
-
-
-# Generate PK/PD values for each scenario
-
-df_PKPD <- data.frame()
-
-for(i in 1:nrow(scenarios)) {
-  temp <- data.frame("Halflife" = scenarios[i, "Halflife"],
-                     "MaxKillingRate" = scenarios[i, "MaxKillingRate"],
-                     "Slope" = scenarios[i, "Slope"],
-                     "t" = 0:90)
-  temp$PK <- PK(temp$t, C_0 = C_0, halflife = scenarios[i, "Halflife"])
-  temp$PD <- PD(temp$PK, Emax = scenarios[i, "MaxKillingRate"], IC50 = IC50, n = scenarios[i, "Slope"])
-  
-  df_PKPD <- rbind(df_PKPD, temp)  
-}
-
-# Calculate max and min concentration and effect across all scenarios
-
-df_PKPD <- df_PKPD %>%
-  group_by(t) %>%
-  summarise(PK_max = max(PK),
-            PK_min = min(PK),
-            PD_max = max(PD),
-            PD_min = min(PD))
-
+df_PKPD <- data.frame("t" = 0:90)
+df_PKPD$max <- decay(df_PKPD$t, 60, 1)
+df_PKPD$min <- decay(df_PKPD$t, 10, 0.8)
 df_PKPD$drug <- "NEXT-GENERATION SMC"
 
 
 # ----------------------------------------------------------
-# Generate PK/PD profiles for SP_AQ
+# Generate database of PK/PD profiles that replicate Zongo et al trial results
 # ----------------------------------------------------------
 
+# Generate PK/PD profiles for SP-AQ
 df_SPAQ <- data.frame()
 
 for(i in c("min", "max")) {
@@ -261,43 +199,18 @@ for(i in c("min", "max")) {
                      "id" = i,
                      "drug" = "SP-AQ")
   
-  temp$PK <- PK(temp$t, 
-                C_0 = C_0, 
-                halflife = nextgen[nextgen$parameter == "Halflife", i])
-  
-  temp$PD <- PD(temp$PK, 
-                Emax = nextgen[nextgen$parameter == "MaxKillingRate", i], 
-                IC50 = IC50, 
-                n = nextgen[nextgen$parameter == "Slope", i])
-  
-  df_SPAQ <- rbind(df_SPAQ, temp)  
-}
+  temp$decay <- decay(t = temp$t, 
+                      halflife = nextgen[nextgen$parameter == "Halflife", i],
+                      efficacy = nextgen[nextgen$parameter == "Efficacy", i])
 
-
-df_SPAQ <- data.frame()
-
-for(i in c("min", "max")) {
-  temp <- data.frame("t" = 0:90, 
-                     "id" = i,
-                     "drug" = "SP-AQ")
-  
-  temp$PK <- PK(temp$t, 
-                C_0 = C_0, 
-                halflife = nextgen[nextgen$parameter == "Halflife", i])
-  
-  temp$PD <- PD(temp$PK, 
-                Emax = nextgen[nextgen$parameter == "MaxKillingRate", i], 
-                IC50 = IC50, 
-                n = nextgen[nextgen$parameter == "Slope", i])
-  
   df_SPAQ <- rbind(df_SPAQ, temp)  
 }
 
 # Combine into data frame for plotting
 df_SPAQ <- df_SPAQ %>%
   pivot_wider(id_cols = c(id, drug, t),
-              names_from = c(id),
-              values_from = c(PK, PD))
+              names_from = id,
+              values_from = decay)
 
 df_plot_PKPD <- rbind(df_PKPD, df_SPAQ)
 df_plot_PKPD$drug <- factor(df_plot_PKPD$drug, levels = c("SP-AQ", "NEXT-GENERATION SMC"))
@@ -315,11 +228,11 @@ df_plot_PKPD$week <- df_plot_PKPD$t / 7
 # ----------------------------------------------------------
 
 p <- ggplot(data = df_plot_pe[df_plot_pe$drug == "Next-gen SMC", ],
-            aes(x = weeks, y = mean, group = interaction(Halflife, drug))) +
+            aes(x = weeks, y = mean, group = interaction(Halflife, Efficacy, drug))) +
   geom_line(colour = "#899DA4", linetype = "solid", alpha = 0.4, size = 0.2) 
 
 p <- p + geom_line(data = df[df$RSS <= cutoff, ], 
-                   aes(x = weeks, y = y, group = interaction(Halflife, drug)),
+                   aes(x = weeks, y = y, group = interaction(Halflife, Efficacy, drug)),
                    colour = cols[1], alpha = 0.8, size = 0.2, linetype = "dashed")
 #p <- p + geom_ribbon(data = df_plot_pe[df_plot_pe$drug %in% c("SP-AQ"), ],
 #                     aes(ymin = cl, ymax = cu, fill = drug, colour = drug), 
@@ -329,9 +242,7 @@ p <- p + geom_line(data = df_plot_pe[df_plot_pe$drug %in% c("SP-AQ"), ],
                    aes(x = weeks, y = mean), colour = "#781e0b", size = 1)
 
 p <- p + theme(panel.border = element_blank(), 
-               plot.background = element_rect(fill = "#f1f2f2", colour = "#f1f2f2"),
-               panel.background = element_rect(fill = "#f1f2f2"),
-               panel.grid.major = element_line(colour = "grey95"),
+               panel.background = element_blank(),
                panel.grid = element_blank(),
                text = element_text(family = "Arial", size = 18),
                strip.background = element_blank(),
@@ -339,10 +250,11 @@ p <- p + theme(panel.border = element_blank(),
                axis.ticks = element_blank(),
                axis.title.x = element_text(margin = margin(t = 10)),
                axis.title.y = element_text(margin = margin(r = 10)),
-               plot.title = element_text(hjust = 0.5),
+               plot.title = element_blank(),
                legend.position = "none") +
   scale_colour_manual(values = cols) +
   scale_fill_manual(values = cols)
+
 p <- p + scale_x_continuous(breaks = 0:8,
                             expand = expansion(mult = .03, add = 0),
                             limits = c(0, 8)) +
@@ -353,15 +265,16 @@ p <- p + scale_x_continuous(breaks = 0:8,
 p <- p + labs(x = "WEEKS  AFTER  FINAL  SMC  ROUND", 
               y = "PROTECTIVE\nEFFICACY")
 
+p
+
 
 # ----------------------------------------------------------
 # Plot PK/PD profiles
 # ----------------------------------------------------------
 
-
-q <- ggplot(df_plot_PKPD, aes(x = week, ymin = PD_min, ymax = PD_max, fill = drug, colour = drug)) +
+q <- ggplot(df_plot_PKPD, aes(x = week, ymin = min, ymax = max, fill = drug, colour = drug)) +
   geom_ribbon(alpha = 0.4)
-# q <- ggplot(df_plot[df_plot$drug == "NEXT-GENERATION SMC", ], aes(x = t, ymin = PD_min, ymax = PD_max)) +
+# q <- ggplot(df_plot[df_plot$drug == "NEXT-GENERATION SMC", ], aes(x = t, ymin = min, ymax = max)) +
 #   geom_ribbon(alpha = 0.4, fill = cols[3], colour = cols[3]) +
 #   geom_ribbon(data = df_plot[df_plot$drug == "SP-AQ", ], alpha = 0.5, fill = cols[1], colour = cols[1])
 
@@ -383,20 +296,23 @@ q <- q + theme(panel.border = element_blank(),
 q <- q + scale_x_continuous(breaks = seq(0, 12, by = 1),
                             limits = c(0, 8),
                             expand = expansion(mult = .03, add = 0)) +
-  scale_y_continuous(breaks = seq(0, 30, by = 10),
+  scale_y_continuous(breaks = seq(0, 1, by = 0.2),
+                     labels = paste0(seq(0, 100, by = 20), "%"),
                      expand = expansion(mult = .03, add = 0)) +
   scale_colour_manual(values = cols[c(1, 3)]) +
   scale_fill_manual(values = cols[c(1, 3)])
-
+  
 q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  ROUND",  
-              y = expression(E["max"]))
+              y = "INIT. EFFICACY")
 
-p + q + plot_annotation(title = "Next-generation SMC with dominant blood stage activity") +
+q
+
+p + q + plot_annotation(title = "Next-generation SMC with dominant liver stage activity") +
   plot_layout(guides = "collect") &
   theme(plot.title = element_text(family = "Arial", size = 18),
         legend.position = "none", plot.background = element_rect(fill = "#f1f2f2"))
 
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig1_panelB_POSTER.jpg"),
+ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig1_panelC_POSTER.svg"),
        plot = last_plot(),
        width = 13.25,
        height = 2.7,

@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_ChemoBlood_TreatLiver_4rounds"
+exp <- "iTPP3_ChemoBlood_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred <- "inc_red_int_Tot"
@@ -147,7 +147,7 @@ df$Coverage2 <- factor(paste0(df$Coverage2*100, "% ROUND COVERAGE"),
                        levels = c("95% ROUND COVERAGE", "85% ROUND COVERAGE", "75% ROUND COVERAGE"))
 
 # Set target reduction bands
-df$target <- floor(round(df$mean, 0) / 10) * 10
+df$target <- round(df$mean / 10, 0)*10 #floor(round(df$mean, 0) / 10) * 10
 df$target[df$target < 0] <- 0
 df$target_label <- factor(paste0(df$target, "%"), levels = rev(paste0(unique(df$target)[order(unique(df$target))], "%")))
 
@@ -161,10 +161,9 @@ p <- p + geom_tile()
 
 p <- p + facet_grid(Coverage2 ~ Coverage1)
 
-#p <- p + geom_rect(aes(xmin = 4.74, xmax = 8.81, ymin = 2.28, ymax = 29.96), #uncomment for blood stage only
-p <- p + geom_rect(aes(xmin = 5.12, xmax = 8.81, ymin = 2.28, ymax = 29.96),
-                   colour = "white", fill = NA) +
-  annotate(geom = "text", x = 6.9, y = 15, colour = "white", label = "SP-AQ", size = 2,family = "Times New Roman")
+p <- p + geom_rect(aes(xmin = 4.74, xmax = 8.81, ymin = 2.28, ymax = 29.96), colour = "white", fill = NA, size = 0.7) + #uncomment for blood stage only
+#p <- p + geom_rect(aes(xmin = 5.12, xmax = 8.81, ymin = 2.28, ymax = 29.96), colour = "white", fill = NA, size = 0.7) + #uncomment for dominant blood stage
+  annotate(geom = "label", x = 6.9, y = 15, fill = "white", label = "SP-AQ", size = 2.5, label.size = 0, family = "Times New Roman")
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -178,7 +177,8 @@ p <- p + theme(panel.border = element_blank(),
                axis.title.x = element_text(margin = margin(t = 10)),
                axis.title.y = element_text(margin = margin(r = 10)),
                plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.title = element_text(face = "bold"))
+               legend.title = element_text(face = "bold"),
+               legend.position = "bottom")
 
 p <- p + scale_fill_manual(values = rev(df_cols)) +
   scale_x_continuous(breaks = seq(2, 20, 2)) + 
@@ -187,14 +187,14 @@ p <- p + scale_fill_manual(values = rev(df_cols)) +
 p <- p + labs(x = "ELIMINATION  HALF-LIFE  (DAYS)",
               y = "Emax")
 
-p <- p + guides(fill = guide_legend(title = leg_title[pred]))
+p <- p + guides(fill = guide_legend(title = leg_title[pred], nrow = 1, reverse = TRUE))
 
 p
 
 ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig3_", exp, ".jpg"),
        plot = last_plot(),
        width = 9.1,
-       height = 5,
+       height = 7,
        dpi = 300)
 
 

@@ -16,7 +16,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_ChemoBlood_TreatLiver_replication"
+exp <- "iTPP3_ChemoBlood_replication"
 
 # Load required libraries
 library(ggplot2)
@@ -343,6 +343,7 @@ p <- p + theme(panel.border = element_blank(),
                legend.position = "none") +
   scale_colour_manual(values = cols) +
   scale_fill_manual(values = cols)
+
 p <- p + scale_x_continuous(breaks = 0:8,
                             expand = expansion(mult = .03, add = 0),
                             limits = c(0, 8)) +
@@ -351,7 +352,8 @@ p <- p + scale_x_continuous(breaks = 0:8,
                      expand = expansion(mult = .03, add = 0))
 
 p <- p + labs(x = "WEEKS  AFTER  FINAL  SMC  ROUND", 
-              y = "PROTECTIVE\nEFFICACY")
+              y = "PROTECTIVE\nEFFICACY", 
+              title = "COMPARISON  TO  EXISTING  SMC")
 
 
 # ----------------------------------------------------------
@@ -388,16 +390,17 @@ q <- q + scale_x_continuous(breaks = seq(0, 12, by = 1),
   scale_colour_manual(values = cols[c(1, 3)]) +
   scale_fill_manual(values = cols[c(1, 3)])
 
-q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  ROUND",  
-              y = expression(E["max"]))
+q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  ROUND", 
+              y = "KILLING  RATE",
+              title = "RANGE  OF  TIME  VS.  EFFECT  PROFILES")
 
-p + q + plot_annotation(title = "Next-generation SMC with dominant blood stage activity") +
+p + q + plot_annotation(title = "Next-generation SMC with blood stage activity only") +
   plot_layout(guides = "collect") &
   theme(plot.title = element_text(family = "Arial", size = 18),
         legend.position = "none", plot.background = element_rect(fill = "#f1f2f2"))
 
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig1_panelB_POSTER.jpg"),
+ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig1_panelA_POSTER.jpg"),
        plot = last_plot(),
        width = 13.25,
-       height = 2.7,
+       height = 3,
        dpi = 400)
