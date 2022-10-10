@@ -7,6 +7,9 @@ This workflow builds on the workflow presented in Golumbeanu (2021) and Burgert 
 
 ## Folders / Workflow Steps
 
+### 0_scenarios
+- Contains XML scenarios and associated scripts used to simulate data
+
 ### 1_OM_basic_workflow
 - Generates paramater table and XML scenarios from base scaffold.xml
 - Launches OM simulations with 2 outputs
