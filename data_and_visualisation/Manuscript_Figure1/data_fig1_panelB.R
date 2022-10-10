@@ -19,7 +19,6 @@ rm(list = ls())
 exp <- "iTPP3_ChemoBlood_TreatLiver_replication"
 
 # Load required libraries
-library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(patchwork)
@@ -29,10 +28,7 @@ user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1
 GROUP_dr <- "/scicore/home/penny/GROUP/M3TPP/"
 
 # Set working directory
-setwd(paste0("/scicore/home/penny/",user,"/M3TPP"))
-
-# Define colours
-cols <- c("#C93312", "#1B4D79", "#899DA4", "#DC863B")
+setwd(paste0("/scicore/home/penny/",user,"/M3TPP/SMC_TPP"))
 
 
 ##############################
@@ -86,7 +82,7 @@ df[df <= 0] <- 0
 # ----------------------------------------------------------
 
 # Import protective efficacy profile from Zongo et al. 2015
-zongo <- read.csv("./analysisworkflow/analysis_scripts/iTPP3_Publication/zongo_data_extraction.csv", sep = ";", as.is = TRUE)
+zongo <- read.csv("./data_and_visualisation/Manuscript_Figure1/zongo_data_extraction.csv", sep = ";", as.is = TRUE)
 
 # Add dummy columns to match columns in simulation database
 df$linetype <- "mean"
@@ -140,7 +136,7 @@ nextgen <- nextgen %>%
   as.data.frame()
 
 # Save results
-write.csv(nextgen, paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/", exp, "_zongo_best_fit.csv"))
+write.csv(nextgen, paste0("./data_and_visualisation/Manuscript_Figure1/table2_modelB.csv"))
 
 
 # ----------------------------------------------------------
@@ -306,9 +302,37 @@ df_plot_PKPD$drug <- factor(df_plot_PKPD$drug, levels = c("SP-AQ", "NEXT-GENERAT
 df_plot_PKPD$week <- df_plot_PKPD$t / 7
 
 
+######################
+# WRITE DATA TO FILE #
+######################
+
+data <- list("df" = df,
+             "df_plot_pe" = df_plot_pe,
+             "df_plot_PKPD" = df_plot_PKPD,
+             "cutoff" = cutoff)
+saveRDS(data, file = "data_and_visualisation/Manuscript_Figure1/data_fig1_panelB.rds")
+
+
 ##################
 # GENERATE PLOTS #
 ##################
+
+# ----------------------------------------------------------
+# Set up
+# ----------------------------------------------------------
+
+# Load required packages
+require(ggplot2)
+
+# Read data
+data <- readRDS("data_and_visualisation/Manuscript_Figure1/data_fig1_panelB.rds")
+df <- data[["df"]]
+df_plot_pe <- data[["df_plot_pe"]]
+df_plot_PKPD <- data[["df_plot_PKPD"]]
+cutoff <- data[["cutoff"]]
+
+# Define plot settings
+cols <- c("#C93312", "#1B4D79", "#899DA4", "#DC863B")
 
 # ----------------------------------------------------------
 # Plot trial validation
@@ -396,8 +420,8 @@ p + q + plot_annotation(title = "Next-generation SMC with dominant blood stage a
   theme(plot.title = element_text(family = "Arial", size = 18),
         legend.position = "none", plot.background = element_rect(fill = "#f1f2f2"))
 
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig1_panelB_POSTER.jpg"),
+ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure1/fig1_panelB.jpg"),
        plot = last_plot(),
-       width = 13.25,
-       height = 2.7,
+       width = 9.1,
+       height = 2.5,
        dpi = 400)

@@ -19,15 +19,13 @@ exp <- "iTPP3_ChemoBlood_4rounds"
 pred <- "inc_red_int_Tot"
 
 library(hetGP)
-library(ggplot2)
 library(tidyr)
 library(dplyr)
 library(scales)
-library(patchwork)
 
 user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
 GROUP_dr <- "/scicore/home/penny/GROUP/M3TPP/"
-setwd(paste0("/scicore/home/penny/", user, "/M3TPP/"))
+setwd(paste0("/scicore/home/penny/", user, "/M3TPP/SMC_TPP/"))
 
 load(paste0(GROUP_dr, exp, "/param_ranges.RData"))
 param_ranges_cont
@@ -86,26 +84,9 @@ predict.grid <- function(param.ranges, grid.ranges, ngrid, model, scale = TRUE) 
   return(scenarios)
 }
 
-# Define plot colours
-# cols <- c("0%" = "#010203", "5%" = "#0f1f2f", "10%" = "#152c43", "15%" = "#1d3d5d", "20%" = "#295784",
-#           "25%" = "#3e6897", "30%" = "#537bac", "35%" = "#938998", "40%" = "#a6899a", "45%" = "#b98a93",
-#           "50%" = "#c78d85", "55%" = "#ca9574", "60%" = "#f9a24b", "65%" = "#fab464", "70%" = "#fac67c",
-#           "75%" = "#fad694", "80%" = "#fcdfaa", "85%" = "#fee8c0", "90%" = "#fff4e1")
-cols <- c("0%" = "#010203", "10%" = "#0f1f2f", "20%" = "#1d3d5d", "30%" = "#295784", "40%" = "#537bac",
-          "50%" = "#938998", "60%" = "#ca9574", "70%" = "#f9a24b", "80%" = "#fad694", "90%" = "#fee8c0",
-          "100%" = "#fff4e1")
-
-# Define legend titles
-leg_title <- c("inc_red_int_Tot" = "CLINICAL\nINCIDENCE\nREDUCTION",
-               "sev_red_int_Tot" = "SEVERE\nDISEASE\nREDUCTION",
-               "prev_red_int_Aug" = "PREVALENCE\nREDUCTION",
-               "mor_red_int_Tot" = "MORTALITY\nREDUCTION")
-
-
-
 
 # ----------------------------------------------------------
-# Generate figure 3
+# Generate data
 # ----------------------------------------------------------
 
 # Generate grid of predictions
@@ -146,58 +127,15 @@ df$Coverage1 <- factor(paste0(df$Coverage1*100, "% PROGRAM REACH"),
 df$Coverage2 <- factor(paste0(df$Coverage2*100, "% ROUND COVERAGE"),
                        levels = c("95% ROUND COVERAGE", "85% ROUND COVERAGE", "75% ROUND COVERAGE"))
 
-# For poster, show only 95% round coverage
-df <- df[df$Coverage2 == "95% ROUND COVERAGE", ]
-
 # Set target reduction bands
-df$target <- round(df$mean / 10, 0)*10 #floor(round(df$mean, 0) / 10) * 10
+df$target <- round(df$mean / 10, 0)*10
 df$target[df$target < 0] <- 0
 df$target_label <- factor(paste0(df$target, "%"), levels = rev(paste0(unique(df$target)[order(unique(df$target))], "%")))
 
-# Generate plot
-df_plot <- df[df$EIR == 8, ]
-df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
 
-p <- ggplot(df_plot, aes(x = Halflife, y = MaxKillingRate, fill = target_label))
+# ----------------------------------------------------------
+# Write data to file
+# ----------------------------------------------------------
 
-p <- p + geom_tile()
+saveRDS(df, "./data_and_visualisation/Manuscript_Figure3/data_fig3.rds")
 
-p <- p + facet_grid(. ~ Coverage1)
-
-p <- p + geom_rect(aes(xmin = 4.74, xmax = 8.81, ymin = 2.28, ymax = 29.96), colour = "white", fill = NA, size = 0.7) + #uncomment for blood stage only
-#p <- p + geom_rect(aes(xmin = 5.12, xmax = 8.81, ymin = 2.28, ymax = 29.96), colour = "white", fill = NA, size = 0.7) + #uncomment for dominant blood stage
-  annotate(geom = "label", x = 6.9, y = 15, fill = "white", label = "SP-AQ", size = 5, label.size = 0, family = "Arial")
-
-p <- p + theme(panel.border = element_blank(), 
-               plot.background = element_rect(fill = "#f1f2f2", colour = "#f1f2f2"),
-               panel.background = element_rect(fill = "#f1f2f2"),
-               panel.grid = element_blank(),
-               text = element_text(family = "Arial", size = 24),
-               strip.background = element_blank(),
-               axis.line = element_blank(),
-               axis.ticks = element_blank(),
-               axis.text.x = element_text(margin = margin(t = 0)),
-               axis.text.y = element_text(margin = margin(r = 0)),
-               axis.title.x = element_text(margin = margin(t = 10)),
-               axis.title.y = element_text(margin = margin(r = 10)),
-               plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.background = element_rect(fill = "#f1f2f2"),
-         #      legend.title = element_text(face = "bold"),
-               legend.position = "bottom")
-
-p <- p + scale_fill_manual(values = rev(df_cols)) +
-  scale_x_continuous(breaks = seq(2, 20, 4)) + 
-  scale_y_continuous(breaks = seq(2, 30, 4))
-
-p <- p + labs(x = "ELIMINATION  HALF-LIFE  (DAYS)",
-              y = expression(E["max"]))
-
-p <- p + guides(fill = guide_legend(title = leg_title[pred], nrow = 1, reverse = TRUE))
-
-p
-
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig3_POSTER", exp, ".jpg"),
-       plot = last_plot(),
-       width = 17.4,
-       height = 5,
-       dpi = 400)

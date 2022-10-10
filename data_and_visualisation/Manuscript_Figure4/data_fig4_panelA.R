@@ -16,8 +16,6 @@ rm(list = ls())
 library(tidyr)
 library(dplyr)
 library(hetGP)
-library(ggplot2)
-library(patchwork)
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
 exp_list <-c("iTPP3_ChemoBlood_TreatLiver_3rounds", "iTPP3_ChemoBlood_TreatLiver_4rounds", "iTPP3_ChemoBlood_TreatLiver_5rounds")
@@ -31,21 +29,11 @@ targets <- seq(50, 90, by = 5)
 
 user <- strsplit(getwd(), "/", fixed = FALSE, perl = FALSE, useBytes = FALSE)[[1]][5]
 GROUP_dr <- "/scicore/home/penny/GROUP/M3TPP/"
-setwd(paste0("/scicore/home/penny/", user, "/M3TPP/"))
-
-# 
-# load(paste0(GROUP_dr, exp, "/param_ranges.RData"))
-# param_ranges_cont
+setwd(paste0("/scicore/home/penny/", user, "/M3TPP/SMC_TPP/"))
 
 varnames <- c("CoverageAllRounds", "CoverageOneRound", "Halflife", "MaxKillingRate", "Slope")
 
 out <- data.frame()
-#out <- matrix(nrow = 1, ncol = 4 + length(varnames))
-#out[1, ] <- c("Scenario", "Target", "Coverage1", "Coverage2", varnames)
-
-# Define plot colours
-cols <- c("#0f1f2f", "#1d3d5d", "#295784", "#3e6897", "#537bac", "#938998", "#ca9574",
-          "#f9a24b", "#fab464", "#fac67c", "#fad694", "#fcdfaa", "#fee8c0")
 
 
 # ----------------------------------------------------------
@@ -55,7 +43,8 @@ cols <- c("#0f1f2f", "#1d3d5d", "#295784", "#3e6897", "#537bac", "#938998", "#ca
 for(exp in exp_list) {
   
   # Set up
-  if (!dir.exists(paste0("./Experiments/", exp, "/Outputs"))) dir.create(paste0("./Experiments/", exp, "/Outputs"))
+  if (!dir.exists(paste0("./../Experiments/", exp, "/Outputs"))) dir.create(paste0("./../Experiments/", exp, "/Outputs"))
+  df <- data.frame()
   
   # Import settings
   setting <- c()
@@ -99,7 +88,8 @@ for(exp in exp_list) {
   }
 
   # Save resulting matrix against future use
-  saveRDS(out, paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/", exp, "_cutoff_criteria.rds"))
+  #saveRDS(out, paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/", exp, "_cutoff_criteria.rds"))
+  #df <- rbind(out, df)
 }
  
 
@@ -109,13 +99,15 @@ for(exp in exp_list) {
 
 # Merge results across experiments
 
-# !!! Note that this must be updated manually should the list of experiments be changed !!!
-df3 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/", exp_list[1], "_cutoff_criteria.rds"))
-df4 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/", exp_list[2], "_cutoff_criteria.rds"))
-df5 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/", exp_list[3], "_cutoff_criteria.rds"))
+# # !!! Note that this must be updated manually should the list of experiments be changed !!!
+# df3 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/", exp_list[1], "_cutoff_criteria.rds"))
+# df4 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/", exp_list[2], "_cutoff_criteria.rds"))
+# df5 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/", exp_list[3], "_cutoff_criteria.rds"))
+# 
+# df <- rbind(df3, df4, df5)
+# remove(df3, df4, df5)
 
-df <- rbind(df3, df4, df5)
-remove(df3, df4, df5)
+df <- out
 
 # Replace infs with NAs
 df <- data.frame(lapply(df, function(x) gsub("Inf", NA, x)), stringsAsFactors = FALSE)
@@ -136,7 +128,7 @@ df <- df %>%
            sep= "_")
   
 # Merge in baseline prevalence
-prev <- read.csv(paste0("./Experiments/", exp_list[2], "/Outputs/Prevalence_prior_to_intervention.csv"))
+prev <- read.csv(paste0("./../Experiments/", exp_list[2], "/Outputs/Prevalence_prior_to_intervention.csv"))
 prev <- prev[, c("Seasonality", "EIR", "Access", "MaxAge", "annual_prev_210_2034")]
 names(prev) <- c("Seasonality", "EIR", "Access", "Agegroup", "annual_prev_210_2034")
 
@@ -185,10 +177,9 @@ head(df)
   
   
 # ----------------------------------------------------------
-# Plot results - figure 4 panel A
+# Generate data to plot
 # ----------------------------------------------------------
 
-text_size <- 10
 df_plot <- df
 
 # Calculate most conservative across all scenarios and all outcomes
@@ -219,68 +210,9 @@ df_plot <- df_plot %>%
          Agegroup == "CHILDREN 3 TO 59 MONTHS")
 
 
-# Generate plot for program reach
+# ----------------------------------------------------------
+# Write data to file
+# ----------------------------------------------------------
 
-p <- ggplot(df_plot, aes(x = annual_prev, y = Target, fill = CoverageAllRounds))
+saveRDS(df_plot, "./data_and_visualisation/Manuscript_Figure4/data_fig4_panelA.rds")
 
-p <- p + geom_tile(colour = "white", size = 1.5)
-
-p <- p + theme(panel.border = element_blank(), 
-               panel.background = element_blank(),
-               panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = text_size),
-               axis.line = element_blank(),
-               axis.ticks = element_blank(),
-               axis.text.x = element_text(margin = margin(t = 0)),
-               axis.text.y = element_text(margin = margin(r = 0)),
-               legend.title = element_text(face = "bold", size = text_size),
-               legend.title.align = 0.5,
-               legend.position = "bottom",
-               legend.key = element_blank())
-
-p <- p + scale_fill_manual(values = cols[c(1, 2, 4, 6, 7, 8, 10, 12)],
-                           na.value = "light grey",
-                           labels = c(unique(df_plot$CoverageAllRounds)[1:(length(unique(df_plot$CoverageAllRounds)) - 1)], "Target not met in\nparameter space")) +
-  scale_y_discrete(labels = c("50%", "", "60%", "", "70%", "", "80%", "", "90%"))
-
-p <- p + labs(y = "TARGET  REDUCTION", x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "PR"["2-10"]))) +
-  guides(fill = guide_legend(title.position = "top", title.hjust = 0.5, title = "COVERAGE  OF  ALL  SMC  ROUNDS", nrow = 2))
-
-
-# Generate plot for round coverage
-
-q <- ggplot(df_plot, aes(x = annual_prev, y = Target, fill = CoverageOneRound))
-
-q <- q + geom_tile(colour = "white", size = 1.5)
-
-q <- q + theme(panel.border = element_blank(), 
-               panel.background = element_blank(),
-               panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = text_size),
-               axis.line = element_blank(),
-               axis.ticks = element_blank(),
-               axis.text.x = element_text(margin = margin(t = 0)),
-               axis.text.y = element_text(margin = margin(r = 0)),
-               legend.title = element_text(face = "bold", size = text_size),
-               legend.title.align = 0.5,
-               legend.position = "bottom",
-               legend.key = element_blank())
-
-q <- q + scale_fill_manual(values = cols[c(1, 2, 4, 6, 8, 12)],
-                           na.value = "light grey",
-                           labels = c(unique(df_plot$CoverageOneRound)[1:(length(unique(df_plot$CoverageOneRound)) - 1)], "Target not met in\nparameter space")) +
-  scale_y_discrete(labels = c("50%", "", "60%", "", "70%", "", "80%", "", "90%"))
-
-q <- q + labs(y = "", x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "PR"["2-10"]))) +
-  guides(fill = guide_legend(title.position = "top", title.hjust = 0.5, title = "COVERAGE OF AT LEAST ONE SMC ROUND", nrow = 2))
-
-# Arrange figure panels
-
-p + q + plot_annotation(title = "A.  MINIMUM  COVERAGE  CRITERIA") & 
-                 theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = text_size))
-
-ggsave(filename = paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/fig4_panelA_", exp, ".jpg"),
-       plot = last_plot(),
-       width = 9.1,
-       height = 4,
-       dpi = 300)
