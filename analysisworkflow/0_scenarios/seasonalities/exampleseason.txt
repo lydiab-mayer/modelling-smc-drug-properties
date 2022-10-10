@@ -1,3 +1,0 @@
-Seasonality	Jan	Feb	Mar	Apr	May	Jun	Jul	Aug	Sep	Oct	Nov	Dec
-seasonal	0	0	0	0	0	8.33333333333333	14.3333333333333	31.6666666666667	80.3333333333333	41	3	0
-
