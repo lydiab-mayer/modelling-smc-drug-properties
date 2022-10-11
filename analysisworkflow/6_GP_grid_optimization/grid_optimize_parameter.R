@@ -36,11 +36,11 @@ ngrid <- as.numeric(args[4])
 target_range_size <- as.numeric(args[5])
 
 # # Sample arguments, retained here for testing
-# sim_folder <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_4rounds/"
+# sim_folder <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_ChemoLiver_TreatLiverBlood_3rounds/"
 # scale <- TRUE
 # ngrid <- "100"
 # target_range_size <- 10
-# gp_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_bloodstage_4rounds/gp/trained/inc_red_int_Tot/seeds_iTPP3bloodstage4rounds_seas3mo_Mali_16_10_0.04_May_0.020831339_inc_red_int_Tot_cv.RData"
+# gp_file <- "/scicore/home/penny/GROUP/M3TPP/iTPP3_ChemoLiver_TreatLiverBlood_3rounds/gp/trained/inc_red_int_Tot/seeds_iTPP3ChemoLiverTreatLiverBlood3rounds_seas3mo_Mali_2_5_exp_0.04_May_inc_red_int_Tot_cv.RData"
 # ngrid <- as.numeric(ngrid)
 
 print(paste0("gp_file: ", gp_file))
@@ -121,6 +121,24 @@ GP_grid_search_predictions <- function(gp_file, scale, ngrid, target_range_size,
   # 
   # scenarios <- cbind(params, samp)
   # scenarios <- scenarios[, rownames(param_ranges)]
+  # rownames(scenarios) <- 1:nrow(scenarios)
+  # # end uncomment
+  
+  # # Uncomment to sample uniformly across all parameters but one (slope)
+  # if (scale == TRUE) {
+  #   params <- expand.grid("Slope" = (6 - 0.5)/(9 - 0.5))
+  # } else {
+  #   params <- expand.grid("Slope" = 6)
+  # }
+  # ncov <- nrow(params)
+  # params <- params[rep(seq_len(ncov), ngrid), ]
+  # 
+  # samp <- lhs(ngrid, t(scale_params[, c("Coverage1", "Coverage2", "Halflife", "MaxKillingRate")]))
+  # samp <- samp[rep(seq_len(ngrid), ncov), ]
+  # colnames(samp) <- c("Coverage1", "Coverage2", "Halflife", "MaxKillingRate")
+  # 
+  # scenarios <- cbind("Slope" = params, samp)
+  # scenarios <- as.data.frame(scenarios[, rownames(param_ranges)])
   # rownames(scenarios) <- 1:nrow(scenarios)
   # # end uncomment
   
