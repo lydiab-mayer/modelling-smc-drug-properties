@@ -50,7 +50,7 @@ for(exp in exp_list) {
   setting <- c()
   
   for(pred in pred_list) {
-    setting <- c(setting, Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization_uniform_sample/", pred, "/*")))
+    setting <- c(setting, Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization_fixed_slope/", pred, "/*")))
   }
   
   setting_id <- sub(".rds", "", sub("opt_", "", basename(setting)))

@@ -52,7 +52,7 @@ for(exp in exp_list) {
   setting <- c()
   
   for(pred in pred_list) {
-    setting <- c(setting, Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*")))
+    setting <- c(setting, Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization_coverage_sample/", pred, "/*")))
   }
   
   setting_id <- sub(".rds", "", sub("opt_", "", basename(setting)))
@@ -134,7 +134,7 @@ df <- df %>%
 # df$CoverageOneRound <- 1 - (1 - df$Coverage1) + df$Coverage1*((1 - df$Coverage2)^df$Rounds)
   
 # Merge in baseline prevalence
-prev <- read.csv(paste0("./../Experiments/", exp_list[2], "/Outputs/prevalence_prior_to_intervention.csv"))
+prev <- read.csv(paste0("./../Experiments/", exp_list[2], "/Outputs/Prevalence_prior_to_intervention.csv"))
 prev <- prev[, c("Seasonality", "EIR", "Access", "MaxAge", "annual_prev_210_2034")]
 names(prev) <- c("Seasonality", "EIR", "Access", "Agegroup", "annual_prev_210_2034")
 
