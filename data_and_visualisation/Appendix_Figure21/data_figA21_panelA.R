@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_ChemoBlood_TreatLiver_4rounds"
+exp <- "iTPP3_ChemoBlood_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred <- c("inc_red_int_Tot")
@@ -303,4 +303,4 @@ data[["slope"]] <- df
 # Write data to file
 # ----------------------------------------------------------
 
-saveRDS(data, "./data_and_visualisation/Manuscript_Figure2/data_fig2_panelA.rds")
+saveRDS(data, "./data_and_visualisation/Appendix_Figure21/data_figA21_panelA.rds")

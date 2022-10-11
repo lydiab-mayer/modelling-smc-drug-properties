@@ -1,10 +1,10 @@
 ############################################################
-# PS_06_PlotSensitivity
 #
 # Visualises relationships between emulator input and predictor variables
-# Note: This script depends on outputs of the script 4_sensitivityanalysis_workflow.R
 #
 # Written by Lydia Braunack-Mayer
+# October 2022
+#
 ############################################################
 
 # ----------------------------------------------------------
@@ -14,7 +14,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- c("iTPP3_ChemoBlood_TreatLiver_4rounds")
+exp <- c("iTPP3_ChemoLiver_TreatLiverBlood_4rounds")
 
 # !!! Insert your predicted parameters here. Note that this must match with one column name in post-processing files !!!
 pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot")
@@ -63,7 +63,7 @@ for (i in 1:length(setting)) {
 
 df <- df %>%
   separate(col = scenario, 
-           into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Outcome", "temp1", "temp2", "temp3"),
+           into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
            sep = "_",
            remove = FALSE)
 df <- df[, !(names(df) %in% c("temp1", "temp2", "temp3"))]
@@ -71,7 +71,7 @@ df <- df[, !(names(df) %in% c("temp1", "temp2", "temp3"))]
 
 # Import aggregated impact for each setting
 
-setting_id <- unique(sub("_Apr_0.02083134.*", "_Apr_0.02083134", sub("_May_0.02083134.*", "_May_0.02083134", setting_id)))
+setting_id <- unique(sub("_Apr.*", "_Apr", sub("_May.*", "_May", setting_id)))
 df_impact <- data.frame()
 
 for (i in 1:length(setting_id)) {
@@ -91,7 +91,7 @@ for (i in 1:length(setting_id)) {
 
 df_impact <- df_impact[, c("inc", "sev", "prev", "mor", "scenario")] %>%
   separate(col = scenario, 
-           into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50"),
+           into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing"),
            sep = "_",
            remove = FALSE)
 
@@ -103,7 +103,7 @@ df_impact <- df_impact %>%
 
 df <- merge(df[, !(names(df) == "scenario")],
             df_impact, 
-            by = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Outcome"))
+            by = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome"))
 
 df$T_eff_scaled <- df$T_eff * df$Median_Reduction
 
@@ -142,13 +142,12 @@ df$Agegroup <- recode(df$Agegroup,
                       "5" = "CHILDREN 3 TO 59 MONTHS",
                       "10" = "CHILDREN 3 TO 119 MONTHS")
 
-df$parameter <- factor(df$parameter, levels = c("Coverage1", "Halflife", "Coverage2", "MaxKillingRate", "Slope"))
+df$parameter <- factor(df$parameter, levels = c("Coverage1", "Halflife", "Coverage2", "Efficacy"))
 df$parameter <- recode(df$parameter,
-                       "Coverage1" = "Program reach [70% - 95%]",
-                       "Coverage2" = "Round coverage [70% - 95%]",
-                       "MaxKillingRate" = "Emax [2 - 30 units]",
-                       "Halflife" = "Elimination half-life [1 - 20 days]",
-                       "Slope" = "Slope [6 - 6]")
+                       "Coverage1" = "Program reach [70 - 95%]",
+                       "Coverage2" = "Round coverage [70 - 95%]",
+                       "Efficacy" = "Initial efficacy [80 - 100%]",
+                       "Halflife" = "Duration of protection half-life [10 - 60 days]")
 
 df$Outcome <- factor(df$Outcome, levels = c("inc", "prev", "sev", "mor"))
 df$Outcome <- recode(df$Outcome,
@@ -168,4 +167,5 @@ df$label <- ifelse(df$Median_Reduction  >= 20, df$label, "")
 # Write data to file
 # ----------------------------------------------------------
 
-saveRDS(df, "./data_and_visualisation/Manuscript_Figure2/data_fig2_panelB.rds")
+saveRDS(df, "./data_and_visualisation/Appendix_Figure22/data_figA22_panelB.rds")
+

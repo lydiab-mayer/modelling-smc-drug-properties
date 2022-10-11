@@ -14,7 +14,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- c("iTPP3_ChemoBlood_TreatLiver_4rounds")
+exp <- c("iTPP3_ChemoBlood_4rounds")
 
 # !!! Insert your predicted parameters here. Note that this must match with one column name in post-processing files !!!
 pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot")
@@ -168,4 +168,4 @@ df$label <- ifelse(df$Median_Reduction  >= 20, df$label, "")
 # Write data to file
 # ----------------------------------------------------------
 
-saveRDS(df, "./data_and_visualisation/Manuscript_Figure2/data_fig2_panelB.rds")
+saveRDS(df, "./data_and_visualisation/Appendix_Figure21/data_figA21_panelB.rds")

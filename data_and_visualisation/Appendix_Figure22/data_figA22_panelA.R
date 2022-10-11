@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_ChemoBlood_TreatLiver_4rounds"
+exp <- "iTPP3_ChemoLiver_TreatLiverBlood_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred <- c("inc_red_int_Tot")
@@ -93,16 +93,15 @@ setting_id[index]
 
 
 # ----------------------------------------------------------
-# Generate data for coverage1
+# Generate figure for coverage1
 # ----------------------------------------------------------
 
 # Generate grid of predictions
-ngrid <- c(31, 1, 1, 1, 1)
+ngrid <- c(31, 1, 1, 1)
 grid_ranges_cont <- rbind(Coverage1 = c(0.7, 1.0),
                           Coverage2 = 0.9,
-                          Halflife = 10,
-                          MaxKillingRate = 3.45,
-                          Slope = 6)
+                          Halflife = 30,
+                          Efficacy = 0.95)
 
 
 # Generate predictions
@@ -122,7 +121,7 @@ for (j in setting_id[index]) {
   
   temp <- temp %>%
     separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Outcome", "temp1", "temp2", "temp3"),
+             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
              sep = "_",
              remove = FALSE)
   
@@ -136,16 +135,15 @@ data[["coverage1"]] <- df
 
 
 # ----------------------------------------------------------
-# Generate data for coverage2
+# Generate figure for coverage2
 # ----------------------------------------------------------
 
 # Generate grid of predictions
-ngrid <- c(1, 31, 1, 1, 1)
+ngrid <- c(1, 31, 1, 1)
 grid_ranges_cont <- rbind(Coverage1 = 0.9,
                           Coverage2 = c(0.7, 1.0),
-                          Halflife = 10,
-                          MaxKillingRate = 3.45,
-                          Slope = 6)
+                          Halflife = 30,
+                          Efficacy = 0.95)
 
 
 # Generate predictions
@@ -165,7 +163,7 @@ for (j in setting_id[index]) {
   
   temp <- temp %>%
     separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Outcome", "temp1", "temp2", "temp3"),
+             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
              sep = "_",
              remove = FALSE)
   
@@ -177,16 +175,15 @@ data[["coverage2"]] <- df
 
 
 # ----------------------------------------------------------
-# Generate data for halflife
+# Generate figure for halflife
 # ----------------------------------------------------------
 
 # Generate grid of predictions
-ngrid <- c(1, 1, 20, 1, 1)
+ngrid <- c(1, 1, 51, 1)
 grid_ranges_cont <- rbind(Coverage1 = 0.9,
                           Coverage2 = 0.9,
-                          Halflife = c(1, 20),
-                          MaxKillingRate = 3.45,
-                          Slope = 6)
+                          Halflife = c(10, 60),
+                          Efficacy = 0.95)
 
 
 # Generate predictions
@@ -206,7 +203,7 @@ for (j in setting_id[index]) {
   
   temp <- temp %>%
     separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Outcome", "temp1", "temp2", "temp3"),
+             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
              sep = "_",
              remove = FALSE)
   
@@ -218,16 +215,15 @@ data[["halflife"]] <- df
 
 
 # ----------------------------------------------------------
-# Generate figure for max killing rate
+# Generate figure for initial efficacy
 # ----------------------------------------------------------
 
 # Generate grid of predictions
-ngrid <- c(1, 1, 1, 29, 1)
+ngrid <- c(1, 1, 1, 21)
 grid_ranges_cont <- rbind(Coverage1 = 0.9,
                           Coverage2 = 0.9,
-                          Halflife = 10,
-                          MaxKillingRate = c(2, 30),
-                          Slope = 6)
+                          Halflife = 30,
+                          Efficacy = c(0.8, 1))
 
 
 # Generate predictions
@@ -247,7 +243,7 @@ for (j in setting_id[index]) {
   
   temp <- temp %>%
     separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Outcome", "temp1", "temp2", "temp3"),
+             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
              sep = "_",
              remove = FALSE)
   
@@ -255,52 +251,11 @@ for (j in setting_id[index]) {
   remove(temp)
 }
 
-data[["MaxKillingRate"]] <- df
-  
-
-# ----------------------------------------------------------
-# Generate figure for slope
-# ----------------------------------------------------------
-
-# Generate grid of predictions
-ngrid <- c(1, 1, 1, 1, 9)
-grid_ranges_cont <- rbind(Coverage1 = 0.9,
-                          Coverage2 = 0.9,
-                          Halflife = 10,
-                          MaxKillingRate = 3.45,
-                          Slope = c(1, 8))
-
-
-# Generate predictions
-df <- data.frame()
-
-for (j in setting_id[index]) {
-  # Load GP model
-  load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
-  
-  # Generate model predictions
-  temp <- predict.grid(param.ranges = param_ranges_cont, 
-                       grid.ranges = grid_ranges_cont, 
-                       ngrid = ngrid, 
-                       model = cv_result$GP_model)
-  
-  temp$scenario <- j
-  
-  temp <- temp %>%
-    separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Outcome", "temp1", "temp2", "temp3"),
-             sep = "_",
-             remove = FALSE)
-  
-  df <- rbind(df, temp)
-  remove(temp)
-}
-
-data[["slope"]] <- df
+data[["Efficacy"]] <- df
 
 
 # ----------------------------------------------------------
 # Write data to file
 # ----------------------------------------------------------
 
-saveRDS(data, "./data_and_visualisation/Manuscript_Figure2/data_fig2_panelA.rds")
+saveRDS(data, "./data_and_visualisation/Appendix_Figure22/data_figA22_panelA.rds")
