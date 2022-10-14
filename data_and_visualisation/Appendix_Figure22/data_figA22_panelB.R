@@ -161,11 +161,13 @@ df$annual_prev_lab <- paste0(round(df$annual_prev*100, 0), "%")
 df$annual_prev_lab <- factor(df$annual_prev_lab, levels = unique(df$annual_prev_lab)[index])
 
 df$label <- ifelse(df$T_eff >= 0.07, paste0(round(df$T_eff*100, 0), "%"), "")
-df$label <- ifelse(df$Median_Reduction  >= 20, df$label, "")
+df$label <- ifelse(df$Median_Reduction  >= 15, df$label, "")
 
 # ----------------------------------------------------------
 # Write data to file
 # ----------------------------------------------------------
 
 saveRDS(df, "./data_and_visualisation/Appendix_Figure22/data_figA22_panelB.rds")
+saveRDS(df, "./data_and_visualisation/Appendix_Figure25/data_figA25.rds")
+saveRDS(df, "./data_and_visualisation/Appendix_Figure28/data_figA28.rds")
 

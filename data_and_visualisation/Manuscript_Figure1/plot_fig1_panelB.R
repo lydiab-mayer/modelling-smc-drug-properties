@@ -45,7 +45,7 @@ p <- p + geom_line(data = df[df$RSS <= cutoff, ],
 #                     alpha = 0.4, linetype = "dashed")
 
 p <- p + geom_line(data = df_plot_pe[df_plot_pe$drug %in% c("SP-AQ"), ],
-                   aes(x = weeks, y = mean), colour = "#781e0b", size = 1)
+                   aes(x = weeks, y = mean), size = 1)
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -69,7 +69,7 @@ p <- p + scale_x_continuous(breaks = 0:8,
                      expand = expansion(mult = .03, add = 0))
 
 p <- p + labs(x = "WEEKS  AFTER  FINAL  SMC  ROUND", 
-              y = "PROTECTIVE\nEFFICACY")
+              y = "PROTECTIVE  EFFICACY")
 
 
 # ----------------------------------------------------------
@@ -108,7 +108,7 @@ q <- q + scale_x_continuous(breaks = seq(0, 12, by = 1),
 q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  ROUND",  
               y = "KILLING  RATE")
 
-p + q + plot_annotation(title = "B. Next-generation SMC with dominant blood stage activity") +
+p + q + plot_annotation(title = "B. Next-generation SMC with dominant blood stage activity and initial, complete liver stage clearance") +
   plot_layout(guides = "collect") &
   theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = 10),
         legend.position = "none")

@@ -19,7 +19,7 @@ require(patchwork)
 setwd(paste0("/scicore/home/penny/brauna0000/M3TPP/SMC_TPP/"))
 
 # Load data
-df <- readRDS("./data_and_visualisation/Manuscript_Figure3/data_fig3.rds")
+df <- readRDS("./data_and_visualisation/Appendix_Figure29/data_figA29.rds")
 
 # ----------------------------------------------------------
 # Define plot settings
@@ -86,7 +86,7 @@ p <- p + guides(fill = guide_legend(title = leg_title["inc_red_int_Tot"], nrow =
 
 p
 
-ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure3/fig3.jpg"),
+ggsave(filename = paste0("./data_and_visualisation/Appendix_Figure29/figA29.jpg"),
        plot = last_plot(),
        width = 9.1,
        height = 7,

@@ -45,7 +45,7 @@ p <- p + geom_line(data = df[df$RSS <= cutoff, ],
 #                     alpha = 0.4, linetype = "dashed")
 
 p <- p + geom_line(data = df_plot_pe[df_plot_pe$drug %in% c("SP-AQ"), ],
-                   aes(x = weeks, y = mean), colour = "#781e0b", size = 1)
+                   aes(x = weeks, y = mean), size = 1)
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),

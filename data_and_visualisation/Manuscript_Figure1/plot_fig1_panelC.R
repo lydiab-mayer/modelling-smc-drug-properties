@@ -46,7 +46,7 @@ p <- p + geom_line(data = df[df$RSS <= cutoff, ],
 #                     alpha = 0.4, linetype = "dashed")
 
 p <- p + geom_line(data = df_plot_pe[df_plot_pe$drug %in% c("SP-AQ"), ],
-                   aes(x = weeks, y = mean), colour = "#781e0b", size = 1)
+                   aes(x = weeks, y = mean), size = 1)
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -113,7 +113,7 @@ q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  ROUND",
 
 q
 
-p + q + plot_annotation(title = "C. Next-generation SMC with dominant liver stage activity") +
+p + q + plot_annotation(title = "C. Next-generation SMC with dominant liver stage activity and initial, complete blood stage clearance") +
   plot_layout(guides = "collect") &
   theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = 10),
         legend.position = "bottom")
@@ -121,6 +121,6 @@ p + q + plot_annotation(title = "C. Next-generation SMC with dominant liver stag
 ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure1/fig1_panelC.jpg"),
        plot = last_plot(),
        width = 9.1,
-       height = 2.5,
+       height = 3,
        dpi = 400)
 

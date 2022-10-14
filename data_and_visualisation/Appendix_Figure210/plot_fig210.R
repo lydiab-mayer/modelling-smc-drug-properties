@@ -19,7 +19,7 @@ require(patchwork)
 setwd(paste0("/scicore/home/penny/brauna0000/M3TPP/SMC_TPP/"))
 
 # Load data
-df <- readRDS("./data_and_visualisation/Manuscript_Figure3/data_fig3.rds")
+df <- readRDS("./data_and_visualisation/Appendix_Figure210/data_figA210.rds")
 
 # ----------------------------------------------------------
 # Define plot settings
@@ -39,6 +39,7 @@ leg_title <- c("inc_red_int_Tot" = "CLINICAL\nINCIDENCE\nREDUCTION",
                "sev_red_int_Tot" = "SEVERE\nDISEASE\nREDUCTION",
                "prev_red_int_Aug" = "PREVALENCE\nREDUCTION",
                "mor_red_int_Tot" = "MORTALITY\nREDUCTION")
+pred <- "inc_red_int_Tot"
 
 
 # ----------------------------------------------------------
@@ -50,15 +51,14 @@ df_plot <- df[df$EIR == 8, ]
 df_cols <- cols[names(cols) %in% unique(df_plot$target_label)]
 
 # Generate plot
-p <- ggplot(df_plot, aes(x = Halflife, y = MaxKillingRate, fill = target_label))
+p <- ggplot(df_plot, aes(x = Halflife, y = Efficacy, fill = target_label))
 
 p <- p + geom_tile()
 
 p <- p + facet_grid(Coverage2 ~ Coverage1)
 
-p <- p + geom_rect(aes(xmin = 4.74, xmax = 8.81, ymin = 2.28, ymax = 29.96), colour = "white", fill = NA, size = 0.7) + #uncomment for blood stage only
-#p <- p + geom_rect(aes(xmin = 5.12, xmax = 8.81, ymin = 2.28, ymax = 29.96), colour = "white", fill = NA, size = 0.7) + #uncomment for dominant blood stage
-  annotate(geom = "label", x = 6.9, y = 15, fill = "white", label = "SP-AQ", size = 2.5, label.size = 0, family = "Times New Roman")
+p <- p + geom_rect(aes(xmin = 23.78, xmax = 29.83, ymin = 0.80, ymax = 1), colour = "white", fill = NA, size = 0.7) +
+  annotate(geom = "label", x = 26.5, y = 0.9, fill = "white", label = "SP-AQ", size = 2.5, label.size = 0, family = "Times New Roman")
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -76,26 +76,19 @@ p <- p + theme(panel.border = element_blank(),
                legend.position = "bottom")
 
 p <- p + scale_fill_manual(values = rev(df_cols)) +
-  scale_x_continuous(breaks = seq(2, 20, 2)) + 
-  scale_y_continuous(breaks = seq(2, 30, 4))
+  scale_x_continuous(breaks = seq(10, 60, 10)) + 
+  scale_y_continuous(breaks = seq(0.8, 1, 0.05),
+                     labels = paste0(seq(80, 100, 5), "%"))
 
-p <- p + labs(x = "ELIMINATION  HALF-LIFE  (DAYS)",
-              y = expression("E"["max"]))
+p <- p + labs(x = "DURATION  OF  PROTECTION  HALF-LIFE  (DAYS)",
+              y = "INITIAL  EFFICACY")
 
-p <- p + guides(fill = guide_legend(title = leg_title["inc_red_int_Tot"], nrow = 1, reverse = TRUE))
+p <- p + guides(fill = guide_legend(title = leg_title[pred], nrow = 1, reverse = TRUE))
 
 p
 
-ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure3/fig3.jpg"),
+ggsave(filename = paste0("./data_and_visualisation/Appendix_Figure210/figA210.jpg"),
        plot = last_plot(),
        width = 9.1,
        height = 7,
        dpi = 300)
-
-
-# Identify point predictions reported in main body of paper
-
-df_point <- df_plot[df_plot$Halflife == 10 & df_plot$MaxKillingRate == 10, ]
-df_point[df_point$Coverage1 == "85% PROGRAM REACH" & df_point$Coverage2 == "85% ROUND COVERAGE", ]
-df_point[df_point$Coverage1 == "95% PROGRAM REACH" & df_point$Coverage2 == "85% ROUND COVERAGE", ]
-

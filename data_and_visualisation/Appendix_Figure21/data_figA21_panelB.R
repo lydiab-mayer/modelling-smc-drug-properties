@@ -144,8 +144,8 @@ df$Agegroup <- recode(df$Agegroup,
 
 df$parameter <- factor(df$parameter, levels = c("Coverage1", "Halflife", "Coverage2", "MaxKillingRate", "Slope"))
 df$parameter <- recode(df$parameter,
-                       "Coverage1" = "Program reach [70% - 95%]",
-                       "Coverage2" = "Round coverage [70% - 95%]",
+                       "Coverage1" = "Program reach [70 - 95%]",
+                       "Coverage2" = "Round coverage [70 - 95%]",
                        "MaxKillingRate" = "Emax [2 - 30 units]",
                        "Halflife" = "Elimination half-life [1 - 20 days]",
                        "Slope" = "Slope [6 - 6]")
@@ -162,10 +162,12 @@ df$annual_prev_lab <- paste0(round(df$annual_prev*100, 0), "%")
 df$annual_prev_lab <- factor(df$annual_prev_lab, levels = unique(df$annual_prev_lab)[index])
 
 df$label <- ifelse(df$T_eff >= 0.07, paste0(round(df$T_eff*100, 0), "%"), "")
-df$label <- ifelse(df$Median_Reduction  >= 20, df$label, "")
+df$label <- ifelse(df$Median_Reduction  >= 15, df$label, "")
 
 # ----------------------------------------------------------
 # Write data to file
 # ----------------------------------------------------------
 
 saveRDS(df, "./data_and_visualisation/Appendix_Figure21/data_figA21_panelB.rds")
+saveRDS(df, "./data_and_visualisation/Appendix_Figure23/data_figA23.rds")
+saveRDS(df, "./data_and_visualisation/Appendix_Figure26/data_figA26.rds")

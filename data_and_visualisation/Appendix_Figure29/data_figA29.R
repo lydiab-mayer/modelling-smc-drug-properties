@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_ChemoBlood_TreatLiver_4rounds"
+exp <- "iTPP3_ChemoBlood_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred <- "inc_red_int_Tot"
@@ -137,5 +137,5 @@ df$target_label <- factor(paste0(df$target, "%"), levels = rev(paste0(unique(df$
 # Write data to file
 # ----------------------------------------------------------
 
-saveRDS(df, "./data_and_visualisation/Manuscript_Figure3/data_fig3.rds")
+saveRDS(df, "./data_and_visualisation/Appendix_Figure29/data_figA29.rds")
 
