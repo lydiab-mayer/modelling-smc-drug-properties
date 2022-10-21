@@ -64,4 +64,5 @@ This folder contains the data generated during this study, along with the R scri
 - The .rds data file corresponding to the figure,
 - The Rscript used to generate the figure, and
 - A jpg version of the figure.
+
 To reproduce a given figure, download the corresponding folder and update the file paths referenced in the corresponding Rscript.
