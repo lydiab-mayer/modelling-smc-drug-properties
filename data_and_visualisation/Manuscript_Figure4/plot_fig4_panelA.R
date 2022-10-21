@@ -57,7 +57,7 @@ p <- p + theme(panel.border = element_blank(),
 
 p <- p + scale_fill_manual(values = cols[c(1, 2, 4, 6, 7, 8, 10, 12)],
                            na.value = "light grey",
-                           labels = c(unique(df$CoverageAllRounds)[1:(length(unique(df$CoverageAllRounds)) - 1)], "Target not met in\nparameter space")) +
+                           labels = c(levels(df$CoverageAllRounds), "Target not met in\nparameter space")) +
   scale_y_discrete(labels = c("50%", "", "60%", "", "70%", "", "80%", "", "90%"))
 
 p <- p + labs(y = "TARGET  REDUCTION", x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "PR"["2-10"]))) +
@@ -85,7 +85,7 @@ q <- q + theme(panel.border = element_blank(),
 
 q <- q + scale_fill_manual(values = cols[c(1, 2, 4, 6, 8, 12)],
                            na.value = "light grey",
-                           labels = c(unique(df$CoverageOneRound)[1:(length(unique(df$CoverageOneRound)) - 1)], "Target not met in\nparameter space")) +
+                           labels = c(levels(df$CoverageOneRound), "Target not met in\nparameter space")) +
   scale_y_discrete(labels = c("50%", "", "60%", "", "70%", "", "80%", "", "90%"))
 
 q <- q + labs(y = "", x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "PR"["2-10"]))) +
@@ -96,7 +96,7 @@ q <- q + labs(y = "", x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "
 p + q + plot_annotation(title = "A.  MINIMUM  COVERAGE  CRITERIA") & 
                  theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = text_size))
 
-ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure4/plot_fig4_panelA.jpg"),
+ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure4/fig4_panelA.jpg"),
        plot = last_plot(),
        width = 9.1,
        height = 4,

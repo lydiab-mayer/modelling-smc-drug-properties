@@ -217,6 +217,6 @@ p_out <- (p_coverage1 | p_coverage2) / (p_halflife | p_maxkilling) + plot_annota
 
 ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure2/fig2_panelA.jpg"),
        plot = p_out,
-       width = 4.5,
-       height = 5,
+       width = 4, #4.5,
+       height = 6, #5,
        dpi = 400)

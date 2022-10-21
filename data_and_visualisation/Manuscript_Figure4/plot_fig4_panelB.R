@@ -71,7 +71,7 @@ p <- p + labs(y = "TARGET  REDUCTION", x = expression(paste("BASELINE ANNUAL ", 
 p + plot_annotation(title = "B.  MINIMUM  ELIMINATION  HALF-LIFE  CRITERIA") & 
   theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = text_size))
 
-ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure4/plot_fig4_panelB.jpg"),
+ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure4/fig4_panelB.jpg"),
        plot = last_plot(),
        width = 9.1,
        height = 6,

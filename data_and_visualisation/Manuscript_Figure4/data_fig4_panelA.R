@@ -201,7 +201,9 @@ df_plot <- df_plot %>%
 # Correct minimum values and set factor levels
 df_plot <- df_plot %>%
   mutate(Halflife = as.factor(ifelse(Halflife <= 5, 5, Halflife)),
-         MaxKillingRate = as.factor(ifelse(MaxKillingRate <= 5, 1, MaxKillingRate)))
+         MaxKillingRate = as.factor(ifelse(MaxKillingRate <= 5, 1, MaxKillingRate)),
+         CoverageAllRounds = factor(CoverageAllRounds, levels = c("20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%")),
+         CoverageOneRound = factor(CoverageOneRound, levels = c("70%", "75%", "80%", "85%", "90%", "95%")))
 
 # Subset data
 df_plot <- df_plot %>%

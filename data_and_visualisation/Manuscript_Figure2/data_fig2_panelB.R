@@ -161,7 +161,7 @@ index <- order(unique(round(df$annual_prev*100, 0)))
 df$annual_prev_lab <- paste0(round(df$annual_prev*100, 0), "%")
 df$annual_prev_lab <- factor(df$annual_prev_lab, levels = unique(df$annual_prev_lab)[index])
 
-df$label <- ifelse(df$T_eff >= 0.07, paste0(round(df$T_eff*100, 0), "%"), "")
+df$label <- ifelse(df$T_eff >= 0.08, paste0(round(df$T_eff*100, 0), "%"), "")
 df$label <- ifelse(df$Median_Reduction  >= 15, df$label, "")
 
 # ----------------------------------------------------------
