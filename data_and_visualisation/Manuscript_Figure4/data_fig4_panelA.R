@@ -69,7 +69,7 @@ for(exp in exp_list) {
     
     # Transform coverage variables
     df$CoverageAllRounds <- df$Coverage1*df$Coverage2^num_rounds[exp]
-    df$CoverageOneRound <- 1 - (1 - df$Coverage1) + df$Coverage1*((1 - df$Coverage2)^num_rounds[exp])
+    df$CoverageOneRound <- 1 - ((1 - df$Coverage1) + df$Coverage1*(1 - df$Coverage2)^num_rounds[exp])
     
     # Add confidence interval bounds
     df$se <- sqrt(df$sd2 + df$nugs)

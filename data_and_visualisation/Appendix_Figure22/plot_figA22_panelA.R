@@ -54,7 +54,7 @@ p <- p + scale_x_continuous(breaks = seq(0.7, 1.0, by= 0.1),
                      labels = paste0(seq(0, 100, by = 10), "%"),
                      expand = expansion(mult = .03, add = 0))
 
-p <- p + labs(x = "PROGRAM  REACH", y = "CLINICAL  INCIDENCE\nREDUCTION")
+p <- p + labs(x = "ROUND  COVERAGE", y = "CLINICAL  INCIDENCE\nREDUCTION")
 
 p_coverage1 <- p
   
@@ -92,7 +92,7 @@ p <- p + scale_x_continuous(breaks = seq(0.7, 1.0, by= 0.1),
                      limits = c(0, 100),
                      expand = expansion(mult = .03, add = 0))
 
-p <- p + labs(x = "ROUND  COVERAGE", y = "")
+p <- p + labs(x = "CYCLE  COVERAGE", y = "")
 
 p_coverage2 <- p
   

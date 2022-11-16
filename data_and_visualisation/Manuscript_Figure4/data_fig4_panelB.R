@@ -22,7 +22,8 @@ exp_list <-c("iTPP3_ChemoBlood_TreatLiver_3rounds", "iTPP3_ChemoBlood_TreatLiver
 num_rounds <- c("iTPP3_ChemoBlood_TreatLiver_3rounds" = 3, "iTPP3_ChemoBlood_TreatLiver_4rounds" = 4, "iTPP3_ChemoBlood_TreatLiver_5rounds" = 5)
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
-pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot")
+#pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot")
+pred_list <- c("prev_red_int_Aug")
 
 # !!! Identify desired targets for optimisation !!!
 targets <- seq(50, 90, by = 5)
@@ -122,7 +123,7 @@ df$Halflife[df$Halflife >= 40] <- NA
 df$MaxKillingRate[df$MaxKillingRate >= 30] <- NA
   
 # Add additional columns for each scenario factor
-df$Scenario <- sub("_red_int_Tot", "", sub("iTPP3bloodstage", "", df$Scenario))
+df$Scenario <- sub("_red_int_Aug", "", sub("iTPP3bloodstage", "", df$Scenario))
 df <- df %>%
   separate(col = Scenario,
            into = c("Rounds", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Endpoint"),
@@ -196,8 +197,8 @@ df_plot <- df %>%
 # Transform min criteria to factor variables
 df_plot <- df_plot %>%
   mutate(Target = paste0(Target, "%"),
-         Coverage1 = as.factor(paste0(Coverage1*100, "% PROGRAM REACH")),
-         Coverage2 = as.factor(paste0(Coverage2*100, "% ROUND COVERAGE")),
+         Coverage1 = as.factor(paste0(Coverage1*100, "% ROUND COVERAGE")),
+         Coverage2 = as.factor(paste0(Coverage2*100, "% CYCLE COVERAGE")),
          Halflife = floor(Halflife/5)*5,
          MaxKillingRate = floor(MaxKillingRate/5)*5)
 

@@ -144,8 +144,8 @@ df$Agegroup <- recode(df$Agegroup,
 
 df$parameter <- factor(df$parameter, levels = c("Coverage1", "Halflife", "Coverage2", "Efficacy"))
 df$parameter <- recode(df$parameter,
-                       "Coverage1" = "Program reach [70 - 95%]",
-                       "Coverage2" = "Round coverage [70 - 95%]",
+                       "Coverage1" = "Round coverage [70 - 95%]",
+                       "Coverage2" = "Cycle coverage [70 - 95%]",
                        "Efficacy" = "Initial efficacy [80 - 100%]",
                        "Halflife" = "Duration of protection half-life [10 - 60 days]")
 

@@ -103,7 +103,7 @@ tab <- df %>%
   select(-label)
 
 temp <- tab %>%
-  filter(parameter %in% c("Program reach [70% - 95%]", "Round coverage [70% - 95%]")) %>%
+  filter(parameter %in% c("Round coverage [70% - 95%]", "Cycle coverage [70% - 95%]")) %>%
   group_by(Seasonality, EIR, Access, Agegroup, Outcome) %>%
   mutate(S_eff = sum(S_eff),
          T_eff = sum(T_eff),

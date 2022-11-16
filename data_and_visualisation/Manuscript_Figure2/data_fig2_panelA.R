@@ -17,6 +17,7 @@ exp <- "iTPP3_ChemoBlood_TreatLiver_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred <- c("inc_red_int_Tot")
+#pred <- c("prev_red_int_Aug")
 
 library(tidyr)
 library(dplyr)

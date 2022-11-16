@@ -90,8 +90,8 @@ p
 
 ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure2/fig2_panelB.jpg"),
        plot = last_plot(),
-       width = 4, #4.5,
-       height = 6, #5,
+       width = 4.5,
+       height = 5,
        dpi = 400)
 
 

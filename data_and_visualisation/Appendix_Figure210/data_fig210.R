@@ -121,10 +121,10 @@ for (j in setting_id[index]) {
 }
 
 # Format resulting database
-df$Coverage1 <- factor(paste0(df$Coverage1*100, "% PROGRAM REACH"), 
-                       levels = c("75% PROGRAM REACH", "85% PROGRAM REACH", "95% PROGRAM REACH"))
-df$Coverage2 <- factor(paste0(df$Coverage2*100, "% ROUND COVERAGE"),
-                       levels = c("95% ROUND COVERAGE", "85% ROUND COVERAGE", "75% ROUND COVERAGE"))
+df$Coverage1 <- factor(paste0(df$Coverage1*100, "% ROUND COVERAGE"), 
+                       levels = c("75% ROUND COVERAGE", "85% ROUND COVERAGE", "95% ROUND COVERAGE"))
+df$Coverage2 <- factor(paste0(df$Coverage2*100, "% CYCLE COVERAGE"),
+                       levels = c("95% CYCLE COVERAGE", "85% CYCLE COVERAGE", "75% CYCLE COVERAGE"))
 
 # Set target reduction bands
 df$target <- round(df$mean / 10, 0)*10

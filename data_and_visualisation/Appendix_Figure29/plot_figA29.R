@@ -96,6 +96,6 @@ ggsave(filename = paste0("./data_and_visualisation/Appendix_Figure29/figA29.jpg"
 # Identify point predictions reported in main body of paper
 
 df_point <- df_plot[df_plot$Halflife == 10 & df_plot$MaxKillingRate == 10, ]
-df_point[df_point$Coverage1 == "85% PROGRAM REACH" & df_point$Coverage2 == "85% ROUND COVERAGE", ]
-df_point[df_point$Coverage1 == "95% PROGRAM REACH" & df_point$Coverage2 == "85% ROUND COVERAGE", ]
+df_point[df_point$Coverage1 == "85% ROUND COVERAGE" & df_point$Coverage2 == "85% CYCLE COVERAGE", ]
+df_point[df_point$Coverage1 == "95% ROUND COVERAGE" & df_point$Coverage2 == "85% CYCLE COVERAGE", ]
 
