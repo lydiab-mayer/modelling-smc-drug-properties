@@ -220,7 +220,7 @@ p_slope <- p
 
 p_out <- (p_coverage1 | p_coverage2) / (p_halflife | p_maxkilling) + plot_annotation(title = "A. Direct SMC effects on children 3 - 59 months") & theme(plot.title = element_text(family = "Times New Roman", face = "bold"))
 
-ggsave(filename = paste0("./data_and_visualisation/Appendix_FigureX/figX_panelA.jpg"),
+ggsave(filename = paste0("./data_and_visualisation/Appendix_Figure29/figA29_panelA.jpg"),
        plot = p_out,
        width = 4.5,
        height = 4.35,

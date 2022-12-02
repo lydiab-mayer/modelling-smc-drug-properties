@@ -17,7 +17,7 @@ require(patchwork)
 setwd(paste0("/scicore/home/penny/brauna0000/M3TPP/SMC_TPP/"))
 
 # Load data
-data <- readRDS("./data_and_visualisation/Appendix_FigureX/data_figX_panelB.rds")
+data <- readRDS("./data_and_visualisation/Appendix_Figure29/data_figA29_panelB.rds")
 
 
 # ----------------------------------------------------------
@@ -220,7 +220,7 @@ p_slope <- p
 
 p_out <- (p_coverage1 | p_coverage2) / (p_halflife | p_maxkilling) + plot_annotation(title = "B. Indirect SMC effects on children 60 - 119 months") & theme(plot.title = element_text(family = "Times New Roman", face = "bold"))
 
-ggsave(filename = paste0("./data_and_visualisation/Appendix_FigureX/figX_panelB.jpg"),
+ggsave(filename = paste0("./data_and_visualisation/Appendix_Figure29/figA29_panelB.jpg"),
        plot = p_out,
        width = 4.5,
        height = 4.35,

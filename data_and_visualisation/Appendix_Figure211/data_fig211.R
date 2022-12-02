@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
-exp <- "iTPP3_ChemoBlood_4rounds"
+exp <- "iTPP3_ChemoLiver_TreatLiverBlood_4rounds"
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred <- "inc_red_int_Tot"
@@ -77,9 +77,9 @@ predict.grid <- function(param.ranges, grid.ranges, ngrid, model, scale = TRUE) 
   scenarios$se <- sqrt(scenarios$sd2 + scenarios$nugs)
   scenarios$cl <- qnorm(0.05, scenarios$mean, scenarios$se)
   scenarios$cu <- qnorm(0.95, scenarios$mean, scenarios$se)
-  
-  # Calculate target reduction
-  scenarios$target <- floor(scenarios$mean / 5) * 5
+  # 
+  # # Calculate target reduction
+  # scenarios$target <- floor(scenarios$mean / 10) * 10
   
   return(scenarios)
 }
@@ -90,12 +90,11 @@ predict.grid <- function(param.ranges, grid.ranges, ngrid, model, scale = TRUE) 
 # ----------------------------------------------------------
 
 # Generate grid of predictions
-ngrid <- c(3, 3, 20, 29, 1)
+ngrid <- c(3, 3, 51, 21)
 grid_ranges_cont <- rbind(Coverage1 = c(0.75, 0.95),
                           Coverage2 = c(0.75, 0.95),
-                          Halflife = c(1, 20),
-                          MaxKillingRate = c(2, 30),
-                          Slope = c(6, 6))
+                          Halflife = c(10, 60),
+                          Efficacy = c(0.8, 1))
 
 df <- data.frame()
 
@@ -113,7 +112,7 @@ for (j in setting_id[index]) {
   
   temp <- temp %>%
     separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Outcome", "temp1", "temp2", "temp3"),
+             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
              sep = "_",
              remove = FALSE)
   
@@ -137,5 +136,5 @@ df$target_label <- factor(paste0(df$target, "%"), levels = rev(paste0(unique(df$
 # Write data to file
 # ----------------------------------------------------------
 
-saveRDS(df, "./data_and_visualisation/Appendix_Figure29/data_figA29.rds")
+saveRDS(df, "./data_and_visualisation/Appendix_Figure211/data_figA211.rds")
 

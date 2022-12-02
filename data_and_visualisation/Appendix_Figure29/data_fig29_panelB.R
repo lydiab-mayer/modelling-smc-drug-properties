@@ -357,4 +357,4 @@ for (param in c("coverage1", "coverage2", "halflife", "MaxKillingRate", "slope")
 # Write data to file
 # ----------------------------------------------------------
 
-saveRDS(data, "./data_and_visualisation/Appendix_FigureX/data_figX_panelB.rds")
+saveRDS(data, "./data_and_visualisation/Appendix_Figure29/data_figA29_panelB.rds")
