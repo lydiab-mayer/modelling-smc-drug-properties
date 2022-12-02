@@ -15,8 +15,8 @@ rm(list = ls())
 # !!! Insert your experiment name here as a string, e.g. "MyExperiment" !!!
 exp <- "iTPP3_ChemoLiver_TreatLiverBlood_4rounds"
 
-# !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
-pred <- c("inc_red_int_Tot")
+# !!! Insert your predicted parameters here. Note that this must match with one column name in post-processing files !!!
+predictors <- c("inc_red_int_Tot", "prev_red_int_Aug", "sev_red_int_Tot")
 
 library(tidyr)
 library(dplyr)
@@ -86,14 +86,14 @@ data <- vector(mode = "list", length = 0L)
 # Define and load scenarios
 # ----------------------------------------------------------
 
-setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
+setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", predictors[1], "/*"))
 (setting_id <- sub(".rds", "", sub("opt_", "", basename(setting))))
 index <- 48 #24
 setting_id[index]
 
 
 # ----------------------------------------------------------
-# Generate figure for coverage1
+# Generate data for coverage1
 # ----------------------------------------------------------
 
 # Generate grid of predictions
@@ -107,35 +107,44 @@ grid_ranges_cont <- rbind(Coverage1 = c(0.7, 1.0),
 # Generate predictions
 df <- data.frame()
 
-for (j in setting_id[index]) {
-  # Load GP model
-  load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
+for (pred in predictors) {
   
-  # Generate model predictions
-  temp <- predict.grid(param.ranges = param_ranges_cont, 
-                       grid.ranges = grid_ranges_cont, 
-                       ngrid = ngrid, 
-                       model = cv_result$GP_model)
+  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
+  setting_id <- sub(".rds", "", sub("opt_", "", basename(setting)))
   
-  temp$scenario <- j
-  
-  temp <- temp %>%
-    separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
-             sep = "_",
-             remove = FALSE)
-  
-  temp <- temp[, !(names(temp) %in% c("temp1", "temp2", "temp3"))]
-  
-  df <- rbind(df, temp)
-  remove(temp)
+  for (j in setting_id[index]) {
+    # Load GP model
+    load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
+    
+    # Generate model predictions
+    temp <- predict.grid(param.ranges = param_ranges_cont, 
+                         grid.ranges = grid_ranges_cont, 
+                         ngrid = ngrid, 
+                         model = cv_result$GP_model)
+    
+    temp$scenario <- j
+    
+    temp <- temp %>%
+      separate(col = scenario,
+               into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
+               sep = "_",
+               remove = FALSE)
+    
+    temp <- temp[, !(names(temp) %in% c("temp1", "temp2", "temp3"))]
+    
+    temp$pred <- pred
+    
+    df <- rbind(df, temp)
+    remove(temp)
+  }
 }
+
 
 data[["coverage1"]] <- df
 
 
 # ----------------------------------------------------------
-# Generate figure for coverage2
+# Generate data for coverage2
 # ----------------------------------------------------------
 
 # Generate grid of predictions
@@ -149,33 +158,41 @@ grid_ranges_cont <- rbind(Coverage1 = 0.9,
 # Generate predictions
 df <- data.frame()
 
-for (j in setting_id[index]) {
-  # Load GP model
-  load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
+for (pred in predictors) {
   
-  # Generate model predictions
-  temp <- predict.grid(param.ranges = param_ranges_cont, 
-                       grid.ranges = grid_ranges_cont, 
-                       ngrid = ngrid, 
-                       model = cv_result$GP_model)
+  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
+  setting_id <- sub(".rds", "", sub("opt_", "", basename(setting)))
   
-  temp$scenario <- j
-  
-  temp <- temp %>%
-    separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
-             sep = "_",
-             remove = FALSE)
-  
-  df <- rbind(df, temp)
-  remove(temp)
+  for (j in setting_id[index]) {
+    # Load GP model
+    load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
+    
+    # Generate model predictions
+    temp <- predict.grid(param.ranges = param_ranges_cont, 
+                         grid.ranges = grid_ranges_cont, 
+                         ngrid = ngrid, 
+                         model = cv_result$GP_model)
+    
+    temp$scenario <- j
+    
+    temp <- temp %>%
+      separate(col = scenario,
+               into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
+               sep = "_",
+               remove = FALSE)
+    
+    temp$pred <- pred
+    
+    df <- rbind(df, temp)
+    remove(temp)
+  }
 }
 
 data[["coverage2"]] <- df
 
 
 # ----------------------------------------------------------
-# Generate figure for halflife
+# Generate data for halflife
 # ----------------------------------------------------------
 
 # Generate grid of predictions
@@ -189,26 +206,34 @@ grid_ranges_cont <- rbind(Coverage1 = 0.9,
 # Generate predictions
 df <- data.frame()
 
-for (j in setting_id[index]) {
-  # Load GP model
-  load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
+for (pred in predictors) {
   
-  # Generate model predictions
-  temp <- predict.grid(param.ranges = param_ranges_cont, 
-                       grid.ranges = grid_ranges_cont, 
-                       ngrid = ngrid, 
-                       model = cv_result$GP_model)
+  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
+  setting_id <- sub(".rds", "", sub("opt_", "", basename(setting)))
   
-  temp$scenario <- j
-  
-  temp <- temp %>%
-    separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
-             sep = "_",
-             remove = FALSE)
-  
-  df <- rbind(df, temp)
-  remove(temp)
+  for (j in setting_id[index]) {
+    # Load GP model
+    load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
+    
+    # Generate model predictions
+    temp <- predict.grid(param.ranges = param_ranges_cont, 
+                         grid.ranges = grid_ranges_cont, 
+                         ngrid = ngrid, 
+                         model = cv_result$GP_model)
+    
+    temp$scenario <- j
+    
+    temp <- temp %>%
+      separate(col = scenario,
+               into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
+               sep = "_",
+               remove = FALSE)
+    
+    temp$pred <- pred
+    
+    df <- rbind(df, temp)
+    remove(temp)
+  }
 }
 
 data[["halflife"]] <- df
@@ -229,29 +254,52 @@ grid_ranges_cont <- rbind(Coverage1 = 0.9,
 # Generate predictions
 df <- data.frame()
 
-for (j in setting_id[index]) {
-  # Load GP model
-  load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
+for (pred in predictors) {
   
-  # Generate model predictions
-  temp <- predict.grid(param.ranges = param_ranges_cont, 
-                       grid.ranges = grid_ranges_cont, 
-                       ngrid = ngrid, 
-                       model = cv_result$GP_model)
+  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
+  setting_id <- sub(".rds", "", sub("opt_", "", basename(setting)))
   
-  temp$scenario <- j
-  
-  temp <- temp %>%
-    separate(col = scenario,
-             into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
-             sep = "_",
-             remove = FALSE)
-  
-  df <- rbind(df, temp)
-  remove(temp)
+  for (j in setting_id[index]) {
+    # Load GP model
+    load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
+    
+    # Generate model predictions
+    temp <- predict.grid(param.ranges = param_ranges_cont, 
+                         grid.ranges = grid_ranges_cont, 
+                         ngrid = ngrid, 
+                         model = cv_result$GP_model)
+    
+    temp$scenario <- j
+    
+    temp <- temp %>%
+      separate(col = scenario,
+               into = c("Experiment", "Seasonality", "System", "EIR", "Agegroup", "Decay", "Access", "Timing", "Outcome", "temp1", "temp2", "temp3"),
+               sep = "_",
+               remove = FALSE)
+    
+    temp$pred <- pred
+    
+    df <- rbind(df, temp)
+    remove(temp)
+  }
 }
 
-data[["Efficacy"]] <- df
+data[["efficacy"]] <- df
+  
+
+
+
+# ----------------------------------------------------------
+# Format dataset
+# ----------------------------------------------------------
+
+for (param in c("coverage1", "coverage2", "halflife", "efficacy")) {
+  data[[param]]$pred <- factor(data[[param]]$pred, levels = predictors)
+  data[[param]]$pred <- recode_factor(data[[param]]$pred,
+                                      "inc_red_int_Tot" = "Clinical incidence",
+                                      "prev_red_int_Aug" = "Prevalence",
+                                      "sev_red_int_Tot" = "Severe disease")
+}
 
 
 # ----------------------------------------------------------

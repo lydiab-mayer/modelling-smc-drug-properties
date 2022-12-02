@@ -61,7 +61,7 @@ p <- p + scale_fill_manual(values = cols[c(1, 2, 4, 6, 7, 8, 10, 12)],
   scale_y_discrete(labels = c("50%", "", "60%", "", "70%", "", "80%", "", "90%"))
 
 p <- p + labs(y = "TARGET  REDUCTION", x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "PR"["2-10"]))) +
-  guides(fill = guide_legend(title.position = "top", title.hjust = 0.5, title = "COVERAGE  OF  ALL  SMC  ROUNDS", nrow = 2))
+  guides(fill = guide_legend(title.position = "top", title.hjust = 0.5, title = "COVERAGE  OF  ALL  SMC  CYCLES", nrow = 2))
 
 
 # Generate plot for round coverage
@@ -89,7 +89,7 @@ q <- q + scale_fill_manual(values = cols[c(1, 2, 4, 6, 8, 12)],
   scale_y_discrete(labels = c("50%", "", "60%", "", "70%", "", "80%", "", "90%"))
 
 q <- q + labs(y = "", x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "PR"["2-10"]))) +
-  guides(fill = guide_legend(title.position = "top", title.hjust = 0.5, title = "COVERAGE OF AT LEAST ONE SMC ROUND", nrow = 2))
+  guides(fill = guide_legend(title.position = "top", title.hjust = 0.5, title = "COVERAGE OF AT LEAST ONE SMC CYCLE", nrow = 2))
 
 # Arrange figure panels
 

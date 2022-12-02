@@ -26,9 +26,10 @@ data <- readRDS("./data_and_visualisation/Manuscript_Figure2/data_fig2_panelA.rd
 
 col <- "#C93312"
 
-p <- ggplot(data[["coverage1"]], aes(x = Coverage1, y = mean, ymin = cl, ymax = cu)) +
-  geom_ribbon(alpha = 0.3, fill = col) +
-  geom_point(colour = col)
+p <- ggplot(data[["coverage1"]], aes(x = Coverage1, y = mean, ymin = cl, ymax = cu, linetype = pred)) +
+#  geom_ribbon(alpha = 0.3, fill = col) +
+#  geom_point(colour = col) +
+  geom_line(colour = col)
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -43,18 +44,18 @@ p <- p + theme(panel.border = element_blank(),
                axis.title.x = element_text(margin = margin(t = 10)),
                axis.title.y = element_text(margin = margin(r = 10)),
                plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.title = element_text(face = "bold"))
+               legend.position = "none")
 
 p <- p + scale_x_continuous(breaks = seq(0.7, 1.0, by= 0.1),
                             limits = c(0.7, 1.0),
                             labels = paste0(seq(0.7, 1.0, by= 0.1)*100, "%"),
                             expand = expansion(mult = .03, add = 0)) + 
-  scale_y_continuous(breaks = seq(0, 100, by = 10),
+  scale_y_continuous(breaks = seq(0, 100, by = 20),
                      limits = c(0, 100),
-                     labels = paste0(seq(0, 100, by = 10), "%"),
+                     labels = paste0(seq(0, 100, by = 20), "%"),
                      expand = expansion(mult = .03, add = 0))
 
-p <- p + labs(x = "ROUND  COVERAGE", y = "CLINICAL  INCIDENCE\nREDUCTION")
+p <- p + labs(x = "ROUND  COVERAGE", y = "REDUCTION")
 
 p_coverage1 <- p
   
@@ -66,9 +67,10 @@ p_coverage1 <- p
 col_fill <- "#FAEFD1"
 col_colour <- "#827d55"
 
-p <- ggplot(data[["coverage2"]], aes(x = Coverage2, y = mean, ymin = cl, ymax = cu)) +
-  geom_ribbon(alpha = 0.8, fill = col_fill) +
-  geom_point(colour = col_colour)
+p <- ggplot(data[["coverage2"]], aes(x = Coverage2, y = mean, ymin = cl, ymax = cu, linetype = pred)) +
+#  geom_ribbon(alpha = 0.8, fill = col_fill) +
+#  geom_point(colour = col_colour)  +
+  geom_line(colour = col_colour)
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -83,12 +85,12 @@ p <- p + theme(panel.border = element_blank(),
                axis.title.x = element_text(margin = margin(t = 10)),
                axis.title.y = element_text(margin = margin(r = 10)),
                plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.title = element_text(face = "bold"))
+               legend.position = "none")
 
 p <- p + scale_x_continuous(breaks = seq(0.7, 1.0, by= 0.1),
                             labels = paste0(seq(0.7, 1.0, by= 0.1)*100, "%"),
                             expand = expansion(mult = .03, add = 0)) + 
-  scale_y_continuous(breaks = seq(0, 100, by = 10),
+  scale_y_continuous(breaks = seq(0, 100, by = 20),
                      limits = c(0, 100),
                      expand = expansion(mult = .03, add = 0))
 
@@ -103,9 +105,10 @@ p_coverage2 <- p
 
 col <- "#899DA4"
 
-p <- ggplot(data[["halflife"]], aes(x = Halflife, y = mean, ymin = cl, ymax = cu)) +
-  geom_ribbon(alpha = 0.3, fill = col) +
-  geom_point(colour = col)
+p <- ggplot(data[["halflife"]], aes(x = Halflife, y = mean, ymin = cl, ymax = cu, linetype = pred)) +
+#  geom_ribbon(alpha = 0.3, fill = col) +
+#  geom_point(colour = col) +
+  geom_line(colour = col)
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -120,17 +123,17 @@ p <- p + theme(panel.border = element_blank(),
                axis.title.x = element_text(margin = margin(t = 10)),
                axis.title.y = element_text(margin = margin(r = 10)),
                plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.title = element_text(face = "bold"))
+               legend.position = "none")
 
 p <- p + scale_x_continuous(breaks = seq(0, 20, by = 5),
                             limits = c(0, 20),
                             expand = expansion(mult = .03, add = 0)) + 
-  scale_y_continuous(breaks = seq(0, 100, by = 10),
+  scale_y_continuous(breaks = seq(0, 100, by = 20),
                      limits = c(0, 100),
-                     labels = paste0(seq(0, 100, by = 10), "%"),
+                     labels = paste0(seq(0, 100, by = 20), "%"),
                      expand = expansion(mult = .03, add = 0))
 
-p <- p + labs(x = "ELIMINATION\nHALF-LIFE  (DAYS)", y = "CLINICAL  INCIDENCE\nREDUCTION")
+p <- p + labs(x = "ELIMINATION\nHALF-LIFE  (DAYS)", y = "REDUCTION")
 
 p_halflife <- p
   
@@ -141,9 +144,10 @@ p_halflife <- p
 
 col <- "#DC863B"
 
-p <- ggplot(data[["MaxKillingRate"]], aes(x = MaxKillingRate, y = mean, ymin = cl, ymax = cu)) +
-  geom_ribbon(alpha = 0.3, fill = col) +
-  geom_point(colour = col)
+p <- ggplot(data[["MaxKillingRate"]], aes(x = MaxKillingRate, y = mean, ymin = cl, ymax = cu, linetype = pred)) +
+#  geom_ribbon(alpha = 0.3, fill = col) +
+#  geom_point(colour = col) +
+  geom_line(colour = col)
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -158,12 +162,12 @@ p <- p + theme(panel.border = element_blank(),
                axis.title.x = element_text(margin = margin(t = 10)),
                axis.title.y = element_text(margin = margin(r = 10)),
                plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.title = element_text(face = "bold"))
+               legend.position = "none")
 
 p <- p + scale_x_continuous(breaks = seq(0, 30, by = 5),
                             limits = c(0, 30),
                             expand = expansion(mult = .03, add = 0)) + 
-  scale_y_continuous(breaks = seq(0, 100, by = 10),
+  scale_y_continuous(breaks = seq(0, 100, by = 20),
                      limits = c(0, 100),
                      expand = expansion(mult = .03, add = 0))
 
@@ -178,9 +182,10 @@ p_maxkilling <- p
 
 col <- "#425055"
 
-p <- ggplot(data[["slope"]], aes(x = Slope, y = mean, ymin = cl, ymax = cu)) +
-  geom_ribbon(alpha = 0.3, fill = col) +
-  geom_point(colour = col)
+p <- ggplot(data[["slope"]], aes(x = Slope, y = mean, ymin = cl, ymax = cu, linetype = pred)) +
+#  geom_ribbon(alpha = 0.3, fill = col) +
+#  geom_point(colour = col) +
+  geom_line(colour = col)
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
@@ -195,12 +200,12 @@ p <- p + theme(panel.border = element_blank(),
                axis.title.x = element_text(margin = margin(t = 10)),
                axis.title.y = element_text(margin = margin(r = 10)),
                plot.title = element_text(hjust = 0.5, face = "bold"),
-               legend.title = element_text(face = "bold"))
+               legend.position = "none")
 
 p <- p + scale_x_continuous(breaks = seq(0, 8, by = 2),
                             limits = c(0, 8),
                             expand = expansion(mult = .03, add = 0)) + 
-  scale_y_continuous(breaks = seq(0, 100, by = 10),
+  scale_y_continuous(breaks = seq(0, 100, by = 20),
                      limits = c(0, 100),
                      expand = expansion(mult = .03, add = 0))
 
@@ -218,5 +223,5 @@ p_out <- (p_coverage1 | p_coverage2) / (p_halflife | p_maxkilling) + plot_annota
 ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure2/fig2_panelA.jpg"),
        plot = p_out,
        width = 4.5,
-       height = 5,
+       height = 4.35,
        dpi = 400)
