@@ -1,6 +1,6 @@
 This is release 1.0 of the analysis code for:
 
-**Designing and selecting drug properties to increase the public health impact of next-generation malaria chemoprevention**
+**Design and selection of drug properties to increase the public health impact of next-generation seasonal malaria chemoprevention**
 
 *Lydia Braunack-Mayer1,2, Josephine Malinga1,2†, Thiery Masserey1,2†, Narimane Nekkab1,2†, Swapnoleena Sen1,2, David Schellenberg3, André-Marie Tchouatieu4, Sherrie L Kelly1,2, Melissa A Penny1,2* 
 
