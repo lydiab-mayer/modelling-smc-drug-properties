@@ -86,9 +86,9 @@ data <- vector(mode = "list", length = 0L)
 # Define and load scenarios
 # ----------------------------------------------------------
 
-setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp_5to10/GP_grid_optimization/", predictors[1], "/*"))
+setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", predictors[1], "/*"))
 (setting_id <- sub(".rds", "", sub("opt_", "", basename(setting))))
-index <- 48
+index <- 48 #24
 setting_id[index]
 
 
@@ -99,9 +99,9 @@ setting_id[index]
 # Generate grid of predictions
 ngrid <- c(31, 1, 1, 1, 1)
 grid_ranges_cont <- rbind(Coverage1 = c(0.7, 1.0),
-                          Coverage2 = 0.9,
-                          Halflife = 10,
-                          MaxKillingRate = 3.45,
+                          Coverage2 = 0.95,
+                          Halflife = 15,
+                          MaxKillingRate = 10,
                           Slope = 6)
 
 
@@ -110,12 +110,12 @@ df <- data.frame()
 
 for (pred in predictors) {
   
-  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp_5to10/GP_grid_optimization/", pred, "/*"))
+  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
   setting_id <- sub(".rds", "", sub("opt_", "", basename(setting)))
   
   for (j in setting_id[index]) {
     # Load GP model
-    load(paste0(GROUP_dr, exp, "/gp_5to10/trained/", pred, "/seeds_", j, "_cv.RData"))
+    load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
     
     # Generate model predictions
     temp <- predict.grid(param.ranges = param_ranges_cont, 
@@ -150,10 +150,10 @@ data[["coverage1"]] <- df
 
 # Generate grid of predictions
 ngrid <- c(1, 31, 1, 1, 1)
-grid_ranges_cont <- rbind(Coverage1 = 0.9,
+grid_ranges_cont <- rbind(Coverage1 = 0.95,
                           Coverage2 = c(0.7, 1.0),
-                          Halflife = 10,
-                          MaxKillingRate = 3.45,
+                          Halflife = 15,
+                          MaxKillingRate = 10,
                           Slope = 6)
 
 
@@ -162,12 +162,12 @@ df <- data.frame()
 
 for (pred in predictors) {
   
-  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp_5to10/GP_grid_optimization/", pred, "/*"))
+  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
   setting_id <- sub(".rds", "", sub("opt_", "", basename(setting)))
   
   for (j in setting_id[index]) {
     # Load GP model
-    load(paste0(GROUP_dr, exp, "/gp_5to10/trained/", pred, "/seeds_", j, "_cv.RData"))
+    load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
     
     # Generate model predictions
     temp <- predict.grid(param.ranges = param_ranges_cont, 
@@ -199,10 +199,10 @@ data[["coverage2"]] <- df
 
 # Generate grid of predictions
 ngrid <- c(1, 1, 20, 1, 1)
-grid_ranges_cont <- rbind(Coverage1 = 0.9,
-                          Coverage2 = 0.9,
+grid_ranges_cont <- rbind(Coverage1 = 0.95,
+                          Coverage2 = 0.95,
                           Halflife = c(1, 20),
-                          MaxKillingRate = 3.45,
+                          MaxKillingRate = 10,
                           Slope = 6)
 
 
@@ -211,12 +211,12 @@ df <- data.frame()
 
 for (pred in predictors) {
   
-  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp_5to10/GP_grid_optimization/", pred, "/*"))
+  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
   setting_id <- sub(".rds", "", sub("opt_", "", basename(setting)))
   
   for (j in setting_id[index]) {
     # Load GP model
-    load(paste0(GROUP_dr, exp, "/gp_5to10/trained/", pred, "/seeds_", j, "_cv.RData"))
+    load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
     
     # Generate model predictions
     temp <- predict.grid(param.ranges = param_ranges_cont, 
@@ -248,9 +248,9 @@ data[["halflife"]] <- df
 
 # Generate grid of predictions
 ngrid <- c(1, 1, 1, 29, 1)
-grid_ranges_cont <- rbind(Coverage1 = 0.9,
-                          Coverage2 = 0.9,
-                          Halflife = 10,
+grid_ranges_cont <- rbind(Coverage1 = 0.95,
+                          Coverage2 = 0.95,
+                          Halflife = 15,
                           MaxKillingRate = c(2, 30),
                           Slope = 6)
 
@@ -260,12 +260,12 @@ df <- data.frame()
 
 for (pred in predictors) {
   
-  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp_5to10/GP_grid_optimization/", pred, "/*"))
+  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
   setting_id <- sub(".rds", "", sub("opt_", "", basename(setting)))
   
   for (j in setting_id[index]) {
     # Load GP model
-    load(paste0(GROUP_dr, exp, "/gp_5to10/trained/", pred, "/seeds_", j, "_cv.RData"))
+    load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
     
     # Generate model predictions
     temp <- predict.grid(param.ranges = param_ranges_cont, 
@@ -297,10 +297,10 @@ data[["MaxKillingRate"]] <- df
 
 # Generate grid of predictions
 ngrid <- c(1, 1, 1, 1, 9)
-grid_ranges_cont <- rbind(Coverage1 = 0.9,
-                          Coverage2 = 0.9,
-                          Halflife = 10,
-                          MaxKillingRate = 3.45,
+grid_ranges_cont <- rbind(Coverage1 = 0.95,
+                          Coverage2 = 0.95,
+                          Halflife = 15,
+                          MaxKillingRate = 10,
                           Slope = c(1, 8))
 
 
@@ -309,12 +309,12 @@ df <- data.frame()
 
 for (pred in predictors) {
   
-  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp_5to10/GP_grid_optimization/", pred, "/*"))
+  setting <- Sys.glob(paste0(GROUP_dr, exp, "/gp/GP_grid_optimization/", pred, "/*"))
   setting_id <- sub(".rds", "", sub("opt_", "", basename(setting)))
   
   for (j in setting_id[index]) {
     # Load GP model
-    load(paste0(GROUP_dr, exp, "/gp_5to10/trained/", pred, "/seeds_", j, "_cv.RData"))
+    load(paste0(GROUP_dr, exp, "/gp/trained/", pred, "/seeds_", j, "_cv.RData"))
     
     # Generate model predictions
     temp <- predict.grid(param.ranges = param_ranges_cont, 

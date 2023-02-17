@@ -60,8 +60,8 @@ c(paste0("Total input EIR: ", sum(df$Average$input.EIR)), paste0("Total simulate
 
 df$Average$scenario_id <- as.factor(df$Average$scenario_id)
 df$Average$scenario_id <- recode(df$Average$scenario_id, 
-                                 "iTPP3_ChemoBlood_TreatLiver_4rounds_7" = "3 MONTH",
-                                 "iTPP3_ChemoBlood_TreatLiver_4rounds_8" = "5 MONTH")
+                                 "iTPP3_ChemoBlood_TreatLiver_4rounds_7" = "THREE MONTHS",
+                                 "iTPP3_ChemoBlood_TreatLiver_4rounds_8" = "FIVE MONTHS")
 
 
 # ----------------------------------------------------------

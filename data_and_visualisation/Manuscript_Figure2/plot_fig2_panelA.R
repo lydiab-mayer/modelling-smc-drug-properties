@@ -19,6 +19,9 @@ setwd(paste0("/scicore/home/penny/brauna0000/M3TPP/SMC_TPP/"))
 # Load data
 data <- readRDS("./data_and_visualisation/Manuscript_Figure2/data_fig2_panelA.rds")
 
+# Define values for linetype
+linetype <- c("longdash", "solid", "dotted")
+
 
 # ----------------------------------------------------------
 # Generate plot for coverage1
@@ -34,7 +37,7 @@ p <- ggplot(data[["coverage1"]], aes(x = Coverage1, y = mean, ymin = cl, ymax = 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid.major = element_line(colour = "grey95"),
-               panel.grid.minor = element_blank(),
+               panel.grid.minor = element_line(colour = "grey95"),
                text = element_text(family = "Times New Roman", size = 10),
                strip.background = element_blank(),
                axis.line = element_blank(),
@@ -50,10 +53,11 @@ p <- p + scale_x_continuous(breaks = seq(0.7, 1.0, by= 0.1),
                             limits = c(0.7, 1.0),
                             labels = paste0(seq(0.7, 1.0, by= 0.1)*100, "%"),
                             expand = expansion(mult = .03, add = 0)) + 
-  scale_y_continuous(breaks = seq(0, 100, by = 20),
-                     limits = c(0, 100),
-                     labels = paste0(seq(0, 100, by = 20), "%"),
-                     expand = expansion(mult = .03, add = 0))
+  scale_y_continuous(breaks = seq(40, 100, by = 20),
+                     limits = c(40, 100),
+                     labels = paste0(seq(40, 100, by = 20), "%"),
+                     expand = expansion(mult = .03, add = 0)) +
+  scale_linetype_manual(values = linetype)
 
 p <- p + labs(x = "ROUND  COVERAGE", y = "REDUCTION")
 
@@ -75,7 +79,7 @@ p <- ggplot(data[["coverage2"]], aes(x = Coverage2, y = mean, ymin = cl, ymax = 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid.major = element_line(colour = "grey95"),
-               panel.grid.minor = element_blank(),
+               panel.grid.minor = element_line(colour = "grey95"),
                text = element_text(family = "Times New Roman", size = 10),
                strip.background = element_blank(),
                axis.line = element_blank(),
@@ -90,9 +94,10 @@ p <- p + theme(panel.border = element_blank(),
 p <- p + scale_x_continuous(breaks = seq(0.7, 1.0, by= 0.1),
                             labels = paste0(seq(0.7, 1.0, by= 0.1)*100, "%"),
                             expand = expansion(mult = .03, add = 0)) + 
-  scale_y_continuous(breaks = seq(0, 100, by = 20),
-                     limits = c(0, 100),
-                     expand = expansion(mult = .03, add = 0))
+  scale_y_continuous(breaks = seq(40, 100, by = 20),
+                     limits = c(40, 100),
+                     expand = expansion(mult = .03, add = 0)) +
+  scale_linetype_manual(values = linetype)
 
 p <- p + labs(x = "CYCLE  COVERAGE", y = "")
 
@@ -113,7 +118,7 @@ p <- ggplot(data[["halflife"]], aes(x = Halflife, y = mean, ymin = cl, ymax = cu
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid.major = element_line(colour = "grey95"),
-               panel.grid.minor = element_blank(),
+               panel.grid.minor = element_line(colour = "grey95"),
                text = element_text(family = "Times New Roman", size = 10),
                strip.background = element_blank(),
                axis.line = element_blank(),
@@ -128,10 +133,11 @@ p <- p + theme(panel.border = element_blank(),
 p <- p + scale_x_continuous(breaks = seq(0, 20, by = 5),
                             limits = c(0, 20),
                             expand = expansion(mult = .03, add = 0)) + 
-  scale_y_continuous(breaks = seq(0, 100, by = 20),
-                     limits = c(0, 100),
-                     labels = paste0(seq(0, 100, by = 20), "%"),
-                     expand = expansion(mult = .03, add = 0))
+  scale_y_continuous(breaks = seq(40, 100, by = 20),
+                     limits = c(40, 100),
+                     labels = paste0(seq(40, 100, by = 20), "%"),
+                     expand = expansion(mult = .03, add = 0)) +
+  scale_linetype_manual(values = linetype)
 
 p <- p + labs(x = "ELIMINATION\nHALF-LIFE  (DAYS)", y = "REDUCTION")
 
@@ -152,7 +158,7 @@ p <- ggplot(data[["MaxKillingRate"]], aes(x = MaxKillingRate, y = mean, ymin = c
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid.major = element_line(colour = "grey95"),
-               panel.grid.minor = element_blank(),
+               panel.grid.minor = element_line(colour = "grey95"),
                text = element_text(family = "Times New Roman", size = 10),
                strip.background = element_blank(),
                axis.line = element_blank(),
@@ -164,12 +170,13 @@ p <- p + theme(panel.border = element_blank(),
                plot.title = element_text(hjust = 0.5, face = "bold"),
                legend.position = "none")
 
-p <- p + scale_x_continuous(breaks = seq(0, 30, by = 5),
+p <- p + scale_x_continuous(breaks = seq(0, 30, by = 10),
                             limits = c(0, 30),
                             expand = expansion(mult = .03, add = 0)) + 
-  scale_y_continuous(breaks = seq(0, 100, by = 20),
-                     limits = c(0, 100),
-                     expand = expansion(mult = .03, add = 0))
+  scale_y_continuous(breaks = seq(40, 100, by = 20),
+                     limits = c(40, 100),
+                     expand = expansion(mult = .03, add = 0)) +
+  scale_linetype_manual(values = linetype)
 
 p <- p + labs(x = expression("E"["max"]), y = "")
 
@@ -190,7 +197,7 @@ p <- ggplot(data[["slope"]], aes(x = Slope, y = mean, ymin = cl, ymax = cu, line
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid.major = element_line(colour = "grey95"),
-               panel.grid.minor = element_blank(),
+               panel.grid.minor = element_line(colour = "grey95"),
                text = element_text(family = "Times New Roman", size = 10),
                strip.background = element_blank(),
                axis.line = element_blank(),
@@ -205,9 +212,10 @@ p <- p + theme(panel.border = element_blank(),
 p <- p + scale_x_continuous(breaks = seq(0, 8, by = 2),
                             limits = c(0, 8),
                             expand = expansion(mult = .03, add = 0)) + 
-  scale_y_continuous(breaks = seq(0, 100, by = 20),
-                     limits = c(0, 100),
-                     expand = expansion(mult = .03, add = 0))
+  scale_y_continuous(breaks = seq(40, 100, by = 20),
+                     limits = c(40, 100),
+                     expand = expansion(mult = .03, add = 0)) +
+  scale_linetype_manual(values = linetype)
 
 p <- p + labs(x = "PD  MODEL  SLOPE", y = "")
 

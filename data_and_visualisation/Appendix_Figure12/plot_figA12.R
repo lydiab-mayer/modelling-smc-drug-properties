@@ -34,22 +34,30 @@ int <- month*3:7
 p <- ggplot()
 
 # Add data for average EIR
-p <- p + geom_rect(aes(xmin = 3, xmax = 7, ymin = 0, ymax = max(df$Average$simulated.EIR)), fill = "#899DA4", alpha = 0.1) +
+p <- p + geom_rect(aes(xmin = 3, xmax = 8, ymin = 0, ymax = max(df$Average$simulated.EIR)), fill = "#899DA4", alpha = 0.1) +
 geom_line(data = df$Average, aes(x = timestep/(73/12), y = simulated.EIR, colour = scenario_id)) + 
-  geom_vline(xintercept = 3:7, colour = "#899DA4", linetype = "dashed")
-  
+  geom_vline(xintercept = 3:7, colour = "#899DA4", linetype = "dashed") 
+
+# Add labels
+p <- p + geom_text(aes(x = 3, y = max(df$Average$simulated.EIR)*1.05, label = "Cycle 5"), family = "Times New Roman") +
+  geom_text(aes(x = 4, y = max(df$Average$simulated.EIR)*1.05, label = "Cycle 1"), family = "Times New Roman") +
+  geom_text(aes(x = 5, y = max(df$Average$simulated.EIR)*1.05, label = "Cycle 2"), family = "Times New Roman") +
+  geom_text(aes(x = 6, y = max(df$Average$simulated.EIR)*1.05, label = "Cycle 3"), family = "Times New Roman") +
+  geom_text(aes(x = 7, y = max(df$Average$simulated.EIR)*1.05, label = "Cycle 4"), family = "Times New Roman") +
+  geom_text(aes(x = 5.5, y = 0.02, label = "Follow up period"), family = "Times New Roman")
+
 # Add lines marking rounds
 
 # Define plot theme
 p <- p + theme(panel.border = element_blank(), 
                  panel.background = element_blank(),
                  panel.grid = element_blank(),
-                 text = element_text(family = "Times New Roman", size = 7),
+                 text = element_text(family = "Times New Roman", size = 12),
                  strip.background = element_blank(),
                  axis.line = element_blank(),
                  axis.ticks = element_blank(),
                axis.text.y = element_blank(),
-                 axis.title.x = element_text(margin = margin(t = 10)),
+                 axis.title.x = element_text(margin = margin(t = 12)),
                  plot.title = element_text(hjust = 0.5, face = "bold"),
                  legend.title = element_text(face = "bold"),
                legend.position = "bottom",
@@ -60,7 +68,7 @@ p <- p + theme(panel.border = element_blank(),
 
 # Define plot titles
 p <- p + labs(x = "MONTH",
-              y = "ENTOMOLOGICAL  INNOCULATION  RATE",
+              y = "ENTOMOLOGICAL\nINNOCULATION  RATE",
               colour = "SEASONAL  PROFILE")
 
 p
@@ -69,5 +77,5 @@ p
 ggsave(filename= paste0("./data_and_visualisation/Appendix_Figure12/plot_figA12.jpg"),
        plot = last_plot(),
        width = 9.1,
-       height = 3,
+       height = 4,
        dpi = 400)

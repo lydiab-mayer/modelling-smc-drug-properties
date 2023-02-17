@@ -68,7 +68,7 @@ p <- p + scale_x_continuous(breaks = 0:8,
                      labels = paste0(seq(0, 100, by = 20), "%"),
                      expand = expansion(mult = .03, add = 0))
 
-p <- p + labs(x = "WEEKS  AFTER  FINAL  SMC  ROUND", 
+p <- p + labs(x = "WEEKS  AFTER  FINAL  SMC  CYCLE", 
               y = "PROTECTIVE  EFFICACY")
 
 
@@ -100,12 +100,12 @@ q <- q + theme(panel.border = element_blank(),
 q <- q + scale_x_continuous(breaks = seq(0, 12, by = 1),
                             limits = c(0, 8),
                             expand = expansion(mult = .03, add = 0)) +
-  scale_y_continuous(breaks = seq(0, 30, by = 10),
+  scale_y_continuous(breaks = seq(0, 30, by = 5),
                      expand = expansion(mult = .03, add = 0)) +
   scale_colour_manual(values = cols[c(1, 3)]) +
   scale_fill_manual(values = cols[c(1, 3)])
 
-q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  ROUND",  
+q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  CYCLE",  
               y = "KILLING  RATE")
 
 p + q + plot_annotation(title = "B. Next-generation SMC with dominant blood stage activity and initial, complete liver stage clearance") +
