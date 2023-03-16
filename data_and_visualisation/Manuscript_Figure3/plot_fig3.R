@@ -58,12 +58,12 @@ p <- p + facet_grid(Coverage2 ~ Coverage1)
 
 p <- p + geom_rect(aes(xmin = 4.74, xmax = 8.81, ymin = 2.28, ymax = 29.96), colour = "white", fill = NA, size = 0.7) + #uncomment for blood stage only
 #p <- p + geom_rect(aes(xmin = 5.12, xmax = 8.81, ymin = 2.28, ymax = 29.96), colour = "white", fill = NA, size = 0.7) + #uncomment for dominant blood stage
-  annotate(geom = "label", x = 6.9, y = 15, fill = "white", label = "SP-AQ", size = 2.5, label.size = 0, family = "Times New Roman")
+  annotate(geom = "label", x = 6.9, y = 15, fill = "white", label = "SP-AQ", size = 2.5, label.size = 0, family = "serif")
 
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = 10),
+               text = element_text(family = "serif", size = 10),
                strip.background = element_blank(),
                axis.line = element_blank(),
                axis.ticks = element_blank(),
@@ -87,6 +87,12 @@ p <- p + guides(fill = guide_legend(title = leg_title["inc_red_int_Tot"], nrow =
 p
 
 ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure3/fig3.jpg"),
+       plot = last_plot(),
+       width = 9.1,
+       height = 7,
+       dpi = 300)
+
+ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure3/fig3.pdf"),
        plot = last_plot(),
        width = 9.1,
        height = 7,

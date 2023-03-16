@@ -47,7 +47,7 @@ p <- p + facet_grid(Coverage2 ~ Coverage1)
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = text_size),
+               text = element_text(family = "serif", size = text_size),
                strip.background = element_blank(),
                strip.text = element_text(face = "bold"),
                axis.line = element_blank(),
@@ -69,7 +69,7 @@ p <- p + labs(y = "TARGET  REDUCTION", x = expression(paste("BASELINE ANNUAL ", 
   guides(fill = guide_legend(title.position = "top", title = "ELIMINATION  HALF-LIFE  (DAYS)", nrow = 1))
 
 p + plot_annotation(title = "B.  MINIMUM  ELIMINATION  HALF-LIFE  CRITERIA") & 
-  theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = text_size))
+  theme(plot.title = element_text(family = "serif", face = "bold", size = text_size))
 
 ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure4/fig4_panelB.jpg"),
        plot = last_plot(),
@@ -77,4 +77,8 @@ ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure4/fig4_panel
        height = 6,
        dpi = 300)
 
-
+ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure4/fig4_panelB.pdf"),
+       plot = last_plot(),
+       width = 9.1,
+       height = 6,
+       dpi = 300)

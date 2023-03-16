@@ -45,7 +45,7 @@ p <- p + geom_tile(colour = "white", size = 1.5)
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = text_size),
+               text = element_text(family = "serif", size = text_size),
                axis.line = element_blank(),
                axis.ticks = element_blank(),
                axis.text.x = element_text(margin = margin(t = 0)),
@@ -73,7 +73,7 @@ q <- q + geom_tile(colour = "white", size = 1.5)
 q <- q + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = text_size),
+               text = element_text(family = "serif", size = text_size),
                axis.line = element_blank(),
                axis.ticks = element_blank(),
                axis.text.x = element_text(margin = margin(t = 0)),
@@ -94,9 +94,15 @@ q <- q + labs(y = "", x = expression(paste("BASELINE  ANNUAL  ", italic("Pf"), "
 # Arrange figure panels
 
 p + q + plot_annotation(title = "A.  MINIMUM  COVERAGE  CRITERIA") & 
-                 theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = text_size))
+                 theme(plot.title = element_text(family = "serif", face = "bold", size = text_size))
 
 ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure4/fig4_panelA.jpg"),
+       plot = last_plot(),
+       width = 9.1,
+       height = 4,
+       dpi = 300)
+
+ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure4/fig4_panelA.pdf"),
        plot = last_plot(),
        width = 9.1,
        height = 4,

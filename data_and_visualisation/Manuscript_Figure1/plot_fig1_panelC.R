@@ -51,7 +51,7 @@ p <- p + geom_line(data = df_plot_pe[df_plot_pe$drug %in% c("SP-AQ"), ],
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = 10),
+               text = element_text(family = "serif", size = 10),
                strip.background = element_blank(),
                axis.line = element_blank(),
                axis.ticks = element_blank(),
@@ -89,7 +89,7 @@ q <- q + theme(panel.border = element_blank(),
                panel.background = element_blank(),
                panel.grid.major = element_line(colour = "grey95"),
                panel.grid.minor = element_blank(),
-               text = element_text(family = "Times New Roman", size = 10),
+               text = element_text(family = "serif", size = 10),
                strip.background = element_blank(),
               axis.line = element_blank(),
               axis.ticks = element_blank(),
@@ -115,7 +115,7 @@ q
 
 p + q + plot_annotation(title = "C. Next-generation SMC with dominant liver stage activity and initial, complete blood stage clearance") +
   plot_layout(guides = "collect") &
-  theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = 10),
+  theme(plot.title = element_text(family = "serif", face = "bold", size = 10),
         legend.position = "bottom")
 
 ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure1/fig1_panelC.jpg"),
@@ -124,3 +124,8 @@ ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure1/fig1_panel
        height = 3,
        dpi = 400)
 
+ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure1/fig1_panelC.pdf"),
+       plot = last_plot(),
+       width = 9.1,
+       height = 3,
+       dpi = 400)

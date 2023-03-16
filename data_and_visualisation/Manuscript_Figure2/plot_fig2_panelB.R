@@ -55,7 +55,7 @@ p <- p + geom_bar(position = "stack", stat = "identity", colour = "white")
 
 p <- p + geom_text(aes(colour = parameter), 
                    position = position_stack(vjust = 0.5),
-                   family = "Times New Roman",
+                   family = "serif",
                    size = fontsize*0.28,
                    show.legend = FALSE)
 
@@ -64,7 +64,7 @@ p <- p + facet_wrap(Outcome ~ ., scales = "free_x", ncol = 1)
 p <- p + theme(panel.border = element_blank(), 
                panel.background = element_blank(),
                panel.grid = element_blank(),
-               text = element_text(family = "Times New Roman", size = fontsize),
+               text = element_text(family = "serif", size = fontsize),
                title = element_text(face = "bold"),
                strip.background = element_blank(),
                axis.line = element_blank(),
@@ -89,6 +89,12 @@ p <- p + guides(fill = guide_legend(nrow = 2))
 p
 
 ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure2/fig2_panelB.jpg"),
+       plot = last_plot(),
+       width = 4.5,
+       height = 5,
+       dpi = 400)
+
+ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure2/fig2_panelB.pdf"),
        plot = last_plot(),
        width = 4.5,
        height = 5,
