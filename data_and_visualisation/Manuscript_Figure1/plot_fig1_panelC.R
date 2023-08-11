@@ -113,7 +113,7 @@ q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  CYCLE",
 
 q
 
-p + q + plot_annotation(title = "C. Next-generation SMC with dominant liver stage activity and initial, complete blood stage clearance") +
+p + q + plot_annotation(title = "Next-generation SMC with dominant liver stage activity and initial, complete blood stage clearance") +
   plot_layout(guides = "collect") &
   theme(plot.title = element_text(family = "serif", face = "bold", size = 10),
         legend.position = "bottom")

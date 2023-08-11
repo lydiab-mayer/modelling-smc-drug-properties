@@ -19,7 +19,7 @@ library(patchwork)
 setwd(paste0("/scicore/home/penny/brauna0000/M3TPP/SMC_TPP"))
 
 # Load data
-df <- readRDS("./data_and_visualisation/Manuscript_Figure4/data_fig4_panelB.rds")
+df <- readRDS("./data_and_visualisation/Appendix_Figure213/data_figA213.rds")
 
 
 # ----------------------------------------------------------
@@ -38,7 +38,7 @@ text_size <- 10
 # Generate plot
 # ----------------------------------------------------------
 
-p <- ggplot(df, aes(x = annual_prev, y = Target, fill = DurationHalflife))
+p <- ggplot(df, aes(x = annual_prev, y = Target, fill = Halflife))
 
 p <- p + geom_tile(colour = "white", size = 1.5)
 
@@ -59,25 +59,19 @@ p <- p + theme(panel.border = element_blank(),
                legend.position = "bottom",
                legend.key = element_blank())
 
-p <- p + scale_fill_manual(values = cols[c(1, 2, 4, 5, 6, 7, 9, 11, 13)], 
-                    na.value = "light grey",
-                    labels = c(levels(df$DurationHalflife), 
-                               "Target not met in\nparameter space")) +
+p <- p + scale_fill_manual(values = cols[c(4, 6, 8, 12)], 
+                           na.value = "light grey",
+                           labels = c(levels(df$Halflife), 
+                                      "Target not met in\nparameter space")) +
   scale_y_discrete(labels = c("50%", "", "60%", "", "70%", "", "80%", "", "90%"))
 
 p <- p + labs(y = "TARGET  REDUCTION", x = expression(paste("BASELINE ANNUAL ", italic("Pf"), "PR"["2-10"]))) +
-  guides(fill = guide_legend(title.position = "top", title = "DURATION  OF  PROTECTION  HALF-LIFE  (DAYS)", nrow = 1))
+  guides(fill = guide_legend(title.position = "top", title = "ELIMINATION  HALF-LIFE  (DAYS)", nrow = 1))
 
-p + plot_annotation(title = "B.  MINIMUM  DURATION  OF  PROTECTION  HALF-LIFE  CRITERIA") & 
+p + plot_annotation(title = "MINIMUM  ELIMINATION  HALF-LIFE  CRITERIA") & 
   theme(plot.title = element_text(family = "serif", face = "bold", size = text_size))
 
-ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure4/fig4_panelB.jpg"),
-       plot = last_plot(),
-       width = 9.1,
-       height = 6,
-       dpi = 300)
-
-ggsave(filename = paste0("./data_and_visualisation/Manuscript_Figure4/fig4_panelB.pdf"),
+ggsave(filename = paste0("./data_and_visualisation/Appendix_Figure213/figA213.jpg"),
        plot = last_plot(),
        width = 9.1,
        height = 6,

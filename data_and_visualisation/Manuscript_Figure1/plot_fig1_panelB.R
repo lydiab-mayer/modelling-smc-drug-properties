@@ -106,9 +106,9 @@ q <- q + scale_x_continuous(breaks = seq(0, 12, by = 1),
   scale_fill_manual(values = cols[c(1, 3)])
 
 q <- q + labs(x = "WEEKS  AFTER  ONE  SMC  CYCLE",  
-              y = "KILLING  RATE")
+              y = "KILLING  RATE  PER DAY")
 
-p + q + plot_annotation(title = "B. Next-generation SMC with dominant blood stage activity and initial, complete liver stage clearance") +
+p + q + plot_annotation(title = "Next-generation SMC with dominant blood stage activity and initial, complete liver stage clearance") +
   plot_layout(guides = "collect") &
   theme(plot.title = element_text(family = "serif", face = "bold", size = 10),
         legend.position = "none")

@@ -23,7 +23,6 @@ num_rounds <- c("iTPP3_ChemoBlood_TreatLiver_3rounds" = 3, "iTPP3_ChemoBlood_Tre
 
 # !!! Insert your predicted parameter here. Note that this must match with one column name in post-processing files !!!
 pred_list <- c("inc_red_int_Tot", "sev_red_int_Tot")
-#pred_list <- c("prev_red_int_Aug")
 
 # !!! Identify desired targets for optimisation !!!
 targets <- seq(50, 90, by = 5)
@@ -61,7 +60,7 @@ for(exp in exp_list) {
   # Calculate cutoff criteria
   for(i in 1:length(setting_id)){
     print(paste0("Generating table for setting ", i , " of ", length(setting_id), " for experiment ", exp))
-  
+    
     # Set up table to store results
     out_int <- expand.grid(setting_id[i], targets, coverage1, coverage2)
     out_int <- cbind(out_int, matrix(nrow = nrow(out_int), ncol = length(varnames)))
@@ -87,29 +86,19 @@ for(exp in exp_list) {
     # Store outputs
     out <- rbind(out, out_int)
   }
-
+  
   # # Save resulting matrix against future use
   # saveRDS(out, paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/", exp, "_cutoff_criteria.rds"))
   # 
 }
- 
+
 # ----------------------------------------------------------
 # Generate and format database of results across all experiments
 # ----------------------------------------------------------
 
-# Merge results across experiments
-
-# # !!! Note that this must be updated manually should the list of experiments be changed !!!
-# df3 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_ChemoBlood_TreatLiver_3rounds_cutoff_criteria.rds"))
-# df4 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_ChemoBlood_TreatLiver_4rounds_cutoff_criteria.rds"))
-# df5 <- readRDS(paste0("./analysisworkflow/analysis_scripts/iTPP3_Publication/Figures/iTPP3_ChemoBlood_TreatLiver_5rounds_cutoff_criteria.rds"))
-# 
-# df <- rbind(df3, df4, df5)
-# remove(df3, df4, df5)
- 
 # Replace infs with NAs
 df <- data.frame(lapply(out, function(x) gsub("Inf", NA, x)), stringsAsFactors = FALSE)
-  
+
 # Format variables as numeric
 df$Target <- as.numeric(df$Target)
 df$Coverage1 <- as.numeric(df$Coverage1)
@@ -121,19 +110,14 @@ df$Slope <- as.numeric(df$Slope)
 # Replace minimum characterstics outside of considered range with NA
 df$Halflife[df$Halflife >= 40] <- NA
 df$MaxKillingRate[df$MaxKillingRate >= 30] <- NA
-  
+
 # Add additional columns for each scenario factor
-df$Scenario <- sub("_red_int_Tot", "", sub("iTPP3bloodstage", "", df$Scenario))
+df$Scenario <- sub("_red_int_Aug", "", sub("iTPP3bloodstage", "", df$Scenario))
 df <- df %>%
   separate(col = Scenario,
            into = c("Rounds", "Seasonality", "System", "EIR", "Agegroup", "Access", "Timing", "IC50", "Endpoint"),
            sep= "_")
-# 
-# # Transform coverage variables
-# df$Rounds <- as.numeric(sub("rounds", "", df$Rounds))
-# df$CoverageAllRounds <- df$Coverage1*df$Coverage2^df$Rounds
-# df$CoverageOneRound <- 1 - (1 - df$Coverage1) + df$Coverage1*((1 - df$Coverage2)^df$Rounds)
-  
+
 # Merge in baseline prevalence
 prev <- read.csv(paste0("./../Experiments/", exp_list[2], "/Outputs/Prevalence_prior_to_intervention.csv"))
 prev <- prev[, c("Seasonality", "EIR", "Access", "MaxAge", "annual_prev_210_2034")]
@@ -147,7 +131,7 @@ prev <- prev %>%
 prev$annual_prev <- paste0(round(prev$annual_prev_210_2034*100, 0), "%")
 
 df <- merge(df, prev, by = c("Seasonality", "EIR", "Access"))
-  
+
 # Format text
 prev_levels <- paste0(unique(round(prev$annual_prev_210_2034[order(prev$annual_prev_210_2034)]*100, 0)), "%")
 df$annual_prev <- factor(df$annual_prev, levels = prev_levels)
@@ -162,23 +146,23 @@ df$Endpoint <- recode(df$Endpoint,
 df$Rounds <- sub("iTPP3ChemoBloodTreatLiver", "", df$Rounds)  
 df$Rounds <- factor(df$Rounds, levels = c("3rounds", "4rounds", "5rounds"))
 df$Rounds <- recode(df$Rounds,
-                     "3rounds" = "3 SMC ROUNDS",
-                     "4rounds" = "4 SMC ROUNDS",
-                     "5rounds" = "5 SMC ROUNDS")
-  
+                    "3rounds" = "3 SMC ROUNDS",
+                    "4rounds" = "4 SMC ROUNDS",
+                    "5rounds" = "5 SMC ROUNDS")
+
 df$Seasonality <- factor(df$Seasonality, levels = c("seas3mo", "seas5mo"))
 df$Seasonality <- recode(df$Seasonality, "seas3mo" = "3 MONTH SEASON", "seas5mo" = "5 MONTH SEASON")
-  
+
 df$Agegroup <- factor(df$Agegroup, levels = c("5", "10"))
 df$Agegroup <- recode(df$Agegroup,
-                       "5" = "CHILDREN 3 TO 59 MONTHS",
-                       "10" = "CHILDREN 3 TO 119 MONTHS")
-  
+                      "5" = "CHILDREN 3 TO 59 MONTHS",
+                      "10" = "CHILDREN 3 TO 119 MONTHS")
+
 df$Access <- factor(df$Access, levels = c("0.04", "0.24"))
 df$Access <- recode(df$Access,
-                     "0.04" = "LOW ACCESS",
-                     "0.24" = "HIGH ACCESS")
-  
+                    "0.04" = "LOW ACCESS",
+                    "0.24" = "HIGH ACCESS")
+
 head(df)
 
 
@@ -199,26 +183,18 @@ df_plot <- df_plot %>%
   mutate(Target = paste0(Target, "%"),
          Coverage1 = as.factor(paste0(Coverage1*100, "% ROUND COVERAGE")),
          Coverage2 = as.factor(paste0(Coverage2*100, "% CYCLE COVERAGE")),
-         Halflife = ifelse(floor(Halflife/2)*2 <= 2, 2, floor(Halflife/2)*2),
+         Halflife = floor(Halflife/5)*5,
          MaxKillingRate = floor(MaxKillingRate/5)*5)
-
-# Convert halflife into duration
-source("./analysisworkflow/analysis_scripts/Convert_elimination_to_duration.R")
-df_plot <- df_plot %>%
-  left_join(duration, by = "Halflife")
 
 # Correct minimum values and set factor levels
 df_plot <- df_plot %>%
   mutate(Coverage2 = factor(Coverage2, levels = rev(levels(Coverage2))),
-         Halflife = as.factor(Halflife),
-         Duration = as.factor(Duration),
-         DurationHalflife = as.factor(DurationHalflife),
-         MaxKillingRate = as.factor(ifelse(MaxKillingRate <= 5, 5, MaxKillingRate)))
+         Halflife = as.factor(ifelse(Halflife <= 5, 5, Halflife)),
+         MaxKillingRate = as.factor(ifelse(MaxKillingRate <= 5, 1, MaxKillingRate)))
 
 
 # ----------------------------------------------------------
 # Write data to file
 # ----------------------------------------------------------
 
-saveRDS(df_plot, "./data_and_visualisation/Manuscript_Figure4/data_fig4_panelB.rds")
-
+saveRDS(df_plot, "./data_and_visualisation/Appendix_Figure213/data_figA213.rds")
